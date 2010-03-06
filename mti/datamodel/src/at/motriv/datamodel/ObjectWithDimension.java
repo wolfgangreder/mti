@@ -4,6 +4,8 @@
  */
 package at.motriv.datamodel;
 
+import at.motriv.datamodel.entities.era.Era;
+
 /**
  *
  * @author wolfi

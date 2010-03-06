@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.motriv.datamodel.impl;
+package at.motriv.datamodel.entities.era.impl;
 
-import at.motriv.datamodel.Era;
+import at.motriv.datamodel.entities.era.Era;
 
 /**
  *
@@ -31,6 +31,6 @@ public abstract class AbstractEra implements Era
   @Override
   public String toString()
   {
-    return getName();
+    return getName() + "(" + getCountry() + ")";
   }
 }

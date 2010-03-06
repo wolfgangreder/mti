@@ -163,8 +163,11 @@
     <column name="name" type="VARCHAR" size="100" required="true"/>
     <column name="yearfrom" type="INTEGER" required="true"/>
     <column name="yearto" type="INTEGER" required="false"/>
+    <column name="country" type="CHAR" size="2" required="false"/>
+    <column name="comment" type="CLOB"/>
     <unique name="ndx_era_name">
       <unique-column name="name"/>
+      <unique-column name="country"/>
     </unique>
   </table>
 

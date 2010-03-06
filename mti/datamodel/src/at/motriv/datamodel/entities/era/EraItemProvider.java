@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.motriv.datamodel.provider;
+package at.motriv.datamodel.entities.era;
 
-import at.motriv.datamodel.Era;
+import at.motriv.datamodel.entities.era.Era;
 import at.mountainsd.dataprovider.api.DataProviderException;
 import at.mountainsd.dataprovider.api.ItemProvider;
 import java.util.List;

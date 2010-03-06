@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+    TODO define vocabulary identification
+    PUBLIC ID: -//vendor//vocabulary//EN
+    SYSTEM ID: http://server/path/era.dtd
+
+-->
+
+<!--
+    An example how to use this DTD from your XML document:
+
+    <?xml version="1.0"?>
+
+    <!DOCTYPE eras SYSTEM "era.dtd">
+
+    <eras>
+    ...
+    </eras>
+-->
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT eras (era)*>
+<!ATTLIST eras
+    country CDATA #IMPLIED
+    version CDATA #REQUIRED
+  >
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT era (name,comment?)>
+<!ATTLIST era
+    yearto CDATA #IMPLIED
+    yearfrom CDATA #REQUIRED
+    id CDATA #REQUIRED
+  >
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT name (#PCDATA)>
+<!ATTLIST name
+    xml:lang CDATA #IMPLIED
+  >
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT comment (#PCDATA)>
+<!ATTLIST comment
+    xml:lang CDATA #IMPLIED
+  >

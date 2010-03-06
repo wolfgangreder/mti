@@ -23,14 +23,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import javax.sql.DataSource;
 import net.jcip.annotations.ThreadSafe;
+import org.apache.commons.beanutils.DynaBean;
 import org.apache.ddlutils.DdlUtilsException;
 import org.apache.ddlutils.Platform;
 import org.apache.ddlutils.PlatformFactory;
 import org.apache.ddlutils.io.DatabaseIO;
 import org.apache.ddlutils.model.Database;
+import org.apache.ddlutils.model.Table;
 import org.openide.filesystems.FileAttributeEvent;
 import org.openide.filesystems.FileChangeListener;
 import org.openide.filesystems.FileEvent;
@@ -185,12 +191,12 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
     return null;
   }
 
-  protected PreparedStatement getSelectStatement(Connection conn, String enumName) throws SQLException
+  protected PreparedStatement getEnumSelectStatement(Connection conn, String enumName) throws SQLException
   {
     return conn.prepareStatement("select name from " + enumName);
   }
 
-  protected PreparedStatement getInsertStatement(Connection conn, String enumName) throws SQLException
+  protected PreparedStatement getEnumInsertStatement(Connection conn, String enumName) throws SQLException
   {
     return conn.prepareStatement("insert into " + enumName + " (name) values (?)");
   }
@@ -207,14 +213,14 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
         ResultSet rs = null;
         Set<String> names = new HashSet<String>();
         try {
-          stmt = getSelectStatement(conn, name);
+          stmt = getEnumSelectStatement(conn, name);
           rs = stmt.executeQuery();
           while (rs.next()) {
             names.add(rs.getString(1));
           }
           rs.close();
           stmt.close();
-          stmt = getInsertStatement(conn, name);
+          stmt = getEnumInsertStatement(conn, name);
           for (Enum<?> s : values) {
             if (!names.contains(s.name())) {
               stmt.setString(1, s.name());
@@ -266,6 +272,7 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
         Database db = new DatabaseIO().read(source);
         Platform platform = PlatformFactory.createNewPlatformInstance(ds);
         platform.alterTables(db, true);
+        checkEra(platform, db);
       } finally {
         if (is != null) {
           is.close();
@@ -275,5 +282,28 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
     } catch (IOException ex) {
     } catch (DdlUtilsException ex) {
     }
+  }
+
+
+  private void checkEra(Platform platform,Database db)
+  {
+    List<DynaBean> dynas = new LinkedList<DynaBean>();
+    Set<UUID> idsInDb = new HashSet<UUID>();
+    Table era = db.findTable("era", false);
+    @SuppressWarnings("unchecked")
+    Iterator<DynaBean> iter = platform.query(db, "select id from era");
+    while (iter.hasNext()) {
+      DynaBean current = iter.next();
+      Object obj = current.get("id");
+      idsInDb.add((UUID)obj);
+    }
+    DynaBean dyna = db.createDynaBeanFor("era",false);
+    UUID id = UUID.fromString("c4566b51-1f65-45e8-bc5f-42d20cf004c2");
+    dyna.set("id", id);
+    dyna.set("name", "Epoche I");
+    dyna.set("yearfrom",1837);
+    dyna.set("yearto",1920);
+    dyna.set("country","AT");
+    platform.insert(db, dyna);
   }
 }
