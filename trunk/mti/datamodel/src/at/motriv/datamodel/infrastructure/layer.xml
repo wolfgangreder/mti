@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+  <folder name="DataProvider">
+    <folder name="DataProviderContext">
+      <file name="at-motriv-motriv-DataProviderContext.instance">
+        <attr name="instanceClass" stringvalue="at.mountainsd.dataprovider.api.DataProviderContext"/>
+        <attr name="instanceCreate" methodvalue="at.mountainsd.dataprovider.api.DataProviderContext.instanceOf"/>
+        <attr name="context" stringvalue="at.motriv.motriv"/>
+        <attr name="label" bundlevalue="at.motriv.datamodel.Bundle#LBL_DataProviderContext"/>
+      </file>
+    </folder>
+    <folder name="at.motriv.motriv">
+      <folder name="ItemProviders">
+        <folder name="database_provider">
+          <folder name="jdbc_firebirdsql_">
+            <file name="FBMotrivProviderLookup.instance">
+              <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBMotrivItemProviderLookup"/>
+              <attr name="instanceCreate" methodvalue="at.motriv.datamodel.rdbms.firebirdsql.FBMotrivItemProviderLookup.getInstance"/>
+            </file>
+            <folder name="providers">
+              <!--file name="at-motriv-datamodel-provider-LocomotiveProvider.instance">
+                <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBLocomotiveProvider"/>
+                <attr name="instanceCreate" methodvalue="at.motriv.datamodel.rdbms.firebirdsql.FBLocomotiveProvider.getInstance"/>
+              </file-->
+            </folder>
+          </folder>
+          <folder name="jdbc_derby_">
+            <file name="DerbyMotrivProviderLookup.instance">
+              <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.derby.DerbyMotrivItemProviderLookup"/>
+              <attr name="instanceCreate" methodvalue="at.motriv.datamodel.rdbms.derby.DerbyMotrivItemProviderLookup.getInstance"/>
+            </file>
+            <folder name="providers">
+              <!--file name="at-motriv-datamodel-provider-LocomotiveProvider.instance">
+                <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBLocomotiveProvider"/>
+                <attr name="instanceCreate" methodvalue="at.motriv.datamodel.rdbms.firebirdsql.FBLocomotiveProvider.getInstance"/>
+              </file-->
+            </folder>
+          </folder>
+        </folder>
+      </folder>
+    </folder>
+  </folder>
+  <folder name="Preferences">
+    <folder name="at">
+      <folder name="mountain-sd">
+        <folder name="config">
+          <folder name="Motriv">
+            <file name="dataprovider.xml" url="../config/dataprovider_firebird.xml"/>
+          </folder>
+        </folder>
+      </folder>
+    </folder>
+  </folder>
+</filesystem>
