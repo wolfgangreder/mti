@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eras country="AT" version="1.0">
+  <!--Eisenbahnepochen Österreich nach nem801_a
+            http://www.morop.org/de/normes/nem801a_d.pdf
+  -->
+  <era id="c4566b51-1f65-45e8-bc5f-42d20cf004c2" yearfrom="1837" yearto="1920">
+    <name xml:lang="DE">Epoche I</name>
+    <comment xml:lang="DE"><![CDATA[<html>Epoche des Eisenbahnbaus von den Anfängen bis zur Vollendung eines zusammenhängenden Streckennetzes.<br>Entstehung von Privat- und Staatsbahnen; letztere 1858 reprivatisiert.<br>Ab 1882 Entstehung des großen Staatsbahnnetzes (k.k.St.B) durch Übernahme defizitärer Bahnen und Neubauten.<br>Entwicklung der Dampflokomotive bis zum Abschluss ihrer Grundform.<br>Im Wagenbau wird der Abteil-(Coupé-)wagen von den Durchgangswagen mit Mittel- oder Seitengang verdrängt.]]></comment>
+  </era>
+</eras>
+

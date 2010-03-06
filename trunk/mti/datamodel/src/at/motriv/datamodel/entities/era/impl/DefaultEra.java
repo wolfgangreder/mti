@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.motriv.datamodel.impl;
+package at.motriv.datamodel.entities.era.impl;
 
-import at.motriv.datamodel.Era;
+import at.motriv.datamodel.entities.era.Era;
 import java.util.UUID;
 import net.jcip.annotations.Immutable;
 
@@ -20,16 +20,20 @@ public class DefaultEra extends AbstractEra implements Era
   private final String name;
   private final int yearFrom;
   private final Integer yearTo;
+  private final String country;
+  private final String comment;
 
-  public DefaultEra(UUID id, String name, int yearFrom, Integer yearTo)
+  public DefaultEra(UUID id, String name, int yearFrom, Integer yearTo, String country, String comment)
   {
-    if (yearTo!=null && yearTo<=yearFrom) {
+    if (yearTo != null && yearTo <= yearFrom) {
       throw new IllegalArgumentException("yearFrom>yearTo");
     }
     this.id = id;
     this.name = name;
     this.yearFrom = yearFrom;
     this.yearTo = yearTo;
+    this.country = country;
+    this.comment = comment;
   }
 
   @Override
@@ -54,5 +58,17 @@ public class DefaultEra extends AbstractEra implements Era
   public Integer getYearTo()
   {
     return yearTo;
+  }
+
+  @Override
+  public String getCountry()
+  {
+    return country;
+  }
+
+  @Override
+  public String getComment()
+  {
+    return comment;
   }
 }

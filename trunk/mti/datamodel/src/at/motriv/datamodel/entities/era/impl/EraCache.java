@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.motriv.datamodel.rdbms;
+package at.motriv.datamodel.entities.era.impl;
 
-import at.motriv.datamodel.Era;
+import at.motriv.datamodel.entities.era.Era;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.UUID;

@@ -2,9 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.motriv.datamodel;
+package at.motriv.datamodel.entities.era;
 
-import at.motriv.datamodel.impl.AbstractEra;
+import at.motriv.datamodel.entities.era.Era;
+import at.motriv.datamodel.entities.era.impl.AbstractEra;
+import at.motriv.datamodel.entities.era.impl.DefaultEra;
 import at.mountainsd.util.Builder;
 import java.util.UUID;
 import net.jcip.annotations.NotThreadSafe;
@@ -21,6 +23,8 @@ public class EraBuilder extends AbstractEra implements Era, Builder<Era>
   private String name;
   private int yearFrom;
   private Integer yearTo;
+  private String country;
+  private String comment;
 
   @Override
   public UUID getId()
@@ -103,8 +107,42 @@ public class EraBuilder extends AbstractEra implements Era, Builder<Era>
   }
 
   @Override
+  public String getCountry()
+  {
+    return country;
+  }
+
+  public EraBuilder country(String country)
+  {
+    this.country = country;
+    return this;
+  }
+
+  public void setCountry(String country)
+  {
+    this.country = country;
+  }
+
+  @Override
+  public String getComment()
+  {
+    return comment;
+  }
+
+  public EraBuilder comment(String comment)
+  {
+    this.comment = comment;
+    return this;
+  }
+
+  public void setComment(String comment)
+  {
+    this.comment = comment;
+  }
+
+  @Override
   public Era build()
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    return new DefaultEra(id, name, yearFrom, yearTo, country, comment);
   }
 }

@@ -4,10 +4,10 @@
  */
 package at.motriv.datamodel.rdbms.firebirdsql;
 
-import at.motriv.datamodel.Era;
-import at.motriv.datamodel.EraBuilder;
-import at.motriv.datamodel.provider.EraItemProvider;
-import at.motriv.datamodel.rdbms.EraCache;
+import at.motriv.datamodel.entities.era.Era;
+import at.motriv.datamodel.entities.era.EraBuilder;
+import at.motriv.datamodel.entities.era.EraItemProvider;
+import at.motriv.datamodel.entities.era.impl.EraCache;
 import at.mountainsd.dataprovider.api.DataProviderException;
 import at.mountainsd.dataprovider.api.jdbc.JDBCUtilities;
 import java.sql.Connection;
