@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : model.xml
+    Created on : 26. Februar 2010, 18:09
+    Author     : wolfi
+    Description:
+        Purpose of the document follows.
+-->
+
+<!DOCTYPE database SYSTEM 'http://db.apache.org/torque/dtd/database.dtd'>
+<database name="mti">
+
+  <table name="externalkind">
+    <column name="name" type="VARCHAR" size="50" required="true" primaryKey="true"/>
+  </table>
+
+  <table name="modelcondition">
+    <column name="name" type="VARCHAR" size="50" required="true" primaryKey="true"/>
+  </table>
+
+  <table name="externalrepository">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="name" type="VARCHAR" size="50" required="true"/>
+    <column name="baseurl" type="VARCHAR" size="250" required="true"/>
+    <unique name="ndx_externalrepository_name">
+      <unique-column name="name"/>
+    </unique>
+  </table>
+
+  <table name="externals">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="repository" type="CHAR" size="36" required="true"/>
+    <column name="kind" type="VARCHAR" size="50" required="true"/>
+    <column name="mime_type" type="VARCHAR" size="100"/>
+    <column name="description" type="CLOB"/>
+    <foreign-key name="fk_externals_repository" foreignTable="externalrepository" onDelete="restrict" onUpdate="cascade">
+      <reference local="repository" foreign="id"/>
+    </foreign-key>
+    <foreign-key name="fk_kind_externalkind" foreignTable="externalkind" onDelete="restrict" onUpdate="cascade">
+      <reference local="kind" foreign="name"/>
+    </foreign-key>
+  </table>
+
+  <table name="scale">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="name" type="VARCHAR" size="10" required="true"/>
+    <column name="scale" type="INTEGER"/>
+    <column name="trackwidth" type="DOUBLE"/>
+  </table>
+
+  <table name="contact">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="name" type="VARCHAR" size="100" required="true"/>
+    <column name="address1" type="VARCHAR" size="100" required="false"/>
+    <column name="address2" type="VARCHAR" size="100" required="false"/>
+    <column name="zip" type="VARCHAR" size="10" required="false"/>
+    <column name="city" type="VARCHAR" size="100" required="false"/>
+    <column name="country" type="VARCHAR" size="100" required="false"/>
+    <column name="email" type="VARCHAR" size="100" required="false"/>
+    <column name="www" type="VARCHAR" size="100" required="false"/>
+    <column name="description" type="CLOB" required="false"/>
+    <unique name="ndx_contact_name">
+      <unique-column name="name"/>
+    </unique>
+  </table>
+
+  <table name="manufacturer">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <foreign-key foreignTable="contact" onDelete="cascade" onUpdate="cascade" name="fk_manufacturer_contact">
+      <reference foreign="id" local="id"/>
+    </foreign-key>
+  </table>
+
+  <table name="retailer">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <foreign-key foreignTable="contact" onDelete="cascade" onUpdate="cascade" name="fk_retailer_contact">
+      <reference foreign="id" local="id"/>
+    </foreign-key>
+  </table>
+
+  <table name="inventoryobject">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="name" type="VARCHAR" size="100" required="true"/>
+    <column name="description" type="CLOB"/>
+    <column name="price" type="DECIMAL" size="18,5"/>
+    <column name="dateofpurchase" type="DATE"/>
+    <column name="productno" type="VARCHAR" size="50"/>
+    <column name="manufacturer" type="CHAR" size="36" required="true"/>
+    <column name="retailer" type="CHAR" size="36" required="true"/>
+    <column name="condition" type="VARCHAR" size="50" required="true" default="NEW"/>
+    <column name="masterimage" type="CHAR" size="36"/>
+    <foreign-key foreignTable="manufacturer" onDelete="restrict" onUpdate="cascade" name="fk_invetoryobj_manufacturer">
+      <reference foreign="id" local="manufacturer"/>
+    </foreign-key>
+    <foreign-key foreignTable="retailer" onDelete="restrict" onUpdate="cascade" name="fk_invetoryobj_retailer">
+      <reference foreign="id" local="retailer"/>
+    </foreign-key>
+    <foreign-key foreignTable="modelcondition" onDelete="restrict" onUpdate="cascade" name="fk_inventoryobj_modelcondition">
+      <reference foreign="name" local="condition"/>
+    </foreign-key>
+    <foreign-key foreignTable="hasexternal" name="fk_inventoryobject_masterimage" onDelete="restrict" onUpdate="cascade">
+      <reference foreign="externals" local="masterimage"/>
+      <reference foreign="inventoryobject" local="id"/>
+    </foreign-key>
+  </table>
+
+  <table name="hasexternal">
+    <column name="externals" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="inventoryobject" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <foreign-key name="fk_hasexternal_externals" foreignTable="externals" onDelete="restrict" onUpdate="cascade">
+      <reference foreign="id" local="externals"/>
+    </foreign-key>
+    <foreign-key name="fk_hasexternal_invetoryobject" foreignTable="inventoryobject" onDelete="cascade" onUpdate="cascade">
+      <reference foreign="id" local="inventoryobject"/>
+    </foreign-key>
+  </table>
+
+  <table name="sparepart">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="amount" type="INTEGER"/>
+    <foreign-key name="sparepart_inventoryobject" foreignTable="inventoryobject" onDelete="cascade" onUpdate="cascade">
+      <reference foreign="id" local="id"/>
+    </foreign-key>
+  </table>
+
+  <table name="decoder">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="address" type="VARCHAR" size="20"/>
+    <foreign-key name="decoder_sparepart" foreignTable="sparepart" onDelete="cascade" onUpdate="cascade">
+      <reference foreign="id" local="id"/>
+    </foreign-key>
+  </table>
+
+  <table name="decoderparams">
+    <column name="decoder" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="externals" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="isactive" type="BIT" default="false" required="true"/>
+    <column name="memo" type="CLOB"/>
+    <foreign-key name="fk_decoderparams_decoder" foreignTable="decoder" onDelete="cascade" onUpdate="cascade">
+      <reference foreign="id" local="decoder"/>
+    </foreign-key>
+    <foreign-key name="fk_decoderparams_externals" foreignTable="externals" onDelete="restrict" onUpdate="cascade">
+      <reference foreign="id" local="externals"/>
+    </foreign-key>
+  </table>
+
+  <table name="decodersound">
+    <column name="decoder" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="externals" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="isactive" type="BIT" default="false" required="true"/>
+    <column name="memo" type="CLOB"/>
+    <foreign-key name="fk_decodersound_decoder" foreignTable="decoder" onDelete="cascade" onUpdate="cascade">
+      <reference foreign="id" local="decoder"/>
+    </foreign-key>
+    <foreign-key name="fk_decodersound_externals" foreignTable="externals" onDelete="restrict" onUpdate="cascade">
+      <reference foreign="id" local="externals"/>
+    </foreign-key>
+  </table>
+
+  <table name="era">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="name" type="VARCHAR" size="100" required="true"/>
+    <column name="yearfrom" type="INTEGER" required="true"/>
+    <column name="yearto" type="INTEGER" required="false"/>
+    <unique name="ndx_era_name">
+      <unique-column name="name"/>
+    </unique>
+  </table>
+
+  <table name="locomotive">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="decoder" type="CHAR" size="36"/>
+    <column name="era" type="CHAR" size="36"/>
+    <column name="scale" type="CHAR" size="36" required="true"/>
+    <column name="length_" type="DOUBLE"/>
+    <column name="width" type="DOUBLE"/>
+    <column name="height" type="DOUBLE"/>
+    <column name="weight" type="DOUBLE"/>
+    <column name="wheelarragement" type="VARCHAR" size="20"/>
+    <column name="kind" type="VARCHAR" size="50"/>
+    <column name="locclass" type="VARCHAR" size="50"/>
+    <column name="company" type="VARCHAR" size="100"/>
+    <column name="country" type="VARCHAR" size="50"/>
+    <foreign-key name="locomotive_inventoryobject" foreignTable="inventoryobject" onDelete="cascade" onUpdate="cascade">
+      <reference foreign="id" local="id"/>
+    </foreign-key>
+    <foreign-key name="locomotive_decoder" foreignTable="decoder" onDelete="restrict" onUpdate="cascade">
+      <reference foreign="id" local="decoder"/>
+    </foreign-key>
+    <foreign-key name="locomotive_era" foreignTable="era" onDelete="restrict" onUpdate="cascade">
+      <reference foreign="id" local="era"/>
+    </foreign-key>
+    <foreign-key name="locomotive_scale" foreignTable="scale" onDelete="restrict" onUpdate="cascade">
+      <reference foreign="id" local="scale"/>
+    </foreign-key>
+    <index name="locomotive_company">
+      <index-column name="company"/>
+    </index>
+    <index name="locomotive_country">
+      <index-column name="country"/>
+    </index>
+  </table>
+
+  <table name="wagon">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="decoder" type="CHAR" size="36"/>
+    <column name="era" type="CHAR" size="36"/>
+    <column name="scale" type="CHAR" size="36" required="true"/>
+    <column name="length_" type="DOUBLE"/>
+    <column name="width" type="DOUBLE"/>
+    <column name="height" type="DOUBLE"/>
+    <column name="weight" type="DOUBLE"/>
+    <column name="kind" type="VARCHAR" size="50"/>
+    <column name="wagonclass" type="VARCHAR" size="50"/>
+    <column name="numaxels" type="INTEGER"/>
+    <column name="company" type="VARCHAR" size="100"/>
+    <column name="country" type="VARCHAR" size="50"/>
+    <foreign-key name="wagon_inventoryobject" foreignTable="inventoryobject" onDelete="cascade" onUpdate="cascade">
+      <reference foreign="id" local="id"/>
+    </foreign-key>
+    <foreign-key name="wagon_decoder" foreignTable="decoder" onDelete="restrict" onUpdate="cascade">
+      <reference foreign="id" local="decoder"/>
+    </foreign-key>
+    <foreign-key name="wagon_era" foreignTable="era" onDelete="restrict" onUpdate="cascade">
+      <reference foreign="id" local="era"/>
+    </foreign-key>
+    <foreign-key name="wagon_scale" foreignTable="scale" onDelete="restrict" onUpdate="cascade">
+      <reference foreign="id" local="scale"/>
+    </foreign-key>
+    <index name="wagon_company">
+      <index-column name="company"/>
+    </index>
+    <index name="wagon_country">
+      <index-column name="country"/>
+    </index>
+  </table>
+</database>
