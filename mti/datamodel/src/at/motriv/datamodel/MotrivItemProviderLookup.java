@@ -45,7 +45,7 @@ public abstract class MotrivItemProviderLookup implements ItemProviderLookup
 
   protected InputStream getModelStream()
   {
-    return getClass().getClassLoader().getResourceAsStream("at/motriv/datamodel/model.xml");
+    return getClass().getClassLoader().getResourceAsStream("at/motriv/datamodel/rdbms/model.xml");
   }
 
   protected abstract void checkDatasourceImpl() throws DataProviderException;

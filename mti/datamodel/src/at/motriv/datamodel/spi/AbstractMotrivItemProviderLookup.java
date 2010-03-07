@@ -7,12 +7,17 @@ package at.motriv.datamodel.spi;
 import at.motriv.datamodel.ExternalKind;
 import at.motriv.datamodel.ModelCondition;
 import at.motriv.datamodel.MotrivItemProviderLookup;
+import at.motriv.datamodel.entities.era.Era;
+import at.motriv.datamodel.entities.era.EraXMLSupport;
+import at.motriv.datamodel.entities.scale.Scale;
+import at.motriv.datamodel.entities.scale.ScaleXMLSupport;
 import at.mountainsd.dataprovider.api.DataProvider;
 import at.mountainsd.dataprovider.api.DataProviderException;
 import at.mountainsd.dataprovider.api.ItemProvider;
 import at.mountainsd.dataprovider.api.jdbc.JDBCDriverConnection;
 import at.mountainsd.dataprovider.api.jdbc.JDBCDriverConnectionProvider;
 import at.mountainsd.dataprovider.api.jdbc.JDBCUtilities;
+import at.mountainsd.util.XMLException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -21,22 +26,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Locale;
 import java.util.Set;
-import java.util.UUID;
 import javax.sql.DataSource;
 import net.jcip.annotations.ThreadSafe;
-import org.apache.commons.beanutils.DynaBean;
 import org.apache.ddlutils.DdlUtilsException;
 import org.apache.ddlutils.Platform;
 import org.apache.ddlutils.PlatformFactory;
 import org.apache.ddlutils.io.DatabaseIO;
 import org.apache.ddlutils.model.Database;
-import org.apache.ddlutils.model.Table;
 import org.openide.filesystems.FileAttributeEvent;
 import org.openide.filesystems.FileChangeListener;
 import org.openide.filesystems.FileEvent;
@@ -45,6 +46,7 @@ import org.openide.filesystems.FileRenameEvent;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
@@ -272,38 +274,80 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
         Database db = new DatabaseIO().read(source);
         Platform platform = PlatformFactory.createNewPlatformInstance(ds);
         platform.alterTables(db, true);
-        checkEra(platform, db);
       } finally {
         if (is != null) {
           is.close();
         }
       }
       checkEnums();
+      checkEra();
+      checkScales();
     } catch (IOException ex) {
+      Exceptions.printStackTrace(ex);
     } catch (DdlUtilsException ex) {
+      Exceptions.printStackTrace(ex);
     }
   }
 
+  protected abstract void internalCheckEra(Connection conn, Collection<? extends Era> defaultEras) throws SQLException;
 
-  private void checkEra(Platform platform,Database db)
+  private FileObject locateDefaultEra()
   {
-    List<DynaBean> dynas = new LinkedList<DynaBean>();
-    Set<UUID> idsInDb = new HashSet<UUID>();
-    Table era = db.findTable("era", false);
-    @SuppressWarnings("unchecked")
-    Iterator<DynaBean> iter = platform.query(db, "select id from era");
-    while (iter.hasNext()) {
-      DynaBean current = iter.next();
-      Object obj = current.get("id");
-      idsInDb.add((UUID)obj);
+    Locale loc = Locale.getDefault();
+    FileObject result = FileUtil.getConfigFile("defaultdata/era/era_" + loc.getCountry() + ".era");
+    if (result == null) {
+      result = FileUtil.getConfigFile("defaultdata/era/era.era");
     }
-    DynaBean dyna = db.createDynaBeanFor("era",false);
-    UUID id = UUID.fromString("c4566b51-1f65-45e8-bc5f-42d20cf004c2");
-    dyna.set("id", id);
-    dyna.set("name", "Epoche I");
-    dyna.set("yearfrom",1837);
-    dyna.set("yearto",1920);
-    dyna.set("country","AT");
-    platform.insert(db, dyna);
+    return result;
+  }
+
+  private void checkEra()
+  {
+    try {
+      FileObject fo = locateDefaultEra();
+      DataObject dob = DataObject.find(fo);
+      EraXMLSupport xmlSupport = dob.getLookup().lookup(EraXMLSupport.class);
+      Collection<? extends Era> defaultEras = xmlSupport.loadEntitiesFromStream(null);
+      Connection conn = null;
+      try {
+        conn = getDataSource().getConnection();
+        conn.setAutoCommit(false);
+        internalCheckEra(conn, defaultEras);
+      } catch (SQLException e) {
+        Exceptions.printStackTrace(e);
+      } finally {
+        JDBCUtilities.close(conn);
+      }
+    } catch (IOException ex) {
+      Exceptions.printStackTrace(ex);
+    } catch (XMLException ex) {
+      Exceptions.printStackTrace(ex);
+    }
+  }
+
+  protected abstract void internalCheckScales(Connection conn,Collection<? extends Scale> defaultScales) throws SQLException;
+  
+  private void checkScales()
+  {
+    try {
+      FileObject fo = FileUtil.getConfigFile("defaultdata/scales/scales.scales");
+      DataObject dob = DataObject.find(fo);
+      ScaleXMLSupport xmlSupport = dob.getLookup().lookup(ScaleXMLSupport.class);
+      Collection<? extends Scale> defaultScales = xmlSupport.loadEntitiesFromStream(null);
+      Connection conn = null;
+      try {
+        conn = getDataSource().getConnection();
+        conn.setAutoCommit(false);
+        internalCheckScales(conn, defaultScales);
+      } catch (SQLException e) {
+        Exceptions.printStackTrace(e);
+      } finally {
+        JDBCUtilities.close(conn);
+      }
+    } catch (IOException ex) {
+      Exceptions.printStackTrace(ex);
+    } catch (XMLException ex) {
+      Exceptions.printStackTrace(ex);
+    }
   }
 }

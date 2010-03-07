@@ -2,13 +2,17 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.motriv.datamodel;
+package at.motriv.datamodel.entities.locomotive;
+
+import at.motriv.datamodel.ObjectWithDimension;
+import at.motriv.datamodel.ScaledObject;
+import at.motriv.datamodel.ServiceableObject;
 
 /**
  *
  * @author wolfi
  */
-public interface Locomotive extends ServiceableObject, ScaledObject
+public interface Locomotive extends ObjectWithDimension, ServiceableObject, ScaledObject
 {
 
   public String getWheelArragement();

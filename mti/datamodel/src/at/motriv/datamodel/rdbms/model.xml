@@ -45,8 +45,12 @@
   <table name="scale">
     <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
     <column name="name" type="VARCHAR" size="10" required="true"/>
-    <column name="scale" type="INTEGER"/>
-    <column name="trackwidth" type="DOUBLE"/>
+    <column name="scale" type="DOUBLE" required="true"/>
+    <column name="trackwidth" type="DOUBLE" required="true"/>
+    <column name="family" type="CHAR" size="36" required="true"/>
+    <foreign-key name="fk_scale_family" foreignTable="scale" onDelete="restrict" onUpdate="cascade">
+      <reference local="family" foreign="id"/>
+    </foreign-key>
   </table>
 
   <table name="contact">
@@ -197,6 +201,9 @@
     <foreign-key name="locomotive_scale" foreignTable="scale" onDelete="restrict" onUpdate="cascade">
       <reference foreign="id" local="scale"/>
     </foreign-key>
+    <index name="locomotive_kind">
+      <index-column name="kind"/>
+    </index>
     <index name="locomotive_company">
       <index-column name="company"/>
     </index>
