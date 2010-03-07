@@ -4,6 +4,8 @@
  */
 package at.motriv.datamodel;
 
+import at.motriv.datamodel.entities.scale.Scale;
+
 /**
  *
  * @author wolfi

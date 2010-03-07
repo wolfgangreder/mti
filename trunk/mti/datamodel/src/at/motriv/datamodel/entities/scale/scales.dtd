@@ -2,8 +2,8 @@
 
 <!--
     TODO define vocabulary identification
-    PUBLIC ID: -//at.motriv//era//1.0//EN
-    SYSTEM ID: http://www.motriv.at/dtd/era/era.dtd
+    PUBLIC ID: -//vendor//vocabulary//EN
+    SYSTEM ID: http://server/path/scales.dtd
 
 -->
 
@@ -12,36 +12,30 @@
 
     <?xml version="1.0"?>
 
-    <!DOCTYPE eras SYSTEM "era.dtd">
+    <!DOCTYPE scales SYSTEM "scales.dtd">
 
-    <eras>
+    <scales>
     ...
-    </eras>
+    </scales>
 -->
 
 <!--- Put your DTDDoc comment here. -->
-<!ELEMENT eras (era)*>
-<!ATTLIST eras
-    country CDATA #IMPLIED
+<!ELEMENT scales (scale)*>
+<!ATTLIST scales
     version CDATA #REQUIRED
   >
 
 <!--- Put your DTDDoc comment here. -->
-<!ELEMENT era (name,comment?)>
-<!ATTLIST era
-    yearto CDATA #IMPLIED
-    yearfrom CDATA #REQUIRED
+<!ELEMENT scale (name)*>
+<!ATTLIST scale
+    family CDATA #REQUIRED
+    trackwidth CDATA #REQUIRED
+    scale CDATA #REQUIRED
     id CDATA #REQUIRED
   >
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT name (#PCDATA)>
 <!ATTLIST name
-    xml:lang CDATA #IMPLIED
-  >
-
-<!--- Put your DTDDoc comment here. -->
-<!ELEMENT comment (#PCDATA)>
-<!ATTLIST comment
     xml:lang CDATA #IMPLIED
   >

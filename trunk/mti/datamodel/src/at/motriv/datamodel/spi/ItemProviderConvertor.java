@@ -24,7 +24,7 @@ public class ItemProviderConvertor<R extends ItemProvider<?,?>> implements Insta
   @SuppressWarnings("unchecked")
   public ItemProviderConvertor(FileObject fo) throws ClassNotFoundException
   {
-    String className = fo.getName().replace('-', ',');
+    String className = fo.getName().replace('-', '.');
     myClass = (Class<? extends R>) Class.forName(className);
   }
 

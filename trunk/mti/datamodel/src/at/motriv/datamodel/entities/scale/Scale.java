@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.motriv.datamodel;
+package at.motriv.datamodel.entities.scale;
 
 import java.util.UUID;
 
@@ -17,7 +17,9 @@ public interface Scale
 
   public String getName();
 
-  public int getScale();
+  public double getScale();
 
   public double getTrackWidth();
+
+  public UUID getFamily();
 }

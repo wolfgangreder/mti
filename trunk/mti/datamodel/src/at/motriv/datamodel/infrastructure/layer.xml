@@ -19,10 +19,22 @@
               <attr name="instanceCreate" methodvalue="at.motriv.datamodel.rdbms.firebirdsql.FBMotrivItemProviderLookup.getInstance"/>
             </file>
             <folder name="providers">
-              <!--file name="at-motriv-datamodel-provider-LocomotiveProvider.instance">
-                <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBLocomotiveProvider"/>
-                <attr name="instanceCreate" methodvalue="at.motriv.datamodel.rdbms.firebirdsql.FBLocomotiveProvider.getInstance"/>
-              </file-->
+              <file name="at-motriv-datamodel-entities-contact-ContactItemProvider.instance">
+                <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBContactItemProvider"/>
+                <attr name="instanceCreate" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBContactItemProvider.getInstace"/>
+              </file>
+              <file name="at-motriv-datamodel-entities-era-EraItemProvider.instance">
+                <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBEraItemProvider"/>
+                <attr name="instanceCreate" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBEraItemProvider.getInstace"/>
+              </file>
+              <file name="at-motriv-datamodel-entities-locomotive-LocomotiveItemProvider.instance">
+                <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBLocomotiveItemProvider"/>
+                <attr name="instanceCreate" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBLocomotiveItemProvider.getInstace"/>
+              </file>
+              <file name="at-motriv-datamodel-entities-scale-ScaleItemProvider.instance">
+                <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBScaleItemProvider"/>
+                <attr name="instanceCreate" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBScaleItemProvider.getInstace"/>
+              </file>
             </folder>
           </folder>
           <folder name="jdbc_derby_">
@@ -42,8 +54,75 @@
     </folder>
   </folder>
   <folder name="Loaders">
-        <folder name="text">
-            <folder name="era+xml">
+    <folder name="text">
+      <folder name="era+xml">
+        <folder name="Actions">
+          <file name="org-openide-actions-CopyAction.shadow">
+            <attr name="originalFile" stringvalue="Actions/Edit/org-openide-actions-CopyAction.instance"/>
+            <attr name="position" intvalue="400"/>
+          </file>
+          <file name="org-openide-actions-CutAction.shadow">
+            <attr name="originalFile" stringvalue="Actions/Edit/org-openide-actions-CutAction.instance"/>
+            <attr name="position" intvalue="300"/>
+          </file>
+          <file name="org-openide-actions-DeleteAction.shadow">
+            <attr name="originalFile" stringvalue="Actions/Edit/org-openide-actions-DeleteAction.instance"/>
+            <attr name="position" intvalue="600"/>
+          </file>
+          <file name="org-openide-actions-FileSystemAction.shadow">
+            <attr name="originalFile" stringvalue="Actions/System/org-openide-actions-FileSystemAction.instance"/>
+            <attr name="position" intvalue="1100"/>
+          </file>
+          <file name="org-openide-actions-OpenAction.shadow">
+            <attr name="originalFile" stringvalue="Actions/System/org-openide-actions-OpenAction.instance"/>
+            <attr name="position" intvalue="100"/>
+          </file>
+          <file name="org-openide-actions-PropertiesAction.shadow">
+            <attr name="originalFile" stringvalue="Actions/System/org-openide-actions-PropertiesAction.instance"/>
+            <attr name="position" intvalue="1400"/>
+          </file>
+          <file name="org-openide-actions-RenameAction.shadow">
+            <attr name="originalFile" stringvalue="Actions/System/org-openide-actions-RenameAction.instance"/>
+            <attr name="position" intvalue="700"/>
+          </file>
+          <file name="org-openide-actions-SaveAsTemplateAction.shadow">
+            <attr name="originalFile" stringvalue="Actions/System/org-openide-actions-SaveAsTemplateAction.instance"/>
+            <attr name="position" intvalue="900"/>
+          </file>
+          <file name="org-openide-actions-ToolsAction.shadow">
+            <attr name="originalFile" stringvalue="Actions/System/org-openide-actions-ToolsAction.instance"/>
+            <attr name="position" intvalue="1300"/>
+          </file>
+          <file name="sep-1.instance">
+            <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+            <attr name="position" intvalue="200"/>
+          </file>
+          <file name="sep-2.instance">
+            <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+            <attr name="position" intvalue="500"/>
+          </file>
+          <file name="sep-3.instance">
+            <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+            <attr name="position" intvalue="800"/>
+          </file>
+          <file name="sep-4.instance">
+            <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+            <attr name="position" intvalue="1000"/>
+          </file>
+          <file name="sep-5.instance">
+            <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+            <attr name="position" intvalue="1200"/>
+          </file>
+        </folder>
+        <folder name="Factories">
+          <file name="EraDataLoader.instance">
+            <attr name="dataObjectClass" stringvalue="at.motriv.datamodel.entities.era.EraDataObject"/>
+            <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
+            <attr name="mimeType" stringvalue="text/era+xml"/>
+          </file>
+        </folder>
+      </folder>
+        <folder name="scales+xml">
                 <folder name="Actions">
                     <file name="org-openide-actions-CopyAction.shadow">
                         <attr name="originalFile" stringvalue="Actions/Edit/org-openide-actions-CopyAction.instance"/>
@@ -103,16 +182,16 @@
                     </file>
                 </folder>
                 <folder name="Factories">
-                    <file name="EraDataLoader.instance">
-                        <attr name="dataObjectClass" stringvalue="at.motriv.datamodel.entities.era.EraDataObject"/>
+                    <file name="ScalesDataLoader.instance">
+                        <attr name="dataObjectClass" stringvalue="at.motriv.datamodel.entities.scale.ScalesDataObject"/>
                         <attr name="instanceCreate" methodvalue="org.openide.loaders.DataLoaderPool.factory"/>
-                        <attr name="mimeType" stringvalue="text/era+xml"/>
+                        <attr name="mimeType" stringvalue="text/scales+xml"/>
                     </file>
                 </folder>
             </folder>
         </folder>
-    </folder>
-    <folder name="Preferences">
+  </folder>
+  <folder name="Preferences">
     <folder name="at">
       <folder name="mountain-sd">
         <folder name="config">
@@ -124,24 +203,42 @@
     </folder>
   </folder>
   <folder name="Services">
-        <folder name="MIMEResolver">
-            <file name="EraResolver.xml" url="EraResolver.xml">
-                <attr name="displayName" bundlevalue="at.motriv.datamodel.infrastructure.Bundle#Services/MIMEResolver/EraResolver.xml"/>
+    <folder name="MIMEResolver">
+      <file name="EraResolver.xml" url="EraResolver.xml">
+        <attr name="displayName" bundlevalue="at.motriv.datamodel.infrastructure.Bundle#Services/MIMEResolver/EraResolver.xml"/>
+      </file>
+        <file name="ScalesResolver.xml" url="ScalesResolver.xml">
+                <attr name="displayName" bundlevalue="at.motriv.datamodel.infrastructure.Bundle#Services/MIMEResolver/ScalesResolver.xml"/>
             </file>
         </folder>
-    </folder>
-    <folder name="Templates">
-        <folder name="Other">
-            <file name="EraTemplate.era" url="EraTemplate.era">
-                <attr name="displayName" bundlevalue="at.motriv.datamodel.infrastructure.Bundle#Templates/Other/EraTemplate.era"/>
+  </folder>
+  <folder name="Templates">
+    <folder name="Other">
+      <file name="EraTemplate.era" url="EraTemplate.era">
+        <attr name="displayName" bundlevalue="at.motriv.datamodel.infrastructure.Bundle#Templates/Other/EraTemplate.era"/>
+        <attr name="template" boolvalue="true"/>
+      </file>
+        <file name="ScalesTemplate.scales" url="ScalesTemplate.scales">
+                <attr name="displayName" bundlevalue="at.motriv.datamodel.infrastructure.Bundle#Templates/Other/ScalesTemplate.scales"/>
                 <attr name="template" boolvalue="true"/>
             </file>
         </folder>
-    </folder>
-    <folder name="defaultdata">
+  </folder>
+  <folder name="defaultdata">
     <folder name="era">
+      <file name="era.era" url="../entities/era/impl/era_AT.xml"/>
       <file name="era_AT.era" url="../entities/era/impl/era_AT.xml"/>
     </folder>
+    <folder name="scales">
+      <file name="scales.scales" url="../entities/scale/impl/scales.xml"/>
+    </folder>
   </folder>
-  
+  <folder name="xml">
+    <folder name="entities">
+      <folder name="Motriv">
+        <file name="DTD_Era" url="../entities/era/era.dtd"/>
+        <file name="DTD_Scales" url="../entities/scale/scales.dtd"/>
+      </folder>
+    </folder>
+  </folder>
 </filesystem>

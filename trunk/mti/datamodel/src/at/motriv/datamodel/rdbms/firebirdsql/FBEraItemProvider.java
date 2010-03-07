@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -103,6 +104,8 @@ public class FBEraItemProvider extends AbstractMotrivFBItemProvider<UUID, Era> i
         builder.setId(id);
         builder.setName(rs.getString("name"));
         builder.setYearFrom(rs.getInt("yearfrom"));
+        builder.comment(rs.getString("comment"));
+        builder.country(rs.getString("country"));
         int yearTo = rs.getInt("yearto");
         builder.setYearTo(rs.wasNull() ? null : yearTo);
         return builder.build();
@@ -118,7 +121,7 @@ public class FBEraItemProvider extends AbstractMotrivFBItemProvider<UUID, Era> i
     List<Era> result = new ArrayList<Era>(keys.size());
     if (!keys.isEmpty()) {
       try {
-        stmt = conn.prepareStatement("select name,yearfrom,yearto from era where id=?");
+        stmt = conn.prepareStatement("select name,yearfrom,yearto,comment,country from era where id=?");
         Getter getter = new Getter(stmt);
         for (UUID key : keys) {
           try {
@@ -164,32 +167,50 @@ public class FBEraItemProvider extends AbstractMotrivFBItemProvider<UUID, Era> i
   public Era store(Era pItem) throws DataProviderException
   {
     Connection conn = null;
-    PreparedStatement stmt = null;
-    Era result = null;
     try {
       conn = getConnection();
-      if (keyExists(conn, pItem.getId())) {
-        stmt = conn.prepareStatement("update era set name=?,yearfrom=?,yearto=? where id=?");
-      } else {
-        stmt = conn.prepareStatement("insert into era (name,yearfrom,yearto,id) values (?,?,?,?)");
-      }
-      stmt.setString(1, pItem.getName());
-      stmt.setInt(2, pItem.getYearFrom());
-      Integer yt = pItem.getYearTo();
-      if (yt != null) {
-        stmt.setInt(3, pItem.getYearTo());
-      }
-      stmt.setString(4, pItem.getId().toString());
-      stmt.executeUpdate();
-      EraCache.getInstance().store(pItem);
-      result = pItem;
+      return store(conn, pItem, false);
     } catch (SQLException e) {
       throw new DataProviderException(e);
     } finally {
-      JDBCUtilities.close(stmt, conn);
-      if (result!=null) {
-        EraCache.getInstance().store(result);
+      JDBCUtilities.close(conn);
+    }
+  }
+
+  Era store(final Connection conn, Era pItem, boolean noUpdate) throws SQLException
+  {
+    PreparedStatement stmt = null;
+    Era result = null;
+    try {
+      if (keyExists(conn, pItem.getId())) {
+        if (noUpdate) {
+          stmt = null;
+        } else {
+          stmt = conn.prepareStatement("update era set name=?,yearfrom=?,yearto=?,comment=?,country=? where id=?");
+        }
       } else {
+        stmt = conn.prepareStatement("insert into era (name,yearfrom,yearto,comment,country,id) values (?,?,?,?,?,?)");
+      }
+      if (stmt != null) {
+        stmt.setString(1, pItem.getName());
+        stmt.setInt(2, pItem.getYearFrom());
+        Integer yt = pItem.getYearTo();
+        if (yt != null) {
+          stmt.setInt(3, pItem.getYearTo());
+        } else {
+          stmt.setNull(3, Types.INTEGER);
+        }
+        stmt.setString(4, pItem.getComment());
+        stmt.setString(5, pItem.getCountry());
+        stmt.setString(6, pItem.getId().toString());
+        stmt.executeUpdate();
+        stmt.clearParameters();
+        EraCache.getInstance().store(pItem);
+      }
+      result = pItem;
+    } finally {
+      JDBCUtilities.close(stmt);
+      if (result == null) {
         EraCache.getInstance().remove(pItem.getId());
       }
     }
@@ -207,6 +228,13 @@ public class FBEraItemProvider extends AbstractMotrivFBItemProvider<UUID, Era> i
       return rs.next();
     } finally {
       JDBCUtilities.close(rs, stmt);
+    }
+  }
+
+  void checkEra(Connection conn, Collection<? extends Era> defaultEras) throws SQLException
+  {
+    for (Era era : defaultEras) {
+      store(conn, era, true);
     }
   }
 }

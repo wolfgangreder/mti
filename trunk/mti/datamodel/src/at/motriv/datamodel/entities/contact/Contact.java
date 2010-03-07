@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.motriv.datamodel;
+package at.motriv.datamodel.entities.contact;
 
 import java.util.UUID;
 import org.openide.util.Lookup;

@@ -113,7 +113,10 @@
             </module-dependencies>
             <public-packages>
                 <package>at.motriv.datamodel</package>
-                <package>at.motriv.datamodel.spi</package>
+                <package>at.motriv.datamodel.entities.contact</package>
+                <package>at.motriv.datamodel.entities.era</package>
+                <package>at.motriv.datamodel.entities.locomotive</package>
+                <package>at.motriv.datamodel.entities.scale</package>
             </public-packages>
         </data>
     </configuration>

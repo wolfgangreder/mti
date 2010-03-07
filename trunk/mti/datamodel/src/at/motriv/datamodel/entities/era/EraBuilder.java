@@ -4,7 +4,6 @@
  */
 package at.motriv.datamodel.entities.era;
 
-import at.motriv.datamodel.entities.era.Era;
 import at.motriv.datamodel.entities.era.impl.AbstractEra;
 import at.motriv.datamodel.entities.era.impl.DefaultEra;
 import at.mountainsd.util.Builder;
