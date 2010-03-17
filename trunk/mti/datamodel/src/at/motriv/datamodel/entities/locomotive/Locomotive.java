@@ -7,12 +7,13 @@ package at.motriv.datamodel.entities.locomotive;
 import at.motriv.datamodel.ObjectWithDimension;
 import at.motriv.datamodel.ScaledObject;
 import at.motriv.datamodel.ServiceableObject;
+import at.mountain_sd.objects.MutatorProvider;
 
 /**
  *
  * @author wolfi
  */
-public interface Locomotive extends ObjectWithDimension, ServiceableObject, ScaledObject
+public interface Locomotive extends ObjectWithDimension, ServiceableObject, ScaledObject, MutatorProvider<MutableLocomotive>
 {
 
   public String getWheelArragement();

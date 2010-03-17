@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+OpenIDE-Module: at.motriv.gui/0
+OpenIDE-Module-Implementation-Version: 0
+OpenIDE-Module-Layer: at/motriv/gui/layer.xml
+OpenIDE-Module-Localizing-Bundle: at/motriv/gui/Bundle.properties
+

@@ -85,7 +85,7 @@ public class FBScaleItemProvider extends AbstractMotrivFBItemProvider<UUID, Scal
           ScaleBuilder builder = new ScaleBuilder();
           builder.id(id);
           builder.name(rs.getString("name"));
-          builder.scale(rs.getDouble("scale"));
+          builder.scale(rs.getDouble("scalefactor"));
           builder.trackWidth(rs.getDouble("trackwidth"));
           builder.family(JDBCUtilities.getUUID(rs, "family"));
           return builder.build();
@@ -103,7 +103,7 @@ public class FBScaleItemProvider extends AbstractMotrivFBItemProvider<UUID, Scal
     PreparedStatement stmt = null;
     List<Scale> result = new ArrayList<Scale>(ids.size());
     try {
-      stmt = conn.prepareStatement("select name,scale,trackwidth,family from scale where id=?");
+      stmt = conn.prepareStatement("select name,scalefactor,trackwidth,family from modelscale where id=?");
       Getter getter = new Getter(stmt);
       for (UUID id : ids) {
         getter.id = id;
@@ -131,7 +131,7 @@ public class FBScaleItemProvider extends AbstractMotrivFBItemProvider<UUID, Scal
     PreparedStatement stmt = null;
     try {
       conn = getConnection();
-      stmt = conn.prepareStatement("delete from scale where id=?");
+      stmt = conn.prepareStatement("delete from modelscale where id=?");
       stmt.setString(1, pKey.toString());
       stmt.executeUpdate();
       ScaleCache.getInstance().remove(pKey);
@@ -165,10 +165,10 @@ public class FBScaleItemProvider extends AbstractMotrivFBItemProvider<UUID, Scal
         if (noUpdate) {
           stmt = null;
         } else {
-          stmt = conn.prepareStatement("update scale set name=?,scale=?,trackwidth=?,family=? where id=?");
+          stmt = conn.prepareStatement("update modelscale set name=?,scalefactor=?,trackwidth=?,family=? where id=?");
         }
       } else {
-        stmt = conn.prepareStatement("insert into scale (name,scale,trackwidth,family,id) values (?,?,?,?,?)");
+        stmt = conn.prepareStatement("insert into modelscale (name,scalefactor,trackwidth,family,id) values (?,?,?,?,?)");
       }
       if (stmt != null) {
         stmt.setString(1, pItem.getName());
@@ -191,7 +191,7 @@ public class FBScaleItemProvider extends AbstractMotrivFBItemProvider<UUID, Scal
     PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = conn.prepareStatement("select id from scale where id=?");
+      stmt = conn.prepareStatement("select id from modelscale where id=?");
       stmt.setString(1, key.toString());
       rs = stmt.executeQuery();
       return rs.next();
@@ -216,7 +216,7 @@ public class FBScaleItemProvider extends AbstractMotrivFBItemProvider<UUID, Scal
     ResultSet rs = null;
     try {
       conn = getConnection();
-      stmt = conn.prepareStatement("select id from scale");
+      stmt = conn.prepareStatement("select id from modelscale");
       rs = stmt.executeQuery();
       while (rs.next()) {
         UUID id = JDBCUtilities.getUUID(rs, "id");
@@ -241,7 +241,7 @@ public class FBScaleItemProvider extends AbstractMotrivFBItemProvider<UUID, Scal
     ResultSet rs = null;
     try {
       conn = getConnection();
-      stmt = conn.prepareStatement("select id from scale where family=?");
+      stmt = conn.prepareStatement("select id from modelscale where family=?");
       stmt.setString(1, family.toString());
       rs = stmt.executeQuery();
       while (rs.next()) {
@@ -258,8 +258,8 @@ public class FBScaleItemProvider extends AbstractMotrivFBItemProvider<UUID, Scal
 
   void checkScales(Connection conn, Collection<? extends Scale> defaultScales) throws SQLException
   {
-    for (Scale s:defaultScales) {
-      store(conn,s,true);
+    for (Scale s : defaultScales) {
+      store(conn, s, true);
     }
   }
 }
