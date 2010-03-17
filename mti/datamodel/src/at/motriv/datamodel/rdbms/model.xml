@@ -42,13 +42,13 @@
     </foreign-key>
   </table>
 
-  <table name="scale">
+  <table name="modelscale">
     <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
     <column name="name" type="VARCHAR" size="10" required="true"/>
-    <column name="scale" type="DOUBLE" required="true"/>
+    <column name="scalefactor" type="DOUBLE" required="true"/>
     <column name="trackwidth" type="DOUBLE" required="true"/>
     <column name="family" type="CHAR" size="36" required="true"/>
-    <foreign-key name="fk_scale_family" foreignTable="scale" onDelete="restrict" onUpdate="cascade">
+    <foreign-key name="fk_scale_family" foreignTable="modelscale" onDelete="restrict" onUpdate="cascade">
       <reference local="family" foreign="id"/>
     </foreign-key>
   </table>
@@ -179,7 +179,7 @@
     <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
     <column name="decoder" type="CHAR" size="36"/>
     <column name="era" type="CHAR" size="36"/>
-    <column name="scale" type="CHAR" size="36" required="true"/>
+    <column name="modelscale" type="CHAR" size="36" required="true"/>
     <column name="length_" type="DOUBLE"/>
     <column name="width" type="DOUBLE"/>
     <column name="height" type="DOUBLE"/>
@@ -198,8 +198,8 @@
     <foreign-key name="locomotive_era" foreignTable="era" onDelete="restrict" onUpdate="cascade">
       <reference foreign="id" local="era"/>
     </foreign-key>
-    <foreign-key name="locomotive_scale" foreignTable="scale" onDelete="restrict" onUpdate="cascade">
-      <reference foreign="id" local="scale"/>
+    <foreign-key name="locomotive_scale" foreignTable="modelscale" onDelete="restrict" onUpdate="cascade">
+      <reference foreign="id" local="modelscale"/>
     </foreign-key>
     <index name="locomotive_kind">
       <index-column name="kind"/>
@@ -210,13 +210,16 @@
     <index name="locomotive_country">
       <index-column name="country"/>
     </index>
+    <index name="locomotive_wheelarragement">
+      <index-column name="wheelarragement"/>
+    </index>
   </table>
 
   <table name="wagon">
     <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
     <column name="decoder" type="CHAR" size="36"/>
     <column name="era" type="CHAR" size="36"/>
-    <column name="scale" type="CHAR" size="36" required="true"/>
+    <column name="modelscale" type="CHAR" size="36" required="true"/>
     <column name="length_" type="DOUBLE"/>
     <column name="width" type="DOUBLE"/>
     <column name="height" type="DOUBLE"/>
@@ -235,8 +238,8 @@
     <foreign-key name="wagon_era" foreignTable="era" onDelete="restrict" onUpdate="cascade">
       <reference foreign="id" local="era"/>
     </foreign-key>
-    <foreign-key name="wagon_scale" foreignTable="scale" onDelete="restrict" onUpdate="cascade">
-      <reference foreign="id" local="scale"/>
+    <foreign-key name="wagon_scale" foreignTable="modelscale" onDelete="restrict" onUpdate="cascade">
+      <reference foreign="id" local="modelscale"/>
     </foreign-key>
     <index name="wagon_company">
       <index-column name="company"/>

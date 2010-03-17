@@ -18,7 +18,11 @@ public interface ContactItemProvider extends ItemProvider<UUID, Contact>
 
   public List<? extends Retailer> getAllRetailers() throws DataProviderException;
 
+  public Retailer getRetailer(UUID retailer) throws DataProviderException;
+
   public List<? extends Manufacturer> getAllManufacturer() throws DataProviderException;
+
+  public Manufacturer getManufacturer(UUID manufacturer) throws DataProviderException;
 
   public void removeFromRetailer(Retailer contact) throws DataProviderException;
 

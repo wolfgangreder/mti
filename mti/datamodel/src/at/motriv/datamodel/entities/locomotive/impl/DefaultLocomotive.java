@@ -6,6 +6,7 @@ package at.motriv.datamodel.entities.locomotive.impl;
 
 import at.motriv.datamodel.External;
 import at.motriv.datamodel.ModelCondition;
+import at.motriv.datamodel.entities.locomotive.MutableLocomotive;
 import at.motriv.datamodel.entities.scale.Scale;
 import at.motriv.datamodel.ServiceEntry;
 import at.motriv.datamodel.entities.contact.Manufacturer;
@@ -223,5 +224,11 @@ public class DefaultLocomotive extends AbstractLocomotive
   public Scale getScale()
   {
     return scale;
+  }
+
+  @Override
+  public MutableLocomotive getMutator()
+  {
+    return new DefaultMutableLocomotive(this);
   }
 }

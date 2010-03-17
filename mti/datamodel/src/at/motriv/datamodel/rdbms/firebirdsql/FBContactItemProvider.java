@@ -325,6 +325,32 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
   }
 
   @Override
+  public Retailer getRetailer(UUID retailer) throws DataProviderException
+  {
+    if (retailer != null) {
+      Connection conn = null;
+      PreparedStatement stmt = null;
+      ResultSet rs = null;
+      HashSet<UUID> ids = new HashSet<UUID>();
+      try {
+        conn = getConnection();
+        stmt = conn.prepareStatement("select r.id from retailer r,contact c where r.id=c.id and r.id=?");
+        stmt.setString(1, retailer.toString());
+        rs = stmt.executeQuery();
+        if (rs.next()) {
+          List<? extends Retailer> tmp = get(conn, Collections.singleton(retailer), RetailerGetter.class);
+          return tmp.isEmpty() ? null : tmp.get(0);
+        }
+      } catch (SQLException e) {
+        throw new DataProviderException(e);
+      } finally {
+        JDBCUtilities.close(rs, stmt, conn);
+      }
+    }
+    return null;
+  }
+
+  @Override
   public List<? extends Manufacturer> getAllManufacturer() throws DataProviderException
   {
     Connection conn = null;
@@ -344,6 +370,32 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
     } finally {
       JDBCUtilities.close(rs, stmt, conn);
     }
+  }
+
+  @Override
+  public Manufacturer getManufacturer(UUID manufacturer) throws DataProviderException
+  {
+    if (manufacturer != null) {
+      Connection conn = null;
+      PreparedStatement stmt = null;
+      ResultSet rs = null;
+      HashSet<UUID> ids = new HashSet<UUID>();
+      try {
+        conn = getConnection();
+        stmt = conn.prepareStatement("select r.id from manufacturer r,contact c where r.id=c.id");
+        rs = stmt.executeQuery();
+        if (rs.next()) {
+          List<? extends Manufacturer> tmp = get(conn, Collections.singleton(manufacturer), ManufacturerGetter.class);
+          return tmp.isEmpty() ? null : tmp.get(0);
+        }
+      } catch (SQLException e) {
+        throw new DataProviderException(e);
+      } finally {
+        JDBCUtilities.close(rs, stmt, conn);
+      }
+
+    }
+    return null;
   }
 
   @Override

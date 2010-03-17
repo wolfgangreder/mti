@@ -7,6 +7,14 @@
             <suite-component/>
             <module-dependencies>
                 <dependency>
+                    <code-name-base>at.mountain_sd.objects</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>at.mountainsd.dataprovider</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -111,13 +119,14 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages>
+            <friend-packages>
+                <friend>at.motriv.gui</friend>
                 <package>at.motriv.datamodel</package>
                 <package>at.motriv.datamodel.entities.contact</package>
                 <package>at.motriv.datamodel.entities.era</package>
                 <package>at.motriv.datamodel.entities.locomotive</package>
                 <package>at.motriv.datamodel.entities.scale</package>
-            </public-packages>
+            </friend-packages>
         </data>
     </configuration>
 </project>
