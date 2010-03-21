@@ -4,6 +4,7 @@
  */
 package at.motriv.datamodel.entities.locomotive;
 
+import at.motriv.datamodel.Decoder;
 import at.motriv.datamodel.ObjectWithDimension;
 import at.motriv.datamodel.ScaledObject;
 import at.motriv.datamodel.ServiceableObject;
@@ -25,4 +26,6 @@ public interface Locomotive extends ObjectWithDimension, ServiceableObject, Scal
   public String getCompany();
 
   public String getCountry();
+
+  public Decoder getDecoder();
 }

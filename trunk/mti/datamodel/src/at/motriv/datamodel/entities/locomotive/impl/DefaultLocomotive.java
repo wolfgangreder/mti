@@ -4,7 +4,9 @@
  */
 package at.motriv.datamodel.entities.locomotive.impl;
 
+import at.motriv.datamodel.Decoder;
 import at.motriv.datamodel.External;
+import at.motriv.datamodel.ExternalKind;
 import at.motriv.datamodel.ModelCondition;
 import at.motriv.datamodel.entities.locomotive.MutableLocomotive;
 import at.motriv.datamodel.entities.scale.Scale;
@@ -14,12 +16,12 @@ import at.motriv.datamodel.entities.contact.Retailer;
 import at.motriv.datamodel.entities.era.Era;
 import at.mountainsd.util.Money;
 import at.mountainsd.util.Utils;
-import java.awt.Image;
-import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.openide.util.Lookup;
 
@@ -30,7 +32,6 @@ import org.openide.util.Lookup;
 public class DefaultLocomotive extends AbstractLocomotive
 {
 
-  private WeakReference<Image> masterImage;
   private final UUID id;
   private final String name;
   private final String locoClass;
@@ -51,11 +52,15 @@ public class DefaultLocomotive extends AbstractLocomotive
   private final Money price;
   private final ModelCondition condition;
   private final String description;
+  private final External masterImage;
+  private final Map<UUID, External> externals;
+  private final Decoder decoder;
 
   public DefaultLocomotive(UUID id, String name, String locoClass, String wheelArrangement, String kind, Era era, String company,
           String country, Scale scale,
           double weight, double height, double width, double length, Manufacturer manufacturer, String productNumber, Retailer retailer,
-          Date dateOfPurchase, Money price, ModelCondition condition, String descritpion)
+          Date dateOfPurchase, Money price, ModelCondition condition, String descritpion, External masterImage,
+          Collection<? extends External> externals, Decoder decoder)
   {
     this.id = id;
     this.name = name;
@@ -77,6 +82,19 @@ public class DefaultLocomotive extends AbstractLocomotive
     this.price = price;
     this.condition = condition;
     this.description = descritpion;
+    Map<UUID, External> tmp = new HashMap<UUID, External>();
+    for (External ex : externals) {
+      tmp.put(ex.getId(), ex);
+    }
+    if (masterImage != null && masterImage.getKind() != ExternalKind.IMAGE) {
+      throw new IllegalArgumentException("masterimage not an image");
+    }
+    this.masterImage = masterImage;
+    if (masterImage != null) {
+      tmp.put(masterImage.getId(), this.masterImage);
+    }
+    this.externals = Collections.unmodifiableMap(tmp);
+    this.decoder = decoder;
   }
 
   @Override
@@ -196,15 +214,13 @@ public class DefaultLocomotive extends AbstractLocomotive
   @Override
   public Collection<? extends External> getExternals()
   {
-    return Collections.emptyList();
-    //TODO implementieren
+    return externals.values();
   }
 
   @Override
-  public Image getMasterImage()
+  public External getMasterImage()
   {
-    return null;
-    //TODO implementieren
+    return masterImage;
   }
 
   @Override
@@ -224,6 +240,12 @@ public class DefaultLocomotive extends AbstractLocomotive
   public Scale getScale()
   {
     return scale;
+  }
+
+  @Override
+  public Decoder getDecoder()
+  {
+    return decoder;
   }
 
   @Override

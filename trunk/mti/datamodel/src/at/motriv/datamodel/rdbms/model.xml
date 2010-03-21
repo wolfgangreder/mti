@@ -184,7 +184,7 @@
     <column name="width" type="DOUBLE"/>
     <column name="height" type="DOUBLE"/>
     <column name="weight" type="DOUBLE"/>
-    <column name="wheelarragement" type="VARCHAR" size="20"/>
+    <column name="wheelarrangement" type="VARCHAR" size="20"/>
     <column name="kind" type="VARCHAR" size="50"/>
     <column name="locclass" type="VARCHAR" size="50"/>
     <column name="company" type="VARCHAR" size="100"/>
@@ -210,8 +210,8 @@
     <index name="locomotive_country">
       <index-column name="country"/>
     </index>
-    <index name="locomotive_wheelarragement">
-      <index-column name="wheelarragement"/>
+    <index name="locomotive_wheelarrangement">
+      <index-column name="wheelarrangement"/>
     </index>
   </table>
 
@@ -246,6 +246,9 @@
     </index>
     <index name="wagon_country">
       <index-column name="country"/>
+    </index>
+    <index name="wagon_kind">
+      <index-column name="kind"/>
     </index>
   </table>
 </database>

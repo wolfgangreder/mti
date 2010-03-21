@@ -4,6 +4,7 @@
  */
 package at.motriv.datamodel.entities.locomotive;
 
+import at.motriv.datamodel.Decoder;
 import at.motriv.datamodel.External;
 import at.motriv.datamodel.ModelCondition;
 import at.motriv.datamodel.ServiceEntry;
@@ -72,5 +73,7 @@ public interface MutableLocomotive extends Locomotive, Builder<Locomotive>
   public void removeServiceEntry(UUID id);
 
   public void setScale(Scale scale);
+
+  public void setDecoder(Decoder decoder);
 
 }
