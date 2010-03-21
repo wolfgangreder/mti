@@ -37,9 +37,9 @@ public class ItemProviderConvertor<R extends ItemProvider<?,?>> implements Insta
       if (dob != null) {
         InstanceCookie cookie = dob.getLookup().lookup(InstanceCookie.class);
         if (cookie!=null) {
-          Class<?> foClass = cookie.instanceClass();
-          if (foClass.isAssignableFrom(myClass)) {
-            return (R)cookie.instanceCreate();
+          Object instance = cookie.instanceCreate();
+          if (myClass.isInstance(instance)) {
+            return (R)instance;
           }
         }
       }

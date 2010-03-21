@@ -4,7 +4,9 @@
  */
 package at.motriv.datamodel.entities.locomotive.impl;
 
+import at.motriv.datamodel.Decoder;
 import at.motriv.datamodel.External;
+import at.motriv.datamodel.ExternalKind;
 import at.motriv.datamodel.ModelCondition;
 import at.motriv.datamodel.ServiceEntry;
 import at.motriv.datamodel.entities.contact.Manufacturer;
@@ -15,11 +17,12 @@ import at.motriv.datamodel.entities.locomotive.MutableLocomotive;
 import at.motriv.datamodel.entities.scale.Scale;
 import at.mountainsd.util.Money;
 import at.mountainsd.util.Utils;
-import java.awt.Image;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.openide.util.Lookup;
 
@@ -50,10 +53,14 @@ public class DefaultMutableLocomotive implements MutableLocomotive
   private Money price;
   private ModelCondition condition;
   private String description;
+  private External masterImage;
+  private final Map<UUID, External> externals;
+  private Decoder decoder;
 
   public DefaultMutableLocomotive()
   {
     id = UUID.randomUUID();
+    this.externals = new HashMap<UUID, External>();
   }
 
   public DefaultMutableLocomotive(Locomotive loc)
@@ -78,6 +85,15 @@ public class DefaultMutableLocomotive implements MutableLocomotive
     this.price = loc.getPrice();
     this.condition = loc.getCondition();
     this.description = loc.getDescription();
+    this.externals = new HashMap<UUID, External>();
+    for (External e : loc.getExternals()) {
+      externals.put(e.getId(), e);
+    }
+    masterImage = loc.getMasterImage();
+    if (masterImage != null) {
+      externals.put(masterImage.getId(), masterImage);
+    }
+    this.decoder = loc.getDecoder();
   }
 
   @Override
@@ -137,19 +153,32 @@ public class DefaultMutableLocomotive implements MutableLocomotive
   @Override
   public void addExternal(External external)
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    if (external != null) {
+      externals.put(external.getId(), external);
+    }
   }
 
   @Override
   public void removeExternal(UUID id)
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    if (id != null) {
+      if (masterImage != null && masterImage.getId().equals(id)) {
+        masterImage = null;
+      }
+      externals.remove(id);
+    }
   }
 
   @Override
   public void setMasterImage(External external)
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    if (external != null && external.getKind() != ExternalKind.IMAGE) {
+      throw new IllegalArgumentException("external not an image");
+    }
+    masterImage = external;
+    if (external != null) {
+      externals.put(external.getId(), external);
+    }
   }
 
   @Override
@@ -351,9 +380,9 @@ public class DefaultMutableLocomotive implements MutableLocomotive
   }
 
   @Override
-  public Image getMasterImage()
+  public External getMasterImage()
   {
-    return null;
+    return masterImage;
   }
 
   @Override
@@ -381,9 +410,22 @@ public class DefaultMutableLocomotive implements MutableLocomotive
   }
 
   @Override
+  public void setDecoder(Decoder decoder)
+  {
+    this.decoder = decoder;
+  }
+
+  @Override
+  public Decoder getDecoder()
+  {
+    return decoder;
+  }
+
+  @Override
   public Locomotive build()
   {
     return new DefaultLocomotive(id, name, locoClass, wheelArrangement, kind, era, company, country, scale, weight, height, width,
-            length, manufacturer, productNumber, retailer, Utils.copyDate(dateOfPurchase), price, condition, description);
+            length, manufacturer, productNumber, retailer, Utils.copyDate(dateOfPurchase), price, condition, description,
+            masterImage, externals.values(), decoder);
   }
 }

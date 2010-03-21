@@ -21,19 +21,19 @@
             <folder name="providers">
               <file name="at-motriv-datamodel-entities-contact-ContactItemProvider.instance">
                 <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBContactItemProvider"/>
-                <attr name="instanceCreate" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBContactItemProvider.getInstace"/>
+                <attr name="instanceCreate" methodvalue="at.motriv.datamodel.rdbms.firebirdsql.FBContactItemProvider.getInstance"/>
               </file>
               <file name="at-motriv-datamodel-entities-era-EraItemProvider.instance">
                 <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBEraItemProvider"/>
-                <attr name="instanceCreate" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBEraItemProvider.getInstace"/>
+                <attr name="instanceCreate" methodvalue="at.motriv.datamodel.rdbms.firebirdsql.FBEraItemProvider.getInstance"/>
               </file>
               <file name="at-motriv-datamodel-entities-locomotive-LocomotiveItemProvider.instance">
                 <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBLocomotiveItemProvider"/>
-                <attr name="instanceCreate" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBLocomotiveItemProvider.getInstace"/>
+                <attr name="instanceCreate" methodvalue="at.motriv.datamodel.rdbms.firebirdsql.FBLocomotiveItemProvider.getInstance"/>
               </file>
               <file name="at-motriv-datamodel-entities-scale-ScaleItemProvider.instance">
                 <attr name="instanceClass" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBScaleItemProvider"/>
-                <attr name="instanceCreate" stringvalue="at.motriv.datamodel.rdbms.firebirdsql.FBScaleItemProvider.getInstace"/>
+                <attr name="instanceCreate" methodvalue="at.motriv.datamodel.rdbms.firebirdsql.FBScaleItemProvider.getInstance"/>
               </file>
             </folder>
           </folder>

@@ -7,7 +7,6 @@ package at.motriv.datamodel;
 import at.motriv.datamodel.entities.contact.Manufacturer;
 import at.motriv.datamodel.entities.contact.Retailer;
 import at.mountainsd.util.Money;
-import java.awt.Image;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
@@ -40,5 +39,5 @@ public interface InventoryObject extends Lookup.Provider
 
   public Collection<? extends External> getExternals();
 
-  public Image getMasterImage();
+  public External getMasterImage();
 }

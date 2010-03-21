@@ -119,14 +119,13 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <friend-packages>
-                <friend>at.motriv.gui</friend>
+            <public-packages>
                 <package>at.motriv.datamodel</package>
                 <package>at.motriv.datamodel.entities.contact</package>
                 <package>at.motriv.datamodel.entities.era</package>
                 <package>at.motriv.datamodel.entities.locomotive</package>
                 <package>at.motriv.datamodel.entities.scale</package>
-            </friend-packages>
+            </public-packages>
         </data>
     </configuration>
 </project>

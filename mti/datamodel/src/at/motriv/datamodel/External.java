@@ -5,12 +5,13 @@
 package at.motriv.datamodel;
 
 import java.util.UUID;
+import org.openide.util.Lookup;
 
 /**
  *
  * @author wolfi
  */
-public interface External
+public interface External extends Lookup.Provider
 {
 
   /**
