@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE contacts PUBLIC "-//at.motriv//contacts//EN" "http://www.motriv.at/dtd/contacts.dtd">
+<contacts version="1.0">
+  <contact id="2987855c-2d02-4ff6-8697-1779ba5edd7a" isManufacturer="true" isRetailer="true">
+    <name>unbekannt</name>
+  </contact>
+  <contact id="ca6c1920-1aed-46a4-91dd-59b98bc34821" isManufacturer="true">
+    <name>Eigenbau</name>
+  </contact>
+  <contact id="aa0081c2-413d-447a-abc3-3e58897174b2" isRetailer="true">
+    <name>keiner</name>
+  </contact>
+</contacts>

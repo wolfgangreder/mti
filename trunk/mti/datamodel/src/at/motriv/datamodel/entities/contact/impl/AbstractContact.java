@@ -25,6 +25,9 @@ public class AbstractContact implements Contact
   protected String email;
   protected String www;
   protected String memo;
+  protected String phone1;
+  protected String phone2;
+  protected String fax;
 
   protected AbstractContact()
   {
@@ -32,9 +35,9 @@ public class AbstractContact implements Contact
 
   protected AbstractContact(UUID id, String name, String address1, String address2,
           String zip, String city, String country, String email,
-          String www, String memo)
+          String www, String memo, String phone1, String phone2, String fax)
   {
-    this.id = id;
+    this.id = id!=null ? id : UUID.randomUUID();
     this.name = name;
     this.address1 = address1;
     this.address2 = address2;
@@ -44,6 +47,9 @@ public class AbstractContact implements Contact
     this.email = email;
     this.www = www;
     this.memo = memo;
+    this.phone1 = phone1;
+    this.phone2 = phone2;
+    this.fax = fax;
   }
 
   @Override
@@ -107,6 +113,24 @@ public class AbstractContact implements Contact
   }
 
   @Override
+  public String getPhone1()
+  {
+    return phone1;
+  }
+
+  @Override
+  public String getPhone2()
+  {
+    return phone2;
+  }
+
+  @Override
+  public String getFax()
+  {
+    return fax;
+  }
+
+  @Override
   public Lookup getLookup()
   {
     return Lookup.EMPTY;
@@ -122,7 +146,7 @@ public class AbstractContact implements Contact
       return false;
     }
     final AbstractContact other = (AbstractContact) obj;
-    if (this.id != other.id && (this.id == null || !this.id.equals(id))) {
+    if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
       return false;
     }
     return true;

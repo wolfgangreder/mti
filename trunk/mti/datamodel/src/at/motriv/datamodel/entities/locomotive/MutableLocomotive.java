@@ -58,7 +58,9 @@ public interface MutableLocomotive extends Locomotive, Builder<Locomotive>
 
   public void setWeight(double weight);
 
-  public void setWheelArragement(String whellArrangement);
+  public void setLocomotiveNumber(String locNumber);
+  
+  public void setWheelArragement(String wheelArrangement);
 
   public void setKind(String kind);
 
@@ -76,4 +78,5 @@ public interface MutableLocomotive extends Locomotive, Builder<Locomotive>
 
   public void setDecoder(Decoder decoder);
 
+  public void setLastModified(Date lastModified);
 }

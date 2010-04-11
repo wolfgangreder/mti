@@ -17,6 +17,8 @@ import at.mountain_sd.objects.MutatorProvider;
 public interface Locomotive extends ObjectWithDimension, ServiceableObject, ScaledObject, MutatorProvider<MutableLocomotive>
 {
 
+  public String getLocomotiveNumber();
+  
   public String getWheelArragement();
 
   public String getKind();

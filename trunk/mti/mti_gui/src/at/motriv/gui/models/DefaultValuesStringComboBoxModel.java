@@ -42,4 +42,10 @@ public abstract class DefaultValuesStringComboBoxModel extends DefaultValuesComb
   {
     return Collections.emptyList();
   }
+
+  @Override
+  protected String getDefaultSelection()
+  {
+    return null;
+  }
 }

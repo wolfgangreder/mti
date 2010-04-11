@@ -5,7 +5,6 @@
 package at.motriv.datamodel.entities.contact.impl;
 
 import at.motriv.datamodel.entities.contact.Manufacturer;
-import at.motriv.datamodel.entities.contact.Retailer;
 import java.util.UUID;
 
 /**
@@ -24,8 +23,11 @@ public class DefaultManufacturer extends AbstractContact implements Manufacturer
           String country,
           String email,
           String www,
-          String memo)
+          String memo,
+          String phone1,
+          String phone2,
+          String fax)
   {
-    super(id, name, address1, address2, zip, city, country, email, www, memo);
+    super(id, name, address1, address2, zip, city, country, email, www, memo, phone1, phone2, fax);
   }
 }

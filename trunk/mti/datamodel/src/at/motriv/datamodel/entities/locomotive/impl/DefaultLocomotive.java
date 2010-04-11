@@ -55,12 +55,14 @@ public class DefaultLocomotive extends AbstractLocomotive
   private final External masterImage;
   private final Map<UUID, External> externals;
   private final Decoder decoder;
+  private final Date lastModified;
+  private final String locNumber;
 
   public DefaultLocomotive(UUID id, String name, String locoClass, String wheelArrangement, String kind, Era era, String company,
           String country, Scale scale,
           double weight, double height, double width, double length, Manufacturer manufacturer, String productNumber, Retailer retailer,
           Date dateOfPurchase, Money price, ModelCondition condition, String descritpion, External masterImage,
-          Collection<? extends External> externals, Decoder decoder)
+          Collection<? extends External> externals, Decoder decoder, Date lastModified, String locNumber)
   {
     this.id = id;
     this.name = name;
@@ -82,6 +84,7 @@ public class DefaultLocomotive extends AbstractLocomotive
     this.price = price;
     this.condition = condition;
     this.description = descritpion;
+    this.locNumber = locNumber;
     Map<UUID, External> tmp = new HashMap<UUID, External>();
     for (External ex : externals) {
       tmp.put(ex.getId(), ex);
@@ -95,6 +98,13 @@ public class DefaultLocomotive extends AbstractLocomotive
     }
     this.externals = Collections.unmodifiableMap(tmp);
     this.decoder = decoder;
+    this.lastModified = lastModified != null ? Utils.copyDate(lastModified) : new Date();
+  }
+
+  @Override
+  public String getLocomotiveNumber()
+  {
+    return locNumber;
   }
 
   @Override
@@ -252,5 +262,11 @@ public class DefaultLocomotive extends AbstractLocomotive
   public MutableLocomotive getMutator()
   {
     return new DefaultMutableLocomotive(this);
+  }
+
+  @Override
+  public Date getLastModified()
+  {
+    return Utils.copyDate(lastModified);
   }
 }
