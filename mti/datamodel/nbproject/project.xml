@@ -121,9 +121,12 @@
             </module-dependencies>
             <public-packages>
                 <package>at.motriv.datamodel</package>
+                <package>at.motriv.datamodel.config</package>
                 <package>at.motriv.datamodel.entities.contact</package>
+                <package>at.motriv.datamodel.entities.contact.impl</package>
                 <package>at.motriv.datamodel.entities.era</package>
                 <package>at.motriv.datamodel.entities.locomotive</package>
+                <package>at.motriv.datamodel.entities.locomotive.impl</package>
                 <package>at.motriv.datamodel.entities.scale</package>
             </public-packages>
         </data>

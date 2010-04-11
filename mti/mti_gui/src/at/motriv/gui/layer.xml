@@ -2,29 +2,75 @@
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
     <folder name="Actions">
+        <folder name="File">
+            <file name="at-motriv-gui-contact-wizard-NewContactAction.instance">
+                <attr name="delegate" newvalue="at.motriv.gui.contact.wizard.NewContactAction"/>
+                <attr name="displayName" bundlevalue="at.motriv.gui.contact.wizard.Bundle#CTL_NewContactAction"/>
+                <attr name="iconBase" stringvalue="at/motriv/gui/contact/wizard/vcard_add.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+            <file name="at-motriv-gui-locomotive-OpenLocomotiveAction.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
+                <attr name="displayName" bundlevalue="at.motriv.gui.locomotive.Bundle#CTL_OpenLocomotiveAction"/>
+                <attr name="injectable" stringvalue="at.motriv.gui.locomotive.OpenLocomotiveAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
+                <attr name="type" stringvalue="org.openide.cookies.OpenCookie"/>
+            </file>
+        </folder>
+        <folder name="Inventory">
+            <file name="at-motriv-gui-locomotive-NewLocomotiveAction.instance">
+                <attr name="delegate" newvalue="at.motriv.gui.locomotive.NewLocomotiveAction"/>
+                <attr name="displayName" bundlevalue="at.motriv.gui.locomotive.Bundle#CTL_NewLocomotiveAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+        </folder>
         <folder name="Window">
-            <file name="at-motriv-gui-locomotive-LocomotiveAction.instance">
-                <attr name="component" methodvalue="at.motriv.gui.locomotive.LocomotiveTopComponent.findInstance"/>
-                <attr name="displayName" bundlevalue="at.motriv.gui.locomotive.Bundle#CTL_LocomotiveAction"/>
+            <file name="at-motriv-gui-MasterExplorerAction.instance">
+                <attr name="component" methodvalue="at.motriv.gui.MasterExplorerTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="at.motriv.gui.Bundle#CTL_MasterExplorerAction"/>
+                <attr name="iconBase" stringvalue="at/motriv/gui/folder.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
         </folder>
     </folder>
     <folder name="Menu">
+        <folder name="File">
+            <file name="at-motriv-gui-contact-wizard-NewContactAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/File/at-motriv-gui-contact-wizard-NewContactAction.instance"/>
+                <attr name="position" intvalue="250"/>
+            </file>
+            <file name="at-motriv-gui-locomotive-NewLocomotiveAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Inventory/at-motriv-gui-locomotive-NewLocomotiveAction.instance"/>
+                <attr name="position" intvalue="300"/>
+            </file>
+        </folder>
         <folder name="Window">
-            <file name="LocomotiveAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Window/at-motriv-gui-locomotive-LocomotiveAction.instance"/>
+            <file name="MasterExplorerAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/at-motriv-gui-MasterExplorerAction.instance"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Toolbars">
+        <folder name="File">
+            <file name="at-motriv-gui-contact-wizard-NewContactAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/File/at-motriv-gui-contact-wizard-NewContactAction.instance"/>
+                <attr name="position" intvalue="0"/>
             </file>
         </folder>
     </folder>
     <folder name="Windows2">
         <folder name="Components">
-            <file name="LocomotiveTopComponent.settings" url="LocomotiveTopComponentSettings.xml"/>
+            <file name="MasterExplorerTopComponent.settings" url="MasterExplorerTopComponentSettings.xml"/>
         </folder>
         <folder name="Modes">
-            <folder name="editor">
-                <file name="LocomotiveTopComponent.wstcref" url="LocomotiveTopComponentWstcref.xml"/>
+            <folder name="explorer">
+                <file name="MasterExplorerTopComponent.wstcref" url="MasterExplorerTopComponentWstcref.xml"/>
             </folder>
         </folder>
     </folder>
+
 </filesystem>

@@ -14,11 +14,14 @@ import at.motriv.datamodel.entities.locomotive.Locomotive;
 import at.motriv.datamodel.entities.locomotive.LocomotiveItemProvider;
 import at.motriv.datamodel.entities.locomotive.impl.DefaultMutableLocomotive;
 import at.motriv.datamodel.entities.scale.Scale;
+import at.mountainsd.dataprovider.api.DataProviderEvent;
+import at.mountainsd.dataprovider.api.DataProviderEvent.Action;
 import at.mountainsd.dataprovider.api.DataProviderException;
 import at.mountainsd.dataprovider.api.LabelKeyPair;
 import at.mountainsd.dataprovider.api.UniversalSearchRequest;
 import at.mountainsd.dataprovider.api.jdbc.JDBCUtilities;
 import at.mountainsd.util.Money;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,6 +29,7 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,6 +76,56 @@ public class FBLocomotiveItemProvider extends AbstractMotrivFBItemProvider<UUID,
   }
 
   @Override
+  public List<LabelKeyPair<UUID>> getAllLabels() throws DataProviderException
+  {
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+    try {
+      conn = getConnection();
+      stmt = conn.prepareStatement("select i.id,i.name from inventoryobject i,locomotive l where i.id=l.id");
+      rs = stmt.executeQuery();
+      List<LabelKeyPair<UUID>> result = new LinkedList<LabelKeyPair<UUID>>();
+      while (rs.next()) {
+        result.add(new LabelKeyPair<UUID>(JDBCUtilities.getUUID(rs, "id"), rs.getString("name")));
+      }
+      return result;
+    } catch (SQLException ex) {
+      throw new DataProviderException(ex);
+    } finally {
+      JDBCUtilities.close(rs, stmt, conn);
+    }
+  }
+
+  @Override
+  public LabelKeyPair<UUID> getLabel(UUID pKey) throws DataProviderException
+  {
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+    try {
+      conn = getConnection();
+      stmt = conn.prepareStatement("select i.id,i.name from inventoryobject i,locomotive l where i.id=l.id and i.id=?");
+      stmt.setString(1, pKey.toString());
+      rs = stmt.executeQuery();
+      if (rs.next()) {
+        return new LabelKeyPair<UUID>(JDBCUtilities.getUUID(rs, "id"), rs.getString("name"));
+      }
+    } catch (SQLException e) {
+      throw new DataProviderException(e);
+    } finally {
+      JDBCUtilities.close(rs, stmt, conn);
+    }
+    return null;
+  }
+
+  @Override
+  public List<LabelKeyPair<UUID>> getLabelByName(String pName) throws DataProviderException
+  {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
   public List<? extends LabelKeyPair<UUID>> findLabels(Collection<? extends UniversalSearchRequest> requests) throws
           DataProviderException
   {
@@ -110,7 +164,7 @@ public class FBLocomotiveItemProvider extends AbstractMotrivFBItemProvider<UUID,
       try {
         stmt = conn.prepareStatement("select l.id,l.DECODER,l.ERA,l.modelscale,l.LENGTH_,l.WIDTH,l.HEIGHT,l.WEIGHT,"
                 + "l.WHEELARRANGEMENT,l.KIND,l.LOCCLASS,l.COMPANY,l.COUNTRY,i.NAME,i.DESCRIPTION,i.PRICE,i.DATEOFPURCHASE,"
-                + "i.PRODUCTNO,i.MANUFACTURER,i.RETAILER,i.CONDITION,i.MASTERIMAGE "
+                + "i.PRODUCTNO,i.MANUFACTURER,i.RETAILER,i.CONDITION,i.MASTERIMAGE,i.lastModified,l.locnumber "
                 + "from LOCOMOTIVE l,INVENTORYOBJECT i "
                 + "where l.id=i.id and l.id=?");
         DefaultMutableLocomotive builder = new DefaultMutableLocomotive();
@@ -125,11 +179,13 @@ public class FBLocomotiveItemProvider extends AbstractMotrivFBItemProvider<UUID,
           stmt.setString(1, id.toString());
           rs = stmt.executeQuery();
           if (rs.next()) {
+            builder.setLastModified(JDBCUtilities.dateFromSqlTimestamp(rs.getTimestamp("lastModified")));
             builder.setCompany(rs.getString("company"));
             builder.setCondition(ModelCondition.valueOf(rs.getString("condition")));
             builder.setCountry(rs.getString("country"));
             builder.setDateOfPurchase(JDBCUtilities.dateFromSqlDate(rs.getDate("dateofpurchase")));
             builder.setDescription(rs.getString("description"));
+            builder.setLocomotiveNumber(rs.getString("locnumber"));
             UUID tmp = JDBCUtilities.getUUID(rs, "era");
             Era era = eras.get(tmp);
             if (era == null) {
@@ -151,8 +207,13 @@ public class FBLocomotiveItemProvider extends AbstractMotrivFBItemProvider<UUID,
             builder.setManufacturer(manu);
             builder.setMasterImage(null);
             builder.setName(rs.getString("name"));
-            builder.setPrice(Money.valueOf(rs.getBigDecimal("price")));
-            builder.setProductNumber(rs.getString("productnumber"));
+            BigDecimal price = rs.getBigDecimal("price");
+            if (price != null) {
+              builder.setPrice(Money.valueOf(rs.getBigDecimal("price")));
+            } else {
+              builder.setPrice(null);
+            }
+            builder.setProductNumber(rs.getString("productno"));
             tmp = JDBCUtilities.getUUID(rs, "retailer");
             Retailer retailer = retailers.get(tmp);
             if (retailer == null) {
@@ -190,9 +251,10 @@ public class FBLocomotiveItemProvider extends AbstractMotrivFBItemProvider<UUID,
       try {
         conn = getConnection();
         if (keyExists(conn, pKey)) {
-          stmt = conn.prepareStatement("delete from inventoryobject where id=?");
+          stmt = conn.prepareStatement("delete from locomotive where id=?");
           stmt.setString(1, pKey.toString());
           stmt.executeUpdate();
+          fireDataProviderEvent(new DataProviderEvent(this, Action.DELETED, null, pKey));
         }
       } catch (SQLException e) {
         throw new DataProviderException(e);
@@ -221,18 +283,22 @@ public class FBLocomotiveItemProvider extends AbstractMotrivFBItemProvider<UUID,
   {
     if (pItem != null) {
       Connection conn = null;
+      Action action;
       try {
         conn = getConnection();
         if (keyExists(conn, pItem.getId())) {
           update(conn, pItem);
+          action = Action.MODIFIED;
         } else {
           insert(conn, pItem);
+          action = Action.CREATED;
         }
       } catch (SQLException e) {
         throw new DataProviderException(e);
       } finally {
         JDBCUtilities.close(conn);
       }
+      fireDataProviderEvent(new DataProviderEvent(this, action, pItem, pItem.getId()));
     }
     return pItem;
   }
@@ -242,10 +308,14 @@ public class FBLocomotiveItemProvider extends AbstractMotrivFBItemProvider<UUID,
     PreparedStatement stmt = null;
     try {
       stmt = conn.prepareStatement("insert into inventoryobject (name,description,price,dateofpurchase,productno,manufacturer,"
-              + "retailer,condition,masterimage,id)values(?,?,?,?,?,?,?,?,?,?,?)");
+              + "retailer,condition,masterimage,lastModified,id)values(?,?,?,?,?,?,?,?,?,?,?)");
       stmt.setString(1, pItem.getName());
       stmt.setString(2, pItem.getDescription());
-      stmt.setBigDecimal(3, pItem.getPrice().toBigDecimal());
+      if (pItem.getPrice() != null) {
+        stmt.setBigDecimal(3, pItem.getPrice().toBigDecimal());
+      } else {
+        stmt.setBigDecimal(3, null);
+      }
       stmt.setDate(4, JDBCUtilities.sqlDateFromDate(pItem.getDateOfPurchase()));
       stmt.setString(5, pItem.getProductNumber());
       stmt.setString(6, pItem.getManufacturer().getId().toString());
@@ -257,11 +327,12 @@ public class FBLocomotiveItemProvider extends AbstractMotrivFBItemProvider<UUID,
       } else {
         stmt.setString(9, null);
       }
-      stmt.setString(10, pItem.getId().toString());
+      stmt.setTimestamp(10, JDBCUtilities.sqlTimestampFromDate(new Date()));
+      stmt.setString(11, pItem.getId().toString());
       stmt.executeUpdate();
       stmt.close();
       stmt = conn.prepareStatement("insert into locomotive (decoder,era,modelscale,length_,width,height,weight,wheelarrangement,"
-              + "kind,locclass,company,country,id) values (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+              + "kind,locclass,company,country,locnumber,id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
       Decoder decoder = pItem.getDecoder();
       if (decoder != null) {
         stmt.setString(1, pItem.getDecoder().getId().toString());
@@ -279,7 +350,8 @@ public class FBLocomotiveItemProvider extends AbstractMotrivFBItemProvider<UUID,
       stmt.setString(10, pItem.getLocomotiveClass());
       stmt.setString(11, pItem.getCompany());
       stmt.setString(12, pItem.getCountry());
-      stmt.setString(13, pItem.getId().toString());
+      stmt.setString(13, pItem.getLocomotiveNumber());
+      stmt.setString(14, pItem.getId().toString());
       stmt.executeUpdate();
     } finally {
       JDBCUtilities.close(stmt);
@@ -291,10 +363,14 @@ public class FBLocomotiveItemProvider extends AbstractMotrivFBItemProvider<UUID,
     PreparedStatement stmt = null;
     try {
       stmt = conn.prepareStatement("update inventoryobject set name=?,description=?,price=?,dateofpurchase=?,productno=?,"
-              + "manufacturer=?,retailer=?,condition=?,masterimage=? where id=?");
+              + "manufacturer=?,retailer=?,condition=?,masterimage=?,lastModified=? where id=?");
       stmt.setString(1, pItem.getName());
       stmt.setString(2, pItem.getDescription());
-      stmt.setBigDecimal(3, pItem.getPrice().toBigDecimal());
+      if (pItem.getPrice() != null) {
+        stmt.setBigDecimal(3, pItem.getPrice().toBigDecimal());
+      } else {
+        stmt.setBigDecimal(3, null);
+      }
       stmt.setDate(4, JDBCUtilities.sqlDateFromDate(pItem.getDateOfPurchase()));
       stmt.setString(5, pItem.getProductNumber());
       stmt.setString(6, pItem.getManufacturer().getId().toString());
@@ -306,11 +382,12 @@ public class FBLocomotiveItemProvider extends AbstractMotrivFBItemProvider<UUID,
       } else {
         stmt.setString(9, null);
       }
-      stmt.setString(10, pItem.getId().toString());
+      stmt.setTimestamp(10, JDBCUtilities.sqlTimestampFromDate(new Date()));
+      stmt.setString(11, pItem.getId().toString());
       stmt.executeUpdate();
       stmt.close();
       stmt = conn.prepareStatement("update locomotive set decoder=?,era=?,modelscale=?,length_=?,width=?,height=?,weight=?,"
-              + "wheelarrangement=?,kind=?,locclass=?,company=?,country=? where id=?");
+              + "wheelarrangement=?,kind=?,locclass=?,company=?,country=?,locnumber=? where id=?");
       Decoder decoder = pItem.getDecoder();
       if (decoder != null) {
         stmt.setString(1, pItem.getDecoder().getId().toString());
@@ -328,7 +405,8 @@ public class FBLocomotiveItemProvider extends AbstractMotrivFBItemProvider<UUID,
       stmt.setString(10, pItem.getLocomotiveClass());
       stmt.setString(11, pItem.getCompany());
       stmt.setString(12, pItem.getCountry());
-      stmt.setString(13, pItem.getId().toString());
+      stmt.setString(13, pItem.getLocomotiveNumber());
+      stmt.setString(14, pItem.getId().toString());
       stmt.executeUpdate();
     } finally {
       JDBCUtilities.close(stmt);

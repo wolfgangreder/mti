@@ -4,41 +4,94 @@
  */
 package at.motriv.gui.locomotive;
 
+import at.motriv.datamodel.ModelCondition;
+import at.motriv.datamodel.MotrivItemProviderLookup;
+import at.motriv.datamodel.entities.contact.Contact;
+import at.motriv.datamodel.entities.contact.Manufacturer;
+import at.motriv.datamodel.entities.contact.Retailer;
+import at.motriv.datamodel.entities.era.Era;
+import at.motriv.datamodel.entities.locomotive.Locomotive;
+import at.motriv.datamodel.entities.locomotive.LocomotiveItemProvider;
+import at.motriv.datamodel.entities.scale.Scale;
 import at.motriv.gui.ScaleListCellRenderer;
-import at.motriv.gui.models.LocomotiveKindComboBoxModel;
+import at.motriv.gui.contact.wizard.NewContactWizardData;
+import at.motriv.gui.contact.wizard.NewContactWizardIterator;
+import at.motriv.gui.helper.ChangeDocumentListener;
+import at.motriv.gui.locomotive.model.CompanyComboBoxModel;
+import at.motriv.gui.locomotive.model.ConditionComboBoxModel;
+import at.motriv.gui.locomotive.model.CountryComboBoxModel;
+import at.motriv.gui.models.EraComboBoxModel;
+import at.motriv.gui.locomotive.model.LocomotiveKindComboBoxModel;
+import at.motriv.gui.models.ManufacturerComboBoxModel;
+import at.motriv.gui.models.RetailerComboBoxModel;
 import at.motriv.gui.models.ScaleComboBoxModel;
-import at.motriv.gui.models.WheelArrangementComboBoxModel;
-import java.util.logging.Logger;
+import at.motriv.gui.locomotive.model.WheelArrangementComboBoxModel;
+import at.mountainsd.dataprovider.api.DataProviderException;
+import at.mountainsd.util.Money;
+import java.awt.event.ItemEvent;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
 //import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.cookies.SaveCookie;
+import org.openide.nodes.Node;
+import org.openide.util.RequestProcessor;
 
 /**
  * Top component which displays something.
  */
-@ConvertAsProperties(dtd = "-//at.motriv.gui.locomotiv//Locomotive//EN",
-autostore = false)
+@ConvertAsProperties(dtd = "-//at.motriv.gui.locomotiv//Locomotive//EN", autostore = false)
 public final class LocomotiveTopComponent extends TopComponent
 {
 
+  private static enum NameState
+  {
+
+    WRITE_THROUGH,
+    WRITE_THROUGH_CLASS,
+    FOCUS_GAINED,
+    MODIFIED;
+  }
+  private static Map<UUID, LocomotiveTopComponent> openedComponents = new HashMap<UUID, LocomotiveTopComponent>();
   private static final long serialVersionUID = 1L;
-  private static LocomotiveTopComponent instance;
   /** path to the icon used by the component and its open action */
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
   private static final String PREFERRED_ID = "LocomotiveTopComponent";
   private final LocomotiveKindComboBoxModel kindModel = new LocomotiveKindComboBoxModel();
   private final WheelArrangementComboBoxModel wheelModel = new WheelArrangementComboBoxModel();
   private final ScaleComboBoxModel scaleModel = new ScaleComboBoxModel();
+  private final ManufacturerComboBoxModel manufacturerModel = new ManufacturerComboBoxModel();
+  private final RetailerComboBoxModel retailerModel = new RetailerComboBoxModel();
+  private final ConditionComboBoxModel conditionModel = new ConditionComboBoxModel();
+  private final EraComboBoxModel eraModel = new EraComboBoxModel();
+  private final CompanyComboBoxModel companyModel = new CompanyComboBoxModel();
+  private final CountryComboBoxModel countryModel = new CountryComboBoxModel();
+  private DirtyMutableLocomotive current;
+  private LocomotiveNode node;
+  private NameState nameState = NameState.WRITE_THROUGH;
+  private NameState locNumberState = NameState.WRITE_THROUGH;
 
   public LocomotiveTopComponent()
   {
     initComponents();
+    initChangeListener();
     setName(NbBundle.getMessage(LocomotiveTopComponent.class, "CTL_LocomotiveTopComponent"));
 //    setToolTipText(NbBundle.getMessage(LocomotiveTopComponent.class, "HINT_LocomotiveTopComponent"));
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-
+    scaleModel.setDefaultValue();
+    manufacturerModel.setDefaultValue();
+    retailerModel.setDefaultValue();
+    conditionModel.setDefaultValue();
+    eraModel.setDefaultValue();
   }
 
   /** This method is called from within the constructor to
@@ -48,61 +101,558 @@ public final class LocomotiveTopComponent extends TopComponent
    */
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
+    java.awt.GridBagConstraints gridBagConstraints;
 
-    lbName = new javax.swing.JLabel();
-    edName = new javax.swing.JTextField();
-    lbDescription = new javax.swing.JLabel();
-    jScrollPane1 = new javax.swing.JScrollPane();
-    edDescription = new javax.swing.JEditorPane();
-    cbKind = new javax.swing.JComboBox();
-    lbKind = new javax.swing.JLabel();
-    lbWheelArrangement = new javax.swing.JLabel();
-    cbWheelArrangement = new javax.swing.JComboBox();
+    jPanel1 = new javax.swing.JPanel();
     lbClass = new javax.swing.JLabel();
+    lbLocNumber = new javax.swing.JLabel();
+    cbWheelArrangement = new javax.swing.JComboBox();
+    edLocNumber = new javax.swing.JTextField();
+    lbWheelArrangement = new javax.swing.JLabel();
+    cbScale = new javax.swing.JComboBox();
+    lbManufacturer = new javax.swing.JLabel();
     edClass = new javax.swing.JTextField();
     lbScale = new javax.swing.JLabel();
-    cbScale = new javax.swing.JComboBox();
+    edProductNumber = new javax.swing.JTextField();
+    cbCondition = new javax.swing.JComboBox();
+    cbRetailer = new javax.swing.JComboBox();
+    cbEra = new javax.swing.JComboBox();
+    lbPrice = new javax.swing.JLabel();
+    cbDateOfPurchase = new org.jdesktop.swingx.JXDatePicker();
+    cbManufacturer = new javax.swing.JComboBox();
+    lbRetailer = new javax.swing.JLabel();
+    lbEra = new javax.swing.JLabel();
+    jLabel3 = new javax.swing.JLabel();
+    lbCondition = new javax.swing.JLabel();
+    lbName = new javax.swing.JLabel();
+    edName = new javax.swing.JTextField();
+    edPrice = new javax.swing.JFormattedTextField();
+    cbKind = new javax.swing.JComboBox();
+    lbProductNumber = new javax.swing.JLabel();
+    lbKind = new javax.swing.JLabel();
+    jXTaskPaneContainer1 = new org.jdesktop.swingx.JXTaskPaneContainer();
+    jXTaskPane1 = new org.jdesktop.swingx.JXTaskPane();
+    lbHeight = new javax.swing.JLabel();
+    lbLength = new javax.swing.JLabel();
+    lbWidth = new javax.swing.JLabel();
+    jLabel7 = new javax.swing.JLabel();
+    edWeight = new javax.swing.JFormattedTextField();
+    edWidth = new javax.swing.JFormattedTextField();
+    edLength = new javax.swing.JFormattedTextField();
+    edHeight = new javax.swing.JFormattedTextField();
+    jXTaskPane2 = new org.jdesktop.swingx.JXTaskPane();
+    lbCompany = new javax.swing.JLabel();
+    lbCountry = new javax.swing.JLabel();
+    cbCountry = new javax.swing.JComboBox();
+    cbCompany = new javax.swing.JComboBox();
+    jXTaskPane3 = new org.jdesktop.swingx.JXTaskPane();
+    jScrollPane1 = new javax.swing.JScrollPane();
+    edDescription = new javax.swing.JEditorPane();
 
-    lbName.setLabelFor(edName);
-    org.openide.awt.Mnemonics.setLocalizedText(lbName, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbName.text")); // NOI18N
-    lbName.setToolTipText(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbName.toolTipText")); // NOI18N
+    jPanel1.setAlignmentY(0.0F);
+    jPanel1.setOpaque(false);
+    jPanel1.setLayout(new java.awt.GridBagLayout());
 
-    edName.setToolTipText(lbName.getToolTipText());
+    lbClass.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    org.openide.awt.Mnemonics.setLocalizedText(lbClass, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbClass.text")); // NOI18N
+    lbClass.setToolTipText(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbClass.toolTipText")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+    jPanel1.add(lbClass, gridBagConstraints);
 
-    lbDescription.setLabelFor(edDescription);
-    org.openide.awt.Mnemonics.setLocalizedText(lbDescription, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbDescription.text")); // NOI18N
-    lbDescription.setToolTipText(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbDescription.toolTipText")); // NOI18N
-
-    edDescription.setToolTipText(lbDescription.getToolTipText());
-    jScrollPane1.setViewportView(edDescription);
-
-    cbKind.setEditable(true);
-    cbKind.setModel(kindModel);
-    cbKind.setToolTipText(lbKind.getToolTipText());
-
-    lbKind.setLabelFor(cbKind);
-    org.openide.awt.Mnemonics.setLocalizedText(lbKind, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbKind.text")); // NOI18N
-    lbKind.setToolTipText(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbKind.toolTipText")); // NOI18N
-
-    lbWheelArrangement.setLabelFor(cbWheelArrangement);
-    org.openide.awt.Mnemonics.setLocalizedText(lbWheelArrangement, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbWheelArrangement.text")); // NOI18N
-    lbWheelArrangement.setToolTipText(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbWheelArrangement.toolTipText")); // NOI18N
+    lbLocNumber.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    lbLocNumber.setLabelFor(edLocNumber);
+    org.openide.awt.Mnemonics.setLocalizedText(lbLocNumber, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbLocNumber.text")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+    jPanel1.add(lbLocNumber, gridBagConstraints);
 
     cbWheelArrangement.setEditable(true);
     cbWheelArrangement.setModel(wheelModel);
     cbWheelArrangement.setToolTipText(lbWheelArrangement.getToolTipText());
+    cbWheelArrangement.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        cbWheelArrangementItemStateChanged(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 4;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+    jPanel1.add(cbWheelArrangement, gridBagConstraints);
 
-    org.openide.awt.Mnemonics.setLocalizedText(lbClass, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbClass.text")); // NOI18N
-    lbClass.setToolTipText(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbClass.toolTipText")); // NOI18N
+    edLocNumber.addFocusListener(new java.awt.event.FocusAdapter() {
+      public void focusGained(java.awt.event.FocusEvent evt) {
+        edLocNumberFocusGained(evt);
+      }
+      public void focusLost(java.awt.event.FocusEvent evt) {
+        edLocNumberFocusLost(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+    jPanel1.add(edLocNumber, gridBagConstraints);
 
-    edClass.setToolTipText(lbClass.getToolTipText());
-
-    lbScale.setLabelFor(cbScale);
-    org.openide.awt.Mnemonics.setLocalizedText(lbScale, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbScale.text")); // NOI18N
-    lbScale.setToolTipText(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbScale.toolTipText")); // NOI18N
+    lbWheelArrangement.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    lbWheelArrangement.setLabelFor(cbWheelArrangement);
+    org.openide.awt.Mnemonics.setLocalizedText(lbWheelArrangement, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbWheelArrangement.text")); // NOI18N
+    lbWheelArrangement.setToolTipText(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbWheelArrangement.toolTipText")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 4;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+    jPanel1.add(lbWheelArrangement, gridBagConstraints);
 
     cbScale.setModel(scaleModel);
     cbScale.setRenderer(new ScaleListCellRenderer());
+    cbScale.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        cbScaleItemStateChanged(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 6;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+    jPanel1.add(cbScale, gridBagConstraints);
+
+    lbManufacturer.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    lbManufacturer.setLabelFor(cbManufacturer);
+    org.openide.awt.Mnemonics.setLocalizedText(lbManufacturer, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbManufacturer.text")); // NOI18N
+    lbManufacturer.setToolTipText(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbManufacturer.toolTipText")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 7;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+    jPanel1.add(lbManufacturer, gridBagConstraints);
+
+    edClass.setToolTipText(lbClass.getToolTipText());
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+    jPanel1.add(edClass, gridBagConstraints);
+
+    lbScale.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    lbScale.setLabelFor(cbScale);
+    org.openide.awt.Mnemonics.setLocalizedText(lbScale, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbScale.text")); // NOI18N
+    lbScale.setToolTipText(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbScale.toolTipText")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 6;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+    jPanel1.add(lbScale, gridBagConstraints);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 8;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+    jPanel1.add(edProductNumber, gridBagConstraints);
+
+    cbCondition.setModel(conditionModel);
+    cbCondition.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        cbConditionItemStateChanged(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 12;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    jPanel1.add(cbCondition, gridBagConstraints);
+
+    cbRetailer.setMaximumRowCount(16);
+    cbRetailer.setModel(retailerModel);
+    cbRetailer.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        cbRetailerItemStateChanged(evt);
+      }
+    });
+    cbRetailer.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        cbRetailerActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 9;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+    jPanel1.add(cbRetailer, gridBagConstraints);
+
+    cbEra.setMaximumRowCount(16);
+    cbEra.setModel(eraModel);
+    cbEra.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        cbEraItemStateChanged(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 5;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+    jPanel1.add(cbEra, gridBagConstraints);
+
+    lbPrice.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    lbPrice.setLabelFor(edPrice);
+    org.openide.awt.Mnemonics.setLocalizedText(lbPrice, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbPrice.text")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 10;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+    jPanel1.add(lbPrice, gridBagConstraints);
+
+    cbDateOfPurchase.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+      public void propertyChange(java.beans.PropertyChangeEvent evt) {
+        cbDateOfPurchasePropertyChange(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 11;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+    jPanel1.add(cbDateOfPurchase, gridBagConstraints);
+
+    cbManufacturer.setMaximumRowCount(16);
+    cbManufacturer.setModel(manufacturerModel);
+    cbManufacturer.setToolTipText(lbManufacturer.getToolTipText());
+    cbManufacturer.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        cbManufacturerItemStateChanged(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 7;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+    jPanel1.add(cbManufacturer, gridBagConstraints);
+
+    lbRetailer.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    lbRetailer.setLabelFor(cbRetailer);
+    org.openide.awt.Mnemonics.setLocalizedText(lbRetailer, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbRetailer.text")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 9;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+    jPanel1.add(lbRetailer, gridBagConstraints);
+
+    lbEra.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    lbEra.setLabelFor(cbEra);
+    org.openide.awt.Mnemonics.setLocalizedText(lbEra, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbEra.text")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 5;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+    jPanel1.add(lbEra, gridBagConstraints);
+
+    jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabel3.setLabelFor(cbDateOfPurchase);
+    org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.jLabel3.text")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 11;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+    jPanel1.add(jLabel3, gridBagConstraints);
+
+    lbCondition.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    lbCondition.setLabelFor(cbCondition);
+    org.openide.awt.Mnemonics.setLocalizedText(lbCondition, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbCondition.text")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 12;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+    jPanel1.add(lbCondition, gridBagConstraints);
+
+    lbName.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    lbName.setLabelFor(edName);
+    org.openide.awt.Mnemonics.setLocalizedText(lbName, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbName.text")); // NOI18N
+    lbName.setToolTipText(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbName.toolTipText")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+    jPanel1.add(lbName, gridBagConstraints);
+
+    edName.setToolTipText(lbName.getToolTipText());
+    edName.addFocusListener(new java.awt.event.FocusAdapter() {
+      public void focusGained(java.awt.event.FocusEvent evt) {
+        edNameFocusGained(evt);
+      }
+      public void focusLost(java.awt.event.FocusEvent evt) {
+        edNameFocusLost(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+    jPanel1.add(edName, gridBagConstraints);
+
+    edPrice.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0.00"))));
+    edPrice.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+      public void propertyChange(java.beans.PropertyChangeEvent evt) {
+        edPricePropertyChange(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 10;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+    jPanel1.add(edPrice, gridBagConstraints);
+
+    cbKind.setEditable(true);
+    cbKind.setModel(kindModel);
+    cbKind.setToolTipText(lbKind.getToolTipText());
+    cbKind.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        cbKindItemStateChanged(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+    jPanel1.add(cbKind, gridBagConstraints);
+
+    lbProductNumber.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    lbProductNumber.setLabelFor(edProductNumber);
+    org.openide.awt.Mnemonics.setLocalizedText(lbProductNumber, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbProductNumber.text")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 8;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+    jPanel1.add(lbProductNumber, gridBagConstraints);
+
+    lbKind.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    lbKind.setLabelFor(cbKind);
+    org.openide.awt.Mnemonics.setLocalizedText(lbKind, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbKind.text")); // NOI18N
+    lbKind.setToolTipText(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbKind.toolTipText")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+    jPanel1.add(lbKind, gridBagConstraints);
+
+    jXTaskPaneContainer1.setBackground(javax.swing.UIManager.getDefaults().getColor("Panel.background"));
+    jXTaskPaneContainer1.setInheritAlpha(false);
+    jXTaskPaneContainer1.setOpaque(false);
+    jXTaskPaneContainer1.setMinimumSize(new java.awt.Dimension(370, 539));
+
+    jXTaskPane1.setScrollOnExpand(true);
+    jXTaskPane1.setTitle(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.jXTaskPane1.title")); // NOI18N
+
+    lbHeight.setLabelFor(edHeight);
+    org.openide.awt.Mnemonics.setLocalizedText(lbHeight, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbHeight.text")); // NOI18N
+
+    lbLength.setLabelFor(edLength);
+    org.openide.awt.Mnemonics.setLocalizedText(lbLength, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbLength.text")); // NOI18N
+
+    lbWidth.setLabelFor(edWidth);
+    org.openide.awt.Mnemonics.setLocalizedText(lbWidth, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbWidth.text")); // NOI18N
+
+    org.openide.awt.Mnemonics.setLocalizedText(jLabel7, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.jLabel7.text")); // NOI18N
+
+    edWeight.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+    edWeight.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+      public void propertyChange(java.beans.PropertyChangeEvent evt) {
+        edWeightPropertyChange(evt);
+      }
+    });
+
+    edWidth.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+    edWidth.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+      public void propertyChange(java.beans.PropertyChangeEvent evt) {
+        edWidthPropertyChange(evt);
+      }
+    });
+
+    edLength.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+    edLength.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+      public void propertyChange(java.beans.PropertyChangeEvent evt) {
+        edLengthPropertyChange(evt);
+      }
+    });
+
+    edHeight.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+    edHeight.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+      public void propertyChange(java.beans.PropertyChangeEvent evt) {
+        edHeightPropertyChange(evt);
+      }
+    });
+
+    javax.swing.GroupLayout jXTaskPane1Layout = new javax.swing.GroupLayout(jXTaskPane1.getContentPane());
+    jXTaskPane1.getContentPane().setLayout(jXTaskPane1Layout);
+    jXTaskPane1Layout.setHorizontalGroup(
+      jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jXTaskPane1Layout.createSequentialGroup()
+        .addGroup(jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(lbHeight)
+          .addComponent(lbLength)
+          .addComponent(lbWidth)
+          .addComponent(jLabel7))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+          .addComponent(edWeight, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+          .addComponent(edWidth, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+          .addComponent(edLength, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+          .addComponent(edHeight, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addContainerGap(80, Short.MAX_VALUE))
+    );
+    jXTaskPane1Layout.setVerticalGroup(
+      jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jXTaskPane1Layout.createSequentialGroup()
+        .addGroup(jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(lbHeight)
+          .addComponent(edHeight, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(lbLength)
+          .addComponent(edLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(lbWidth)
+          .addComponent(edWidth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel7)
+          .addComponent(edWeight, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+    );
+
+    jXTaskPaneContainer1.add(jXTaskPane1);
+
+    jXTaskPane2.setTitle(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.jXTaskPane2.title")); // NOI18N
+
+    lbCompany.setLabelFor(cbCompany);
+    org.openide.awt.Mnemonics.setLocalizedText(lbCompany, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbCompany.text")); // NOI18N
+
+    lbCountry.setLabelFor(cbCountry);
+    org.openide.awt.Mnemonics.setLocalizedText(lbCountry, org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.lbCountry.text")); // NOI18N
+
+    cbCountry.setEditable(true);
+    cbCountry.setModel(countryModel);
+    cbCountry.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        cbCountryItemStateChanged(evt);
+      }
+    });
+
+    cbCompany.setEditable(true);
+    cbCompany.setModel(companyModel);
+    cbCompany.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        cbCompanyItemStateChanged(evt);
+      }
+    });
+
+    javax.swing.GroupLayout jXTaskPane2Layout = new javax.swing.GroupLayout(jXTaskPane2.getContentPane());
+    jXTaskPane2.getContentPane().setLayout(jXTaskPane2Layout);
+    jXTaskPane2Layout.setHorizontalGroup(
+      jXTaskPane2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jXTaskPane2Layout.createSequentialGroup()
+        .addGroup(jXTaskPane2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(lbCountry)
+          .addComponent(lbCompany))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(jXTaskPane2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+          .addComponent(cbCountry, 0, 227, Short.MAX_VALUE)
+          .addComponent(cbCompany, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addContainerGap(29, Short.MAX_VALUE))
+    );
+    jXTaskPane2Layout.setVerticalGroup(
+      jXTaskPane2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jXTaskPane2Layout.createSequentialGroup()
+        .addGroup(jXTaskPane2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(lbCompany)
+          .addComponent(cbCompany, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(jXTaskPane2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(lbCountry)
+          .addComponent(cbCountry, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+    );
+
+    jXTaskPaneContainer1.add(jXTaskPane2);
+
+    jXTaskPane3.setTitle(org.openide.util.NbBundle.getMessage(LocomotiveTopComponent.class, "LocomotiveTopComponent.jXTaskPane3.title")); // NOI18N
+
+    jScrollPane1.setViewportView(edDescription);
+
+    javax.swing.GroupLayout jXTaskPane3Layout = new javax.swing.GroupLayout(jXTaskPane3.getContentPane());
+    jXTaskPane3.getContentPane().setLayout(jXTaskPane3Layout);
+    jXTaskPane3Layout.setHorizontalGroup(
+      jXTaskPane3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)
+    );
+    jXTaskPane3Layout.setVerticalGroup(
+      jXTaskPane3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
+    );
+
+    jXTaskPaneContainer1.add(jXTaskPane3);
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -110,109 +660,275 @@ public final class LocomotiveTopComponent extends TopComponent
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(layout.createSequentialGroup()
-            .addComponent(lbName)
-            .addGap(61, 61, 61)
-            .addComponent(edName, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addContainerGap(336, Short.MAX_VALUE))
-          .addGroup(layout.createSequentialGroup()
-            .addComponent(lbDescription)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jScrollPane1)
-            .addGap(336, 336, 336))
-          .addGroup(layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(lbKind)
-              .addComponent(lbClass)
-              .addComponent(lbWheelArrangement)
-              .addComponent(lbScale))
-            .addGap(34, 34, 34)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-              .addComponent(cbScale, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-              .addComponent(edClass)
-              .addComponent(cbKind, 0, 249, Short.MAX_VALUE)
-              .addComponent(cbWheelArrangement, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addContainerGap(336, Short.MAX_VALUE))))
+        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addComponent(jXTaskPaneContainer1, javax.swing.GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addComponent(jXTaskPaneContainer1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
       .addGroup(layout.createSequentialGroup()
-        .addContainerGap()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(lbName)
-          .addComponent(edName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(cbKind, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(lbKind))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(lbClass)
-          .addComponent(edClass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(cbWheelArrangement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(lbWheelArrangement))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(lbScale)
-          .addComponent(cbScale, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 190, Short.MAX_VALUE)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(lbDescription)
-          .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addGap(132, 132, 132))
+        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 368, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap(171, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
+
+  private void cbRetailerActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_cbRetailerActionPerformed
+  {//GEN-HEADEREND:event_cbRetailerActionPerformed
+    // TODO add your handling code here:
+  }//GEN-LAST:event_cbRetailerActionPerformed
+
+  private void cbEraItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_cbEraItemStateChanged
+  {//GEN-HEADEREND:event_cbEraItemStateChanged
+    if (evt.getStateChange() == ItemEvent.SELECTED && current != null) {
+      Object tmp = eraModel.getSelectedItem();
+      if (tmp instanceof Era) {
+        current.setEra((Era) tmp);
+        cbEra.setToolTipText(((Era) tmp).getComment());
+      } else {
+        current.setEra(null);
+        cbEra.setToolTipText(null);
+      }
+      checkDirty();
+    }
+  }//GEN-LAST:event_cbEraItemStateChanged
+
+  private void edNameFocusGained(java.awt.event.FocusEvent evt)//GEN-FIRST:event_edNameFocusGained
+  {//GEN-HEADEREND:event_edNameFocusGained
+    switch (nameState) {
+      case WRITE_THROUGH:
+        nameState = NameState.FOCUS_GAINED;
+        break;
+    }
+  }//GEN-LAST:event_edNameFocusGained
+
+  private void edNameFocusLost(java.awt.event.FocusEvent evt)//GEN-FIRST:event_edNameFocusLost
+  {//GEN-HEADEREND:event_edNameFocusLost
+    switch (nameState) {
+      case FOCUS_GAINED:
+        nameState = NameState.WRITE_THROUGH;
+        break;
+    }
+  }//GEN-LAST:event_edNameFocusLost
+
+  private void cbKindItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_cbKindItemStateChanged
+  {//GEN-HEADEREND:event_cbKindItemStateChanged
+    if (evt.getStateChange() == ItemEvent.SELECTED && current != null) {
+      current.setKind((String) cbKind.getSelectedItem());
+      checkDirty();
+    }
+  }//GEN-LAST:event_cbKindItemStateChanged
+
+  private void cbWheelArrangementItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_cbWheelArrangementItemStateChanged
+  {//GEN-HEADEREND:event_cbWheelArrangementItemStateChanged
+    if (evt.getStateChange() == ItemEvent.SELECTED && current != null) {
+      current.setWheelArragement((String) cbWheelArrangement.getSelectedItem());
+      checkDirty();
+    }
+  }//GEN-LAST:event_cbWheelArrangementItemStateChanged
+
+  private void cbCompanyItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_cbCompanyItemStateChanged
+  {//GEN-HEADEREND:event_cbCompanyItemStateChanged
+    if (evt.getStateChange() == ItemEvent.SELECTED && current != null) {
+      current.setCompany((String) cbCompany.getSelectedItem());
+      checkDirty();
+    }
+  }//GEN-LAST:event_cbCompanyItemStateChanged
+
+  private void cbCountryItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_cbCountryItemStateChanged
+  {//GEN-HEADEREND:event_cbCountryItemStateChanged
+    if (evt.getStateChange() == ItemEvent.SELECTED && current != null) {
+      current.setCountry((String) cbCountry.getSelectedItem());
+      checkDirty();
+    }
+  }//GEN-LAST:event_cbCountryItemStateChanged
+
+  private void cbScaleItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_cbScaleItemStateChanged
+  {//GEN-HEADEREND:event_cbScaleItemStateChanged
+    if (evt.getStateChange() == ItemEvent.SELECTED && current != null) {
+      current.setScale((Scale) cbScale.getSelectedItem());
+      checkDirty();
+    }
+  }//GEN-LAST:event_cbScaleItemStateChanged
+
+  private void cbManufacturerItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_cbManufacturerItemStateChanged
+  {//GEN-HEADEREND:event_cbManufacturerItemStateChanged
+    if (evt.getStateChange() == ItemEvent.SELECTED && current != null) {
+      Manufacturer m = (Manufacturer) cbManufacturer.getSelectedItem();
+      if (ManufacturerComboBoxModel.isDummy(m)) {
+        SwingUtilities.invokeLater(new Runnable()
+        {
+
+          @Override
+          public void run()
+          {
+            Contact contact = NewContactWizardIterator.execute(NewContactWizardData.MANUFACTURER_MODES);
+            if (contact != null) {
+              manufacturerModel.setSelectedItem(contact);
+            } else {
+              manufacturerModel.setDefaultValue();
+            }
+          }
+        });
+      } else {
+        current.setManufacturer(m);
+        checkDirty();
+      }
+    }
+  }//GEN-LAST:event_cbManufacturerItemStateChanged
+
+  private void cbRetailerItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_cbRetailerItemStateChanged
+  {//GEN-HEADEREND:event_cbRetailerItemStateChanged
+    if (evt.getStateChange() == ItemEvent.SELECTED && current != null) {
+      Retailer r = (Retailer) cbRetailer.getSelectedItem();
+      if (RetailerComboBoxModel.isDummy(r)) {
+        SwingUtilities.invokeLater(new Runnable()
+        {
+
+          @Override
+          public void run()
+          {
+            Contact contact = NewContactWizardIterator.execute(NewContactWizardData.RETAILER_MODES);
+            if (contact != null) {
+              retailerModel.setSelectedItem(contact);
+            } else {
+              retailerModel.setDefaultValue();
+            }
+          }
+        });
+      } else {
+        current.setRetailer(r);
+        checkDirty();
+      }
+    }
+  }//GEN-LAST:event_cbRetailerItemStateChanged
+
+  private void edPricePropertyChange(java.beans.PropertyChangeEvent evt)//GEN-FIRST:event_edPricePropertyChange
+  {//GEN-HEADEREND:event_edPricePropertyChange
+    if ("value".equals(evt.getPropertyName()) && current != null) {
+      Number num = (Number) edPrice.getValue();
+      if (num != null) {
+        current.setPrice(Money.valueOf(new BigDecimal(num.doubleValue())));
+      } else {
+        current.setPrice(null);
+      }
+      checkDirty();
+    }
+  }//GEN-LAST:event_edPricePropertyChange
+
+  private void cbDateOfPurchasePropertyChange(java.beans.PropertyChangeEvent evt)//GEN-FIRST:event_cbDateOfPurchasePropertyChange
+  {//GEN-HEADEREND:event_cbDateOfPurchasePropertyChange
+    if ("date".equals(evt.getPropertyName()) && current != null) {
+      current.setDateOfPurchase(cbDateOfPurchase.getDate());
+      checkDirty();
+    }
+  }//GEN-LAST:event_cbDateOfPurchasePropertyChange
+
+  private void cbConditionItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_cbConditionItemStateChanged
+  {//GEN-HEADEREND:event_cbConditionItemStateChanged
+    if (evt.getStateChange() == ItemEvent.SELECTED && current != null) {
+      current.setCondition((ModelCondition) cbCondition.getSelectedItem());
+      checkDirty();
+    }
+  }//GEN-LAST:event_cbConditionItemStateChanged
+
+  private void edHeightPropertyChange(java.beans.PropertyChangeEvent evt)//GEN-FIRST:event_edHeightPropertyChange
+  {//GEN-HEADEREND:event_edHeightPropertyChange
+    if ("value".equals(evt.getPropertyName()) && current != null) {
+      current.setHeight(((Number) edHeight.getValue()).doubleValue());
+      checkDirty();
+    }
+  }//GEN-LAST:event_edHeightPropertyChange
+
+  private void edLengthPropertyChange(java.beans.PropertyChangeEvent evt)//GEN-FIRST:event_edLengthPropertyChange
+  {//GEN-HEADEREND:event_edLengthPropertyChange
+    if ("value".equals(evt.getPropertyName()) && current != null) {
+      current.setLength(((Number) edLength.getValue()).doubleValue());
+      checkDirty();
+    }
+  }//GEN-LAST:event_edLengthPropertyChange
+
+  private void edWidthPropertyChange(java.beans.PropertyChangeEvent evt)//GEN-FIRST:event_edWidthPropertyChange
+  {//GEN-HEADEREND:event_edWidthPropertyChange
+    if ("value".equals(evt.getPropertyName()) && current != null) {
+      current.setWidth(((Number) edWidth.getValue()).doubleValue());
+      checkDirty();
+    }
+  }//GEN-LAST:event_edWidthPropertyChange
+
+  private void edWeightPropertyChange(java.beans.PropertyChangeEvent evt)//GEN-FIRST:event_edWeightPropertyChange
+  {//GEN-HEADEREND:event_edWeightPropertyChange
+    if ("value".equals(evt.getPropertyName()) && current != null) {
+      current.setWeight(((Number) edWeight.getValue()).doubleValue());
+      checkDirty();
+    }
+  }//GEN-LAST:event_edWeightPropertyChange
+
+  private void edLocNumberFocusGained(java.awt.event.FocusEvent evt)//GEN-FIRST:event_edLocNumberFocusGained
+  {//GEN-HEADEREND:event_edLocNumberFocusGained
+    switch (locNumberState) {
+      case WRITE_THROUGH:
+      case WRITE_THROUGH_CLASS:
+        locNumberState = NameState.FOCUS_GAINED;
+        break;
+    }
+  }//GEN-LAST:event_edLocNumberFocusGained
+
+  private void edLocNumberFocusLost(java.awt.event.FocusEvent evt)//GEN-FIRST:event_edLocNumberFocusLost
+  {//GEN-HEADEREND:event_edLocNumberFocusLost
+    switch (locNumberState) {
+      case FOCUS_GAINED:
+        locNumberState = getLocNumberWriteThroughState();
+        break;
+    }
+  }//GEN-LAST:event_edLocNumberFocusLost
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JComboBox cbCompany;
+  private javax.swing.JComboBox cbCondition;
+  private javax.swing.JComboBox cbCountry;
+  private org.jdesktop.swingx.JXDatePicker cbDateOfPurchase;
+  private javax.swing.JComboBox cbEra;
   private javax.swing.JComboBox cbKind;
+  private javax.swing.JComboBox cbManufacturer;
+  private javax.swing.JComboBox cbRetailer;
   private javax.swing.JComboBox cbScale;
   private javax.swing.JComboBox cbWheelArrangement;
   private javax.swing.JTextField edClass;
   private javax.swing.JEditorPane edDescription;
+  private javax.swing.JFormattedTextField edHeight;
+  private javax.swing.JFormattedTextField edLength;
+  private javax.swing.JTextField edLocNumber;
   private javax.swing.JTextField edName;
+  private javax.swing.JFormattedTextField edPrice;
+  private javax.swing.JTextField edProductNumber;
+  private javax.swing.JFormattedTextField edWeight;
+  private javax.swing.JFormattedTextField edWidth;
+  private javax.swing.JLabel jLabel3;
+  private javax.swing.JLabel jLabel7;
+  private javax.swing.JPanel jPanel1;
   private javax.swing.JScrollPane jScrollPane1;
+  private org.jdesktop.swingx.JXTaskPane jXTaskPane1;
+  private org.jdesktop.swingx.JXTaskPane jXTaskPane2;
+  private org.jdesktop.swingx.JXTaskPane jXTaskPane3;
+  private org.jdesktop.swingx.JXTaskPaneContainer jXTaskPaneContainer1;
   private javax.swing.JLabel lbClass;
-  private javax.swing.JLabel lbDescription;
+  private javax.swing.JLabel lbCompany;
+  private javax.swing.JLabel lbCondition;
+  private javax.swing.JLabel lbCountry;
+  private javax.swing.JLabel lbEra;
+  private javax.swing.JLabel lbHeight;
   private javax.swing.JLabel lbKind;
+  private javax.swing.JLabel lbLength;
+  private javax.swing.JLabel lbLocNumber;
+  private javax.swing.JLabel lbManufacturer;
   private javax.swing.JLabel lbName;
+  private javax.swing.JLabel lbPrice;
+  private javax.swing.JLabel lbProductNumber;
+  private javax.swing.JLabel lbRetailer;
   private javax.swing.JLabel lbScale;
   private javax.swing.JLabel lbWheelArrangement;
+  private javax.swing.JLabel lbWidth;
   // End of variables declaration//GEN-END:variables
-
-  /**
-   * Gets default instance. Do not use directly: reserved for *.settings files only,
-   * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
-   * To obtain the singleton instance, use {@link #findInstance}.
-   */
-  public static synchronized LocomotiveTopComponent getDefault()
-  {
-    if (instance == null) {
-      instance = new LocomotiveTopComponent();
-    }
-    return instance;
-  }
-
-  /**
-   * Obtain the LocomotiveTopComponent instance. Never call {@link #getDefault} directly!
-   */
-  public static synchronized LocomotiveTopComponent findInstance()
-  {
-    TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-    if (win == null) {
-      Logger.getLogger(LocomotiveTopComponent.class.getName()).warning(
-              "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
-      return getDefault();
-    }
-    if (win instanceof LocomotiveTopComponent) {
-      return (LocomotiveTopComponent) win;
-    }
-    Logger.getLogger(LocomotiveTopComponent.class.getName()).warning(
-            "There seem to be multiple components with the '" + PREFERRED_ID
-            + "' ID. That is a potential source of errors and unexpected behavior.");
-    return getDefault();
-  }
 
   @Override
   public int getPersistenceType()
@@ -223,21 +939,28 @@ public final class LocomotiveTopComponent extends TopComponent
   @Override
   protected void componentActivated()
   {
+    scaleModel.refresh();
+    manufacturerModel.refresh();
+    retailerModel.refresh();
+    eraModel.refresh();
     kindModel.refresh();
     wheelModel.refresh();
-    scaleModel.refresh();
+    companyModel.refresh();
+    countryModel.refresh();
   }
 
   @Override
   public void componentOpened()
   {
-    // TODO add custom code on component opening
   }
 
   @Override
   public void componentClosed()
   {
-    // TODO add custom code on component closing
+    if (current != null) {
+      openedComponents.remove(current.getId());
+    }
+    setActivatedNodes(new Node[]{});
   }
 
   void writeProperties(java.util.Properties p)
@@ -245,27 +968,290 @@ public final class LocomotiveTopComponent extends TopComponent
     // better to version settings since initial version as advocated at
     // http://wiki.apidesign.org/wiki/PropertyFiles
     p.setProperty("version", "1.0");
-    // TODO store your settings
+    p.setProperty("opened_id", current.getId().toString());
   }
 
   Object readProperties(java.util.Properties p)
   {
-    if (instance == null) {
-      instance = this;
-    }
-    instance.readPropertiesImpl(p);
-    return instance;
-  }
-
-  private void readPropertiesImpl(java.util.Properties p)
-  {
     String version = p.getProperty("version");
-    // TODO read your settings according to their version
+    String prop = p.getProperty("opened_id");
+    if (prop == null) {
+      throw new IllegalStateException("prop==null");
+    }
+    final UUID id = UUID.fromString(prop);
+    RequestProcessor.getDefault().execute(new Runnable()
+    {
+
+      @Override
+      public void run()
+      {
+        try {
+          LocomotiveItemProvider provider = MotrivItemProviderLookup.lookup(LocomotiveItemProvider.class);
+          final Locomotive loc = provider.get(id);
+          SwingUtilities.invokeLater(new Runnable()
+          {
+
+            @Override
+            public void run()
+            {
+              if (loc == null) {
+                close();
+              } else {
+                init(new LocomotiveNode(loc));
+              }
+            }
+          });
+        } catch (DataProviderException ex) {
+          Exceptions.printStackTrace(ex);
+        }
+      }
+    });
+    return this;
   }
 
   @Override
   protected String preferredID()
   {
     return PREFERRED_ID;
+  }
+
+  private static LocomotiveTopComponent findInstance(LocomotiveNode init)
+  {
+    UUID i = init.getLookup().lookup(UUID.class);
+    if (i != null) {
+      return openedComponents.get(i);
+    }
+    return null;
+  }
+
+  public static void execute(LocomotiveNode init)
+  {
+    LocomotiveTopComponent tc = findInstance(init);
+    if (tc == null) {
+      tc = new LocomotiveTopComponent();
+      tc.init(init);
+      tc.open();
+    }
+    tc.requestActive();
+  }
+
+  private void init(LocomotiveNode init)
+  {
+    this.node = init;
+    nameState = NameState.MODIFIED;
+    locNumberState = NameState.MODIFIED;
+    current = new DirtyMutableLocomotive(init.getLookup().lookup(Locomotive.class));
+    companyModel.setSelectedItem(current.getCompany());
+    conditionModel.setSelectedItem(current.getCondition());
+    countryModel.setSelectedItem(current.getCountry());
+    cbDateOfPurchase.setDate(current.getDateOfPurchase());
+    edDescription.setText(current.getDescription());
+    eraModel.setSelectedItem(current.getEra());
+    edHeight.setValue(current.getHeight());
+    kindModel.setSelectedItem(current.getKind());
+    edLength.setValue(current.getLength());
+    edClass.setText(current.getLocomotiveClass());
+    manufacturerModel.setSelectedItem(current.getManufacturer());
+    edName.setText(current.getName());
+    edLocNumber.setText(current.getLocomotiveNumber());
+    edPrice.setValue(current.getPrice());
+    edProductNumber.setText(current.getProductNumber());
+    retailerModel.setSelectedItem(current.getRetailer());
+    scaleModel.setSelectedItem(current.getScale());
+    edWeight.setValue(current.getWeight());
+    cbWheelArrangement.setSelectedItem(current.getWheelArragement());
+    edWidth.setValue(current.getWidth());
+    scaleModel.weakSetDefaultValue();
+    manufacturerModel.weakSetDefaultValue();
+    retailerModel.weakSetDefaultValue();
+    conditionModel.weakSetDefaultValue();
+    eraModel.weakSetDefaultValue();
+    if (equals(current.getName(), current.getLocomotiveClass())) {
+      nameState = NameState.WRITE_THROUGH;
+    }
+    locNumberState = getLocNumberWriteThroughState();
+    checkDirty();
+    this.setActivatedNodes(new Node[]{node});
+    LocomotiveTopComponent last = openedComponents.put(current.getId(), this);
+    if (last != null) {
+      throw new IllegalStateException(MessageFormat.format("There is already an openend Window with locomotive {0}", current.getName()));
+    }
+  }
+
+  private boolean equals(Object obj1, Object obj2)
+  {
+    return obj1 == obj2 || obj1 != null && obj1.equals(obj2) || obj2 != null && obj2.equals(obj1);
+  }
+
+  private NameState getLocNumberWriteThroughState()
+  {
+    String className = edClass.getText();
+    String locNumber = edLocNumber.getText();
+    if (equals(className, locNumber)) {
+      if (nameState == NameState.WRITE_THROUGH) {
+        return NameState.WRITE_THROUGH;
+      } else {
+        return NameState.WRITE_THROUGH_CLASS;
+      }
+    }
+    return NameState.MODIFIED;
+  }
+
+  private void store()
+  {
+    current.setCompany((String) cbCompany.getSelectedItem());
+    current.setCondition((ModelCondition) cbCondition.getSelectedItem());
+    current.setCountry((String) cbCountry.getSelectedItem());
+    current.setDateOfPurchase(cbDateOfPurchase.getDate());
+    current.setDescription(edDescription.getText());
+    current.setEra((Era) cbEra.getSelectedItem());
+    current.setHeight(((Number) edHeight.getValue()).doubleValue());
+    current.setKind((String) cbKind.getSelectedItem());
+    current.setLength(((Number) edLength.getValue()).doubleValue());
+    current.setLocomotiveClass(edClass.getText());
+    current.setManufacturer((Manufacturer) cbManufacturer.getSelectedItem());
+    current.setName(edName.getText());
+    current.setLocomotiveNumber(edLocNumber.getText());
+    Number num = (Number) edPrice.getValue();
+    if (num != null) {
+      current.setPrice(Money.valueOf(new BigDecimal(num.doubleValue())));
+    } else {
+      current.setPrice(null);
+    }
+    current.setProductNumber(edProductNumber.getText());
+    current.setRetailer((Retailer) cbRetailer.getSelectedItem());
+    current.setScale((Scale) cbScale.getSelectedItem());
+    current.setWeight(((Number) edWeight.getValue()).doubleValue());
+    current.setWheelArragement((String) cbWheelArrangement.getSelectedItem());
+    current.setWidth(((Number) edWidth.getValue()).doubleValue());
+  }
+
+  private void initChangeListener()
+  {
+    edName.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (current != null) {
+          if (nameState == NameState.FOCUS_GAINED) {
+            nameState = NameState.MODIFIED;
+          }
+          current.setName(edName.getText());
+          if (locNumberState == NameState.WRITE_THROUGH_CLASS) {
+            edLocNumber.setText(edName.getText());
+          }
+          checkDirty();
+        }
+      }
+    });
+    edDescription.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (current != null) {
+          current.setDescription(edDescription.getText());
+          checkDirty();
+        }
+      }
+    });
+    edClass.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (current != null) {
+          current.setLocomotiveClass(edClass.getText());
+          if (nameState == NameState.WRITE_THROUGH) {
+            edName.setText(edClass.getText());
+          }
+          if (locNumberState == NameState.WRITE_THROUGH) {
+            edLocNumber.setText(edClass.getText());
+          }
+          checkDirty();
+        }
+      }
+    });
+    edLocNumber.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (current != null) {
+          current.setLocomotiveNumber(edLocNumber.getText());
+          if (nameState == NameState.FOCUS_GAINED) {
+            nameState = NameState.MODIFIED;
+          }
+          checkDirty();
+        }
+      }
+    });
+    edProductNumber.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (current != null) {
+          current.setProductNumber(edProductNumber.getText());
+          checkDirty();
+        }
+      }
+    });
+  }
+
+  private void innerSave()
+  {
+    try {
+      store();
+      current.save();
+      checkDirty();
+    } catch (DataProviderException ex) {
+      Exceptions.printStackTrace(ex);
+    }
+  }
+
+  private void checkDirty()
+  {
+    if (current.isDirty()) {
+      node.setDirty(new SaveCookie()
+      {
+
+        @Override
+        public void save() throws IOException
+        {
+          if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(new Runnable()
+            {
+
+              @Override
+              public void run()
+              {
+                innerSave();
+              }
+            });
+          } else {
+            innerSave();
+          }
+        }
+      });
+    } else {
+      node.setDirty(null);
+    }
+    setCaption();
+  }
+
+  private void setCaption()
+  {
+    setHtmlDisplayName(NbBundle.getMessage(LocomotiveTopComponent.class,
+            "LocomotiveTopComponent.htmlDisplayName",
+            current.getName(),
+            current.isDirty() ? "<b>" : "",
+            current.isDirty() ? " *" : ""));
   }
 }

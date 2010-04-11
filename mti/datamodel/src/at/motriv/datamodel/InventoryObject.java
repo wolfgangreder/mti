@@ -40,4 +40,6 @@ public interface InventoryObject extends Lookup.Provider
   public Collection<? extends External> getExternals();
 
   public External getMasterImage();
+
+  public Date getLastModified();
 }

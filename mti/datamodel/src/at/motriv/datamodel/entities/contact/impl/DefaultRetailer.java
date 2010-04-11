@@ -23,8 +23,11 @@ public class DefaultRetailer extends AbstractContact implements Retailer
           String country,
           String email,
           String www,
-          String memo)
+          String memo,
+          String phone1,
+          String phone2,
+          String fax)
   {
-    super(id, name, address1, address2, zip, city, country, email, www, memo);
+    super(id, name, address1, address2, zip, city, country, email, www, memo, phone1, phone2, fax);
   }
 }

@@ -17,6 +17,6 @@ public class RetailerBuilder extends ContactBuilder<Retailer>
   @Override
   public Retailer build()
   {
-    return new DefaultRetailer(id, name, address1, address2, zip, city, country, email, www, memo);
+    return new DefaultRetailer(id, name, address1, address2, zip, city, country, email, www, memo, phone1, phone2, fax);
   }
 }

@@ -125,4 +125,37 @@ public abstract class ContactBuilder<C extends Contact> extends AbstractContact 
     this.zip = zip;
     return this;
   }
+
+  public void setPhone1(String phone1)
+  {
+    this.phone1 = phone1;
+  }
+
+  public ContactBuilder<C> phone1(String phone1)
+  {
+    this.phone1 = phone1;
+    return this;
+  }
+
+  public void setPhone2(String phone2)
+  {
+    this.phone2 = phone2;
+  }
+
+  public ContactBuilder<C> phone2(String phone2)
+  {
+    this.phone2 = phone2;
+    return this;
+  }
+
+  public void setFax(String fax)
+  {
+    this.fax = fax;
+  }
+
+  public ContactBuilder<C> fax(String fax)
+  {
+    this.fax = fax;
+    return this;
+  }
 }

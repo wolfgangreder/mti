@@ -25,11 +25,24 @@ public abstract class DefaultValuesComboBoxModel<V> implements ComboBoxModel
   private final List<V> items = new ArrayList<V>();
   private Object selection;
 
+  public void setDefaultValue()
+  {
+    setSelectedItem(getDefaultSelection());
+  }
+
+  public void weakSetDefaultValue()
+  {
+    if (getSelectedItem() == null) {
+      setDefaultValue();
+    }
+  }
+
   public void refresh()
   {
     Set<V> current = new HashSet<V>(getCurrentItems());
     current.addAll(getDefaultItems());
     final List<V> tmp = new ArrayList<V>(current);
+    filterItems(tmp);
     sortItems(tmp);
     if (SwingUtilities.isEventDispatchThread()) {
       setCurrentItems(tmp);
@@ -53,11 +66,17 @@ public abstract class DefaultValuesComboBoxModel<V> implements ComboBoxModel
     fireContentsChanged();
   }
 
+  protected void filterItems(List<? extends V> items)
+  {
+  }
+
   protected abstract void sortItems(List<? extends V> items);
 
   protected abstract List<? extends V> getCurrentItems();
 
   protected abstract List<? extends V> getDefaultItems();
+
+  protected abstract V getDefaultSelection();
 
   @Override
   public void setSelectedItem(Object anItem)

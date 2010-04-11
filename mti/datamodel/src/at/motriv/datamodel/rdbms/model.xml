@@ -63,10 +63,16 @@
     <column name="country" type="VARCHAR" size="100" required="false"/>
     <column name="email" type="VARCHAR" size="100" required="false"/>
     <column name="www" type="VARCHAR" size="100" required="false"/>
+    <column name="phone1" type="VARCHAR" size="50" required="false"/>
+    <column name="phone2" type="VARCHAR" size="50" required="false"/>
+    <column name="fax" type="VARCHAR" size="50" required="false"/>
     <column name="description" type="CLOB" required="false"/>
     <unique name="ndx_contact_name">
       <unique-column name="name"/>
     </unique>
+    <index name="ndx$contact_country">
+      <index-column name="country"/>
+    </index>
   </table>
 
   <table name="manufacturer">
@@ -94,6 +100,7 @@
     <column name="retailer" type="CHAR" size="36" required="true"/>
     <column name="condition" type="VARCHAR" size="50" required="true" default="NEW"/>
     <column name="masterimage" type="CHAR" size="36"/>
+    <column name="lastModified" type="TIMESTAMP" required="true"/>
     <foreign-key foreignTable="manufacturer" onDelete="restrict" onUpdate="cascade" name="fk_invetoryobj_manufacturer">
       <reference foreign="id" local="manufacturer"/>
     </foreign-key>
@@ -177,6 +184,7 @@
 
   <table name="locomotive">
     <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="locnumber" type="CHAR" size="50" required="false"/>
     <column name="decoder" type="CHAR" size="36"/>
     <column name="era" type="CHAR" size="36"/>
     <column name="modelscale" type="CHAR" size="36" required="true"/>
@@ -212,6 +220,9 @@
     </index>
     <index name="locomotive_wheelarrangement">
       <index-column name="wheelarrangement"/>
+    </index>
+    <index name="locomotive_locnumber">
+      <index-column name="locnumber"/>
     </index>
   </table>
 

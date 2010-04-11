@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="at.motriv.config.defaultScale">d5fee291-ce11-4b15-acd4-c20c6075d3f1</entry>
+<entry key="at.motriv.config.scaleFilter">d5fee291-ce11-4b15-acd4-c20c6075d3f1,343184d2-b0e7-4e1b-8935-1904a9b80e27,555ca43e-35c7-49c6-b2be-5874223f0cc8,eb330213-d094-4344-a9b5-30af4bb0bcd4</entry>
+<entry key="at.motriv.config.defaultManufacturer">2987855c-2d02-4ff6-8697-1779ba5edd7a</entry>
+<entry key="at.motriv.config.defaultRetailer">2987855c-2d02-4ff6-8697-1779ba5edd7a</entry>
+</properties>

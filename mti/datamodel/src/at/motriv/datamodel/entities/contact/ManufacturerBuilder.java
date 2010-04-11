@@ -17,6 +17,6 @@ public class ManufacturerBuilder extends ContactBuilder<Manufacturer>
   @Override
   public Manufacturer build()
   {
-    return new DefaultManufacturer(id, name, address1, address2, zip, city, country, email, www, memo);
+    return new DefaultManufacturer(id, name, address1, address2, zip, city, country, email, www, memo, phone1, phone2, fax);
   }
 }

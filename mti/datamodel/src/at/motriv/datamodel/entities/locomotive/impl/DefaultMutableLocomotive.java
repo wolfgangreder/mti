@@ -30,7 +30,7 @@ import org.openide.util.Lookup;
  *
  * @author wolfi
  */
-public class DefaultMutableLocomotive implements MutableLocomotive
+public class DefaultMutableLocomotive extends AbstractLocomotive implements MutableLocomotive
 {
 
   private UUID id;
@@ -56,11 +56,14 @@ public class DefaultMutableLocomotive implements MutableLocomotive
   private External masterImage;
   private final Map<UUID, External> externals;
   private Decoder decoder;
+  private Date lastModified;
+  private String locNumber;
 
   public DefaultMutableLocomotive()
   {
     id = UUID.randomUUID();
     this.externals = new HashMap<UUID, External>();
+    this.lastModified = new Date();
   }
 
   public DefaultMutableLocomotive(Locomotive loc)
@@ -85,6 +88,7 @@ public class DefaultMutableLocomotive implements MutableLocomotive
     this.price = loc.getPrice();
     this.condition = loc.getCondition();
     this.description = loc.getDescription();
+    this.locNumber = loc.getLocomotiveNumber();
     this.externals = new HashMap<UUID, External>();
     for (External e : loc.getExternals()) {
       externals.put(e.getId(), e);
@@ -94,6 +98,7 @@ public class DefaultMutableLocomotive implements MutableLocomotive
       externals.put(masterImage.getId(), masterImage);
     }
     this.decoder = loc.getDecoder();
+    this.lastModified = Utils.copyDate(loc.getLastModified());
   }
 
   @Override
@@ -212,6 +217,12 @@ public class DefaultMutableLocomotive implements MutableLocomotive
   }
 
   @Override
+  public void setLocomotiveNumber(String locNumber)
+  {
+    this.locNumber = locNumber;
+  }
+
+  @Override
   public void setWheelArragement(String whellArrangement)
   {
     this.wheelArrangement = whellArrangement;
@@ -257,6 +268,12 @@ public class DefaultMutableLocomotive implements MutableLocomotive
   public void setScale(Scale scale)
   {
     this.scale = scale;
+  }
+
+  @Override
+  public String getLocomotiveNumber()
+  {
+    return locNumber;
   }
 
   @Override
@@ -426,6 +443,18 @@ public class DefaultMutableLocomotive implements MutableLocomotive
   {
     return new DefaultLocomotive(id, name, locoClass, wheelArrangement, kind, era, company, country, scale, weight, height, width,
             length, manufacturer, productNumber, retailer, Utils.copyDate(dateOfPurchase), price, condition, description,
-            masterImage, externals.values(), decoder);
+            masterImage, externals.values(), decoder, lastModified, locNumber);
+  }
+
+  @Override
+  public Date getLastModified()
+  {
+    return Utils.copyDate(lastModified);
+  }
+
+  @Override
+  public void setLastModified(Date lastModified)
+  {
+    lastModified = lastModified != null ? Utils.copyDate(lastModified) : new Date();
   }
 }

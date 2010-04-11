@@ -5,12 +5,16 @@
 package at.motriv.gui.models;
 
 import at.motriv.datamodel.MotrivItemProviderLookup;
+import at.motriv.datamodel.config.MotrivConfig;
 import at.motriv.datamodel.entities.scale.Scale;
 import at.motriv.datamodel.entities.scale.ScaleItemProvider;
 import at.mountainsd.dataprovider.api.DataProviderException;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.openide.util.Exceptions;
 
 /**
@@ -19,6 +23,23 @@ import org.openide.util.Exceptions;
  */
 public class ScaleComboBoxModel extends DefaultValuesComboBoxModel<Scale>
 {
+
+  @Override
+  protected Scale getDefaultSelection()
+  {
+    UUID defaultId = MotrivConfig.getConfigValue(MotrivConfig.KEY_DEFAULT_SCALE);
+    if (defaultId != null) {
+      ScaleItemProvider provider = MotrivItemProviderLookup.lookup(ScaleItemProvider.class);
+      if (provider != null) {
+        try {
+          return provider.get(defaultId);
+        } catch (DataProviderException ex) {
+          Exceptions.printStackTrace(ex);
+        }
+      }
+    }
+    return null;
+  }
 
   private final static class ScaleComparator implements Comparator<Scale>
   {
@@ -33,8 +54,22 @@ public class ScaleComboBoxModel extends DefaultValuesComboBoxModel<Scale>
       return result;
     }
   }
-
   private final Comparator<Scale> comparator = new ScaleComparator();
+
+  @Override
+  protected void filterItems(List<? extends Scale> items)
+  {
+    Set<UUID> scaleFilter = MotrivConfig.getConfigValue(MotrivConfig.KEY_SCALE_FILTER);
+    if (scaleFilter != null) {
+      Iterator<? extends Scale> iter = items.iterator();
+      while (iter.hasNext()) {
+        Scale current = iter.next();
+        if (!scaleFilter.contains(current.getId())) {
+          iter.remove();
+        }
+      }
+    }
+  }
 
   @Override
   protected void sortItems(List<? extends Scale> items)

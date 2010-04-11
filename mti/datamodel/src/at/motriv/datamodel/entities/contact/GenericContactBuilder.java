@@ -17,6 +17,6 @@ public class GenericContactBuilder extends ContactBuilder<Contact>
   @Override
   public Contact build()
   {
-    return new GenericContact(id, name, address1, address2, zip, city, country, email, www, memo);
+    return new GenericContact(id, name, address1, address2, zip, city, country, email, www, memo, phone1, phone2, fax);
   }
 }

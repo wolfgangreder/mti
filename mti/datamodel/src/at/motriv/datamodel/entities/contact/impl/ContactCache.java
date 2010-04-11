@@ -34,7 +34,7 @@ public final class ContactCache
     private final UUID id;
     private final Class<? extends Contact> itemClass;
 
-    public ContactKey(UUID id, Contact contact)
+    public ContactKey(Contact contact)
     {
       if (contact instanceof Retailer) {
         itemClass = Retailer.class;
@@ -43,7 +43,7 @@ public final class ContactCache
       } else {
         itemClass = GenericContact.class;
       }
-      this.id = id;
+      this.id = contact.getId();
     }
 
     public ContactKey(UUID id, Class<? extends Contact> itemClass)
@@ -111,7 +111,7 @@ public final class ContactCache
 
   public void store(Contact contact)
   {
-    ContactKey key = new ContactKey(contact.getId(), contact);
+    ContactKey key = new ContactKey(contact);
     cache.put(key, new WeakReference<Contact>(contact));
   }
 

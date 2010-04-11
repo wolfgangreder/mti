@@ -91,7 +91,7 @@ public class FBEraItemProvider extends AbstractMotrivFBItemProvider<UUID, Era> i
 
     public Getter(PreparedStatement stmt)
     {
-      this.stmt = null;
+      this.stmt = stmt;
     }
 
     @Override
@@ -105,7 +105,7 @@ public class FBEraItemProvider extends AbstractMotrivFBItemProvider<UUID, Era> i
         builder.setName(rs.getString("name"));
         builder.setYearFrom(rs.getInt("yearfrom"));
         builder.comment(rs.getString("comment"));
-        builder.country(rs.getString("country"));
+        builder.country(rs.getString("country").trim());
         int yearTo = rs.getInt("yearto");
         builder.setYearTo(rs.wasNull() ? null : yearTo);
         return builder.build();
@@ -201,7 +201,7 @@ public class FBEraItemProvider extends AbstractMotrivFBItemProvider<UUID, Era> i
           stmt.setNull(3, Types.INTEGER);
         }
         stmt.setString(4, pItem.getComment());
-        stmt.setString(5, pItem.getCountry());
+        stmt.setString(5, pItem.getCountry().trim());
         stmt.setString(6, pItem.getId().toString());
         stmt.executeUpdate();
         stmt.clearParameters();

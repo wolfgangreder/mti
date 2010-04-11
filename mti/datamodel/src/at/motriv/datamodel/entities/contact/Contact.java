@@ -33,4 +33,10 @@ public interface Contact extends Lookup.Provider
   public String getWWW();
 
   public String getMemo();
+
+  public String getPhone1();
+
+  public String getPhone2();
+
+  public String getFax();
 }

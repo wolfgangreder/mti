@@ -7,6 +7,8 @@ package at.motriv.datamodel.spi;
 import at.motriv.datamodel.ExternalKind;
 import at.motriv.datamodel.ModelCondition;
 import at.motriv.datamodel.MotrivItemProviderLookup;
+import at.motriv.datamodel.entities.contact.Contact;
+import at.motriv.datamodel.entities.contact.ContactXMLSupport;
 import at.motriv.datamodel.entities.era.Era;
 import at.motriv.datamodel.entities.era.EraXMLSupport;
 import at.motriv.datamodel.entities.scale.Scale;
@@ -282,6 +284,7 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
       checkEnums();
       checkEra();
       checkScales();
+      checkContacts();
     } catch (IOException ex) {
       Exceptions.printStackTrace(ex);
     } catch (DdlUtilsException ex) {
@@ -289,7 +292,8 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
     }
   }
 
-  protected abstract void internalCheckEra(Connection conn, Collection<? extends Era> defaultEras) throws SQLException;
+  protected abstract void internalCheckEra(Connection conn, Collection<? extends Era> defaultEras) throws DataProviderException,
+          SQLException;
 
   private FileObject locateDefaultEra()
   {
@@ -313,6 +317,8 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
         conn = getDataSource().getConnection();
         conn.setAutoCommit(false);
         internalCheckEra(conn, defaultEras);
+      } catch (DataProviderException e) {
+        Exceptions.printStackTrace(e);
       } catch (SQLException e) {
         Exceptions.printStackTrace(e);
       } finally {
@@ -325,8 +331,9 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
     }
   }
 
-  protected abstract void internalCheckScales(Connection conn,Collection<? extends Scale> defaultScales) throws SQLException;
-  
+  protected abstract void internalCheckScales(Connection conn, Collection<? extends Scale> defaultScales) throws DataProviderException,
+          SQLException;
+
   private void checkScales()
   {
     try {
@@ -339,6 +346,37 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
         conn = getDataSource().getConnection();
         conn.setAutoCommit(false);
         internalCheckScales(conn, defaultScales);
+      } catch (DataProviderException e) {
+        Exceptions.printStackTrace(e);
+      } catch (SQLException e) {
+        Exceptions.printStackTrace(e);
+      } finally {
+        JDBCUtilities.close(conn);
+      }
+    } catch (IOException ex) {
+      Exceptions.printStackTrace(ex);
+    } catch (XMLException ex) {
+      Exceptions.printStackTrace(ex);
+    }
+  }
+
+  protected abstract void internalCheckContacts(Connection conn, Collection<? extends Contact> defaultContacts) throws
+          DataProviderException, SQLException;
+
+  private void checkContacts()
+  {
+    try {
+      FileObject fo = FileUtil.getConfigFile("defaultdata/contacts/defaultcontacts.contacts");
+      DataObject dob = DataObject.find(fo);
+      ContactXMLSupport xmlSupport = dob.getLookup().lookup(ContactXMLSupport.class);
+      Collection<? extends Contact> defaultContacts = xmlSupport.loadEntitiesFromStream(null);
+      Connection conn = null;
+      try {
+        conn = getDataSource().getConnection();
+        conn.setAutoCommit(false);
+        internalCheckContacts(conn, defaultContacts);
+      } catch (DataProviderException e) {
+        Exceptions.printStackTrace(e);
       } catch (SQLException e) {
         Exceptions.printStackTrace(e);
       } finally {
