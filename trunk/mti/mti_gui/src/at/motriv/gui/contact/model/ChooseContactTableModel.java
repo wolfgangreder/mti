@@ -114,7 +114,13 @@ public class ChooseContactTableModel implements TableModel
   {
     if (!equals(filter, newFilter)) {
       filter = newFilter;
-      triggerFilter();
+      if (filter != null && filter.trim().length() > 0) {
+        triggerFilter();
+      } else {
+        cancelRefresh();
+        items.clear();
+        fireContentsChanged();
+      }
     }
   }
 
@@ -126,6 +132,16 @@ public class ChooseContactTableModel implements TableModel
   public SearchState getSearchState()
   {
     return searchState;
+  }
+
+  public ContactType getContactFilter()
+  {
+    return contactFilter;
+  }
+
+  public void setContactFilter(ContactType contactFilter)
+  {
+    this.contactFilter = contactFilter;
   }
 
   private void setSearchState(final SearchState newState)
@@ -181,6 +197,11 @@ public class ChooseContactTableModel implements TableModel
     return items.get(rowIndex).toString();
   }
 
+  public Contact getValueAt(int rowIndex)
+  {
+    return items.get(rowIndex);
+  }
+
   @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex)
   {
@@ -204,7 +225,7 @@ public class ChooseContactTableModel implements TableModel
   private void fireContentsChanged()
   {
     TableModelEvent evt = new TableModelEvent(this);
-    for (TableModelListener l:listeners) {
+    for (TableModelListener l : listeners) {
       l.tableChanged(evt);
     }
   }

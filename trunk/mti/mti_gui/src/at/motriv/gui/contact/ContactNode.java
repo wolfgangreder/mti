@@ -4,10 +4,15 @@
  */
 package at.motriv.gui.contact;
 
+import at.motriv.datamodel.MotrivUtils;
 import at.motriv.datamodel.entities.contact.Contact;
+import at.motriv.datamodel.entities.contact.ContactType;
+import at.motriv.gui.MotrivGUIConstants;
 import at.mountainsd.dataprovider.api.LabelKeyPair;
 import java.io.IOException;
 import java.util.UUID;
+import javax.swing.Action;
+import org.openide.cookies.OpenCookie;
 import org.openide.cookies.SaveCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataLoaderPool;
@@ -27,33 +32,71 @@ public class ContactNode extends AbstractNode
 
   private final InstanceContent content;
   private final ContactDataObject dob;
+  private final Action defaultAction;
+  private final Action[] actions;
 
   public ContactNode(Contact contact)
   {
     this(contact, new InstanceContent());
   }
 
-  public ContactNode(Class<? extends Contact> clazz, LabelKeyPair<UUID> pair)
+  public ContactNode(ContactType type, LabelKeyPair<UUID> pair)
   {
-    this(clazz, pair, new InstanceContent());
+    this(type, pair, new InstanceContent());
   }
 
   private ContactNode(Contact contact, InstanceContent content)
   {
     super(Children.LEAF, new AbstractLookup(content));
+    setIconBaseWithExtension("at/motriv/gui/contact/vcard.png");
     this.content = content;
     if (contact != null) {
+      setDisplayName(contact.toString());
       content.add(contact);
+      content.add(contact.getId());
     }
     dob = getDataObject();
+    actions = initActions();
+    defaultAction = getDefaultActionFromActions(actions);
+    content.add(createOpenCookie());
   }
 
-  private ContactNode(Class<? extends Contact> clazz, LabelKeyPair<UUID> pair, InstanceContent content)
+  private ContactNode(ContactType type, LabelKeyPair<UUID> pair, InstanceContent content)
   {
     super(Children.LEAF, new AbstractLookup(content));
+    setIconBaseWithExtension("at/motriv/gui/contact/vcard.png");
+    setDisplayName(pair.getLabel());
     this.content = content;
-    content.add(new ContactLookupKey(pair.getKey(), clazz), new ContactConvertor());
+    content.add(pair.getKey(), new ContactConvertor());
+    content.add(pair.getKey());
+    content.add(createOpenCookie());
+    content.add(type);
     dob = getDataObject();
+    actions = initActions();
+    defaultAction = getDefaultActionFromActions(actions);
+  }
+
+  private OpenCookie createOpenCookie()
+  {
+    return new OpenCookie()
+    {
+
+      @Override
+      public void open()
+      {
+        ContactTopComponent.execute(ContactNode.this);
+      }
+    };
+  }
+
+  private void refresh()
+  {
+    UUID myKey = getLookup().lookup(UUID.class);
+    if (myKey != null) {
+      this.content.add(myKey, new ContactConvertor());
+    } else {
+      this.content.remove(myKey, new ContactConvertor());
+    }
   }
 
   public void setDirty(SaveCookie cookie)
@@ -66,8 +109,20 @@ public class ContactNode extends AbstractNode
       }
       if (cookie != null) {
         content.add(cookie);
+      } else if (old != null) {
+        refresh();
       }
     }
+  }
+
+  private Action[] initActions()
+  {
+    return new Action[]{getOpenAction()};
+  }
+
+  private Action getDefaultActionFromActions(Action[] actions)
+  {
+    return actions[0];
   }
 
   private ContactDataObject getDataObject()
@@ -80,6 +135,22 @@ public class ContactNode extends AbstractNode
       Exceptions.printStackTrace(ex);
     }
     return null;
+  }
 
+  private Action getOpenAction()
+  {
+    return MotrivUtils.getActionFromFileObject(MotrivGUIConstants.ACTION_OPEN);
+  }
+
+  @Override
+  public Action getPreferredAction()
+  {
+    return defaultAction;
+  }
+
+  @Override
+  public Action[] getActions(boolean context)
+  {
+    return actions;
   }
 }

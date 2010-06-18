@@ -4,10 +4,11 @@
  */
 package at.motriv.datamodel.spi;
 
-import at.motriv.datamodel.ExternalKind;
+import at.motriv.datamodel.externals.ExternalKind;
 import at.motriv.datamodel.ModelCondition;
 import at.motriv.datamodel.MotrivItemProviderLookup;
 import at.motriv.datamodel.entities.contact.Contact;
+import at.motriv.datamodel.entities.contact.ContactType;
 import at.motriv.datamodel.entities.contact.ContactXMLSupport;
 import at.motriv.datamodel.entities.era.Era;
 import at.motriv.datamodel.entities.era.EraXMLSupport;
@@ -15,6 +16,7 @@ import at.motriv.datamodel.entities.scale.Scale;
 import at.motriv.datamodel.entities.scale.ScaleXMLSupport;
 import at.mountainsd.dataprovider.api.DataProvider;
 import at.mountainsd.dataprovider.api.DataProviderException;
+import at.mountainsd.dataprovider.api.DataSourceChecker;
 import at.mountainsd.dataprovider.api.ItemProvider;
 import at.mountainsd.dataprovider.api.jdbc.JDBCDriverConnection;
 import at.mountainsd.dataprovider.api.jdbc.JDBCDriverConnectionProvider;
@@ -258,6 +260,7 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
       conn.setAutoCommit(false);
       checkEnum(conn, ExternalKind.class);
       checkEnum(conn, ModelCondition.class);
+      checkEnum(conn, ContactType.class);
     } catch (SQLException ex) {
       throw new DataProviderException(ex);
     } finally {
@@ -285,6 +288,14 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
       checkEra();
       checkScales();
       checkContacts();
+      @SuppressWarnings("unchecked")
+      Collection<? extends ItemProvider<?,?>> prov = (Collection<? extends ItemProvider<?, ?>>) getLookup().lookupAll(ItemProvider.class);
+      for (ItemProvider<?,?> p:prov) {
+        DataSourceChecker checker = p.getLookup().lookup(DataSourceChecker.class);
+        if (checker!=null) {
+          checker.checkDatabase(Lookup.EMPTY);
+        }
+      }
     } catch (IOException ex) {
       Exceptions.printStackTrace(ex);
     } catch (DdlUtilsException ex) {
@@ -293,7 +304,7 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
   }
 
   protected abstract void internalCheckEra(Connection conn, Collection<? extends Era> defaultEras) throws DataProviderException,
-          SQLException;
+                                                                                                          SQLException;
 
   private FileObject locateDefaultEra()
   {
@@ -332,7 +343,7 @@ public abstract class AbstractMotrivItemProviderLookup extends MotrivItemProvide
   }
 
   protected abstract void internalCheckScales(Connection conn, Collection<? extends Scale> defaultScales) throws DataProviderException,
-          SQLException;
+                                                                                                                 SQLException;
 
   private void checkScales()
   {

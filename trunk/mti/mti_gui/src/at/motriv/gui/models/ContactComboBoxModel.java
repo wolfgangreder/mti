@@ -20,7 +20,7 @@ import org.openide.util.WeakListeners;
  *
  * @author wolfi
  */
-public class ContactComboBoxModel extends AbstractContactComboBoxModel<Contact>
+public class ContactComboBoxModel extends AbstractContactComboBoxModel
 {
 
   @Override

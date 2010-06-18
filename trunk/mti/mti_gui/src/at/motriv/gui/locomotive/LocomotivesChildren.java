@@ -35,6 +35,11 @@ public class LocomotivesChildren extends Children.Keys<LabelKeyPair<UUID>> imple
     return new Node[]{new LocomotiveNode(key)};
   }
 
+  public void refreshItems()
+  {
+    addNotify();
+  }
+
   @Override
   protected void addNotify()
   {

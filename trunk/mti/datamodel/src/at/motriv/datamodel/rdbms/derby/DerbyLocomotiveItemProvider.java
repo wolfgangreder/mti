@@ -5,10 +5,9 @@
 package at.motriv.datamodel.rdbms.derby;
 
 import at.motriv.datamodel.Decoder;
-import at.motriv.datamodel.External;
+import at.motriv.datamodel.externals.External;
 import at.motriv.datamodel.ModelCondition;
-import at.motriv.datamodel.entities.contact.Manufacturer;
-import at.motriv.datamodel.entities.contact.Retailer;
+import at.motriv.datamodel.entities.contact.Contact;
 import at.motriv.datamodel.entities.era.Era;
 import at.motriv.datamodel.entities.locomotive.Locomotive;
 import at.motriv.datamodel.entities.locomotive.LocomotiveItemProvider;
@@ -163,13 +162,13 @@ public class DerbyLocomotiveItemProvider extends AbstractMotrivDerbyItemProvider
       ResultSet rs = null;
       try {
         stmt = conn.prepareStatement("select l.id,l.DECODER,l.ERA,l.modelscale,l.LENGTH_,l.WIDTH,l.HEIGHT,l.WEIGHT,"
-                + "l.WHEELARRANGEMENT,l.KIND,l.LOCCLASS,l.COMPANY,l.COUNTRY,i.NAME,i.DESCRIPTION,i.PRICE,i.DATEOFPURCHASE,"
-                + "i.PRODUCTNO,i.MANUFACTURER,i.RETAILER,i.CONDITION,i.MASTERIMAGE,i.lastModified,l.locnumber "
-                + "from LOCOMOTIVE l,INVENTORYOBJECT i "
-                + "where l.id=i.id and l.id=?");
+                                     + "l.WHEELARRANGEMENT,l.KIND,l.LOCCLASS,l.COMPANY,l.COUNTRY,i.NAME,i.DESCRIPTION,i.PRICE,i.DATEOFPURCHASE,"
+                                     + "i.PRODUCTNO,i.MANUFACTURER,i.RETAILER,i.CONDITION,i.MASTERIMAGE,i.lastModified,l.locnumber "
+                                     + "from LOCOMOTIVE l,INVENTORYOBJECT i "
+                                     + "where l.id=i.id and l.id=?");
         DefaultMutableLocomotive builder = new DefaultMutableLocomotive();
-        Map<UUID, Retailer> retailers = new HashMap<UUID, Retailer>();
-        Map<UUID, Manufacturer> manufacturer = new HashMap<UUID, Manufacturer>();
+        Map<UUID, Contact> retailers = new HashMap<UUID, Contact>();
+        Map<UUID, Contact> manufacturer = new HashMap<UUID, Contact>();
         Map<UUID, Era> eras = new HashMap<UUID, Era>();
         Map<UUID, Scale> scales = new HashMap<UUID, Scale>();
         DerbyEraItemProvider eraProvider = DerbyEraItemProvider.getInstance();
@@ -199,7 +198,7 @@ public class DerbyLocomotiveItemProvider extends AbstractMotrivDerbyItemProvider
             builder.setLength(rs.getDouble("length_"));
             builder.setLocomotiveClass(rs.getString("locclass"));
             tmp = JDBCUtilities.getUUID(rs, "manufacturer");
-            Manufacturer manu = manufacturer.get(tmp);
+            Contact manu = manufacturer.get(tmp);
             if (manu == null) {
               manu = contactProvider.getManufacturer(tmp);
               manufacturer.put(tmp, manu);
@@ -215,7 +214,7 @@ public class DerbyLocomotiveItemProvider extends AbstractMotrivDerbyItemProvider
             }
             builder.setProductNumber(rs.getString("productno"));
             tmp = JDBCUtilities.getUUID(rs, "retailer");
-            Retailer retailer = retailers.get(tmp);
+            Contact retailer = retailers.get(tmp);
             if (retailer == null) {
               retailer = contactProvider.getRetailer(tmp);
               retailers.put(tmp, retailer);
@@ -308,7 +307,7 @@ public class DerbyLocomotiveItemProvider extends AbstractMotrivDerbyItemProvider
     PreparedStatement stmt = null;
     try {
       stmt = conn.prepareStatement("insert into inventoryobject (name,description,price,dateofpurchase,productno,manufacturer,"
-              + "retailer,condition,masterimage,lastModified,id)values(?,?,?,?,?,?,?,?,?,?,?)");
+                                   + "retailer,condition,masterimage,lastModified,id)values(?,?,?,?,?,?,?,?,?,?,?)");
       stmt.setString(1, pItem.getName());
       stmt.setString(2, pItem.getDescription());
       if (pItem.getPrice() != null) {
@@ -332,7 +331,7 @@ public class DerbyLocomotiveItemProvider extends AbstractMotrivDerbyItemProvider
       stmt.executeUpdate();
       stmt.close();
       stmt = conn.prepareStatement("insert into locomotive (decoder,era,modelscale,length_,width,height,weight,wheelarrangement,"
-              + "kind,locclass,company,country,locnumber,id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                                   + "kind,locclass,company,country,locnumber,id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
       Decoder decoder = pItem.getDecoder();
       if (decoder != null) {
         stmt.setString(1, pItem.getDecoder().getId().toString());
@@ -363,7 +362,7 @@ public class DerbyLocomotiveItemProvider extends AbstractMotrivDerbyItemProvider
     PreparedStatement stmt = null;
     try {
       stmt = conn.prepareStatement("update inventoryobject set name=?,description=?,price=?,dateofpurchase=?,productno=?,"
-              + "manufacturer=?,retailer=?,condition=?,masterimage=?,lastModified=? where id=?");
+                                   + "manufacturer=?,retailer=?,condition=?,masterimage=?,lastModified=? where id=?");
       stmt.setString(1, pItem.getName());
       stmt.setString(2, pItem.getDescription());
       if (pItem.getPrice() != null) {
@@ -387,7 +386,7 @@ public class DerbyLocomotiveItemProvider extends AbstractMotrivDerbyItemProvider
       stmt.executeUpdate();
       stmt.close();
       stmt = conn.prepareStatement("update locomotive set decoder=?,era=?,modelscale=?,length_=?,width=?,height=?,weight=?,"
-              + "wheelarrangement=?,kind=?,locclass=?,company=?,country=?,locnumber=? where id=?");
+                                   + "wheelarrangement=?,kind=?,locclass=?,company=?,country=?,locnumber=? where id=?");
       Decoder decoder = pItem.getDecoder();
       if (decoder != null) {
         stmt.setString(1, pItem.getDecoder().getId().toString());

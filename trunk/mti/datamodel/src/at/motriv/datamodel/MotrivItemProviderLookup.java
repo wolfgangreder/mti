@@ -33,9 +33,13 @@ public abstract class MotrivItemProviderLookup implements ItemProviderLookup
     return MotrivUtils.MOTRIV_CONTEXT;
   }
 
-  public static <T extends ItemProvider<?, ?>>  T lookup(Class<? extends T> clazz)
+  public static <T extends ItemProvider<?, ?>> T lookup(Class<? extends T> clazz)
   {
-    return getInstance().getLookup().lookup(clazz);
+    MotrivItemProviderLookup instance = getInstance();
+    if (instance != null) {
+      return instance.getLookup().lookup(clazz);
+    }
+    return null;
   }
 
   public static void checkDatasource() throws DataProviderException

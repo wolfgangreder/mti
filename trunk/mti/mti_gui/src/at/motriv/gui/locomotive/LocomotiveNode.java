@@ -4,8 +4,10 @@
  */
 package at.motriv.gui.locomotive;
 
+import at.motriv.datamodel.MotrivUtils;
 import at.motriv.datamodel.entities.locomotive.Locomotive;
 import at.motriv.datamodel.entities.locomotive.LocomotiveLookupConvertor;
+import at.motriv.gui.MotrivGUIConstants;
 import at.mountainsd.dataprovider.api.LabelKeyPair;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -68,6 +70,16 @@ public class LocomotiveNode extends AbstractNode
     defaultAction = initDefaultActions();
   }
 
+  private void refresh()
+  {
+    UUID key = getLookup().lookup(UUID.class);
+    if (key != null) {
+      this.content.add(key, new LocomotiveLookupConvertor());
+    } else {
+      this.content.remove(key, new LocomotiveLookupConvertor());
+    }
+  }
+
   public void setDirty(SaveCookie cookie)
   {
     dob.setSaveCookie(cookie);
@@ -78,6 +90,8 @@ public class LocomotiveNode extends AbstractNode
       }
       if (cookie != null) {
         content.add(cookie);
+      } else if (old != null) {
+        refresh();
       }
     }
   }
@@ -116,7 +130,7 @@ public class LocomotiveNode extends AbstractNode
 
   private Action getOpenAction()
   {
-    return new OpenAction();
+    return MotrivUtils.getActionFromFileObject(MotrivGUIConstants.ACTION_OPEN);
   }
 
   private class OpenAction extends AbstractAction

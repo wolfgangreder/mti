@@ -4,7 +4,7 @@
  */
 package at.motriv.gui.contact;
 
-import at.motriv.datamodel.entities.contact.Contact;
+import at.motriv.datamodel.entities.contact.ContactType;
 import java.util.UUID;
 
 /**
@@ -15,12 +15,12 @@ public class ContactLookupKey
 {
 
   private final UUID id;
-  private final Class<? extends Contact> classKey;
+  private final ContactType type;
 
-  public ContactLookupKey(UUID id, Class<? extends Contact> classKey)
+  public ContactLookupKey(UUID id, ContactType type)
   {
     this.id = id;
-    this.classKey = classKey;
+    this.type = type;
   }
 
   public UUID getId()
@@ -28,9 +28,9 @@ public class ContactLookupKey
     return id;
   }
 
-  public Class<? extends Contact> getClassKey()
+  public ContactType getType()
   {
-    return classKey;
+    return type;
   }
 
   @Override
@@ -46,7 +46,7 @@ public class ContactLookupKey
     if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
       return false;
     }
-    if (this.classKey != other.classKey && (this.classKey == null || !this.classKey.equals(other.classKey))) {
+    if (this.type != other.type) {
       return false;
     }
     return true;
@@ -57,7 +57,7 @@ public class ContactLookupKey
   {
     int hash = 7;
     hash = 37 * hash + (this.id != null ? this.id.hashCode() : 0);
-    hash = 37 * hash + (this.classKey != null ? this.classKey.hashCode() : 0);
+    hash = 37 * hash + (this.type != null ? this.type.hashCode() : 0);
     return hash;
   }
 }

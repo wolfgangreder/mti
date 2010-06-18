@@ -7,20 +7,16 @@ package at.motriv.datamodel.rdbms.firebirdsql;
 import at.motriv.datamodel.entities.contact.Contact;
 import at.motriv.datamodel.entities.contact.ContactItemProvider;
 import at.motriv.datamodel.entities.contact.ContactType;
-import at.motriv.datamodel.entities.contact.GenericContactBuilder;
-import at.motriv.datamodel.entities.contact.Manufacturer;
-import at.motriv.datamodel.entities.contact.ManufacturerBuilder;
-import at.motriv.datamodel.entities.contact.Retailer;
-import at.motriv.datamodel.entities.contact.RetailerBuilder;
-import at.motriv.datamodel.entities.contact.impl.ContactBuilder;
+import at.motriv.datamodel.entities.contact.MutableContact;
 import at.motriv.datamodel.entities.contact.impl.ContactCache;
-import at.motriv.datamodel.entities.contact.impl.GenericContact;
+import at.motriv.datamodel.entities.contact.impl.DefaultMutableContact;
 import at.mountainsd.dataprovider.api.DataProviderEvent;
+import at.mountainsd.dataprovider.api.DataProviderEvent.Action;
 import at.mountainsd.dataprovider.api.DataProviderException;
+import at.mountainsd.dataprovider.api.LabelKeyPair;
 import at.mountainsd.dataprovider.api.UniversalSearchRequest;
 import at.mountainsd.dataprovider.api.jdbc.JDBCUtilities;
 import at.mountainsd.util.Utils;
-import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,11 +25,14 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 /**
  *
@@ -48,19 +47,19 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
     private static FBContactItemProvider instance = new FBContactItemProvider();
   }
 
-  private static abstract class Getter<I extends Contact> implements ContactCache.ContactGetter
+  private static class Getter implements Callable<Contact>
   {
 
     private final PreparedStatement stmt;
     private final UUID id;
+    private final Set<ContactType> types;
 
-    public Getter(PreparedStatement stmt, UUID id)
+    public Getter(PreparedStatement stmt, UUID id, Set<ContactType> types)
     {
       this.stmt = stmt;
       this.id = id;
+      this.types = types;
     }
-
-    protected abstract ContactBuilder<? extends Contact> getBuilder();
 
     @Override
     public Contact call() throws Exception
@@ -70,89 +69,28 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
         stmt.setString(1, id.toString());
         rs = stmt.executeQuery();
         if (rs.next()) {
-          ContactBuilder<?> builder = getBuilder();
-          builder.address1(rs.getString("address1"));
-          builder.address2(rs.getString("address2"));
-          builder.city(rs.getString("city"));
-          builder.country(rs.getString("country"));
-          builder.email(rs.getString("email"));
-          builder.id(id);
-          builder.memo(rs.getString("description"));
-          builder.name(rs.getString("name"));
-          builder.www(rs.getString("www"));
-          builder.zip(rs.getString("zip"));
-          builder.phone1(rs.getString("phone1"));
-          builder.phone2(rs.getString("phone2"));
-          builder.fax(rs.getString("fax"));
+          MutableContact builder = new DefaultMutableContact(types);
+          builder.setAddress1(rs.getString("address1"));
+          builder.setAddress2(rs.getString("address2"));
+          builder.setCity(rs.getString("city"));
+          builder.setCountry(rs.getString("country"));
+          builder.setEmail(rs.getString("email"));
+          builder.setId(id);
+          builder.setMemo(rs.getString("description"));
+          builder.setName(rs.getString("name"));
+          builder.setWWW(rs.getString("www"));
+          builder.setZip(rs.getString("zip"));
+          builder.setPhone1(rs.getString("phone1"));
+          builder.setPhone2(rs.getString("phone2"));
+          builder.setFax(rs.getString("fax"));
+          builder.setShopAddress(rs.getString("shopaddress"));
+          builder.setTypes(types);
           return builder.build();
         }
       } finally {
         JDBCUtilities.close(rs);
       }
       return null;
-    }
-  }
-
-  private static class GenericGetter extends Getter<GenericContact>
-  {
-
-    public GenericGetter(PreparedStatement stmt, UUID id)
-    {
-      super(stmt, id);
-    }
-
-    @Override
-    protected ContactBuilder<?> getBuilder()
-    {
-      return new GenericContactBuilder();
-    }
-
-    @Override
-    public Class<? extends Contact> getInstanceClass()
-    {
-      return GenericContact.class;
-    }
-  }
-
-  private static class RetailerGetter extends Getter<Retailer>
-  {
-
-    public RetailerGetter(PreparedStatement stmt, UUID id)
-    {
-      super(stmt, id);
-    }
-
-    @Override
-    protected ContactBuilder<? extends Contact> getBuilder()
-    {
-      return new RetailerBuilder();
-    }
-
-    @Override
-    public Class<? extends Contact> getInstanceClass()
-    {
-      return Retailer.class;
-    }
-  }
-
-  private static class ManufacturerGetter extends Getter<Manufacturer>
-  {
-
-    public ManufacturerGetter(PreparedStatement stmt, UUID id)
-    {
-      super(stmt, id);
-    }
-
-    @Override
-    protected ContactBuilder<? extends Contact> getBuilder()
-    {
-      return new ManufacturerBuilder();
-    }
-
-    @Override
-    public Class<? extends Contact> getInstanceClass()
-    {
-      return Manufacturer.class;
     }
   }
 
@@ -172,7 +110,7 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
       Connection conn = null;
       try {
         conn = getConnection();
-        List<? extends Contact> tmp = get(conn, Collections.singleton(pKey), GenericGetter.class);
+        List<? extends Contact> tmp = get(conn, Collections.singleton(pKey), null);
         return tmp.isEmpty() ? null : tmp.get(0);
       } catch (SQLException e) {
         throw new DataProviderException(e);
@@ -183,23 +121,33 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
     return null;
   }
 
-  @SuppressWarnings("unchecked")
-  <VI extends Contact> List<? extends VI> get(final Connection conn,
-          Collection<? extends UUID> ids,
-          Class<? extends Getter<? extends VI>> getterClass)
-          throws SQLException, DataProviderException
+  List<? extends Contact> get(final Connection conn, Collection<? extends UUID> ids, ContactType filter) throws SQLException,
+                                                                                                                DataProviderException
   {
-    List<VI> result = new ArrayList<VI>(ids.size());
+    List<Contact> result = new ArrayList<Contact>(ids.size());
     if (!ids.isEmpty()) {
       PreparedStatement stmt = null;
       ResultSet rs = null;
+      Map<UUID, Set<ContactType>> tmp = new HashMap<UUID, Set<ContactType>>();
       try {
-        stmt = conn.prepareStatement("select name,address1,address2,zip,city,country,email,www,description,phone1,phone2,fax "
-                + "from contact where id=?");
-        Constructor<? extends Getter<? extends VI>> ctr = getterClass.getConstructor(PreparedStatement.class, UUID.class);
+        stmt = conn.prepareStatement("select name from contacttypes where id=?");
         for (UUID id : ids) {
-          Contact tmp = ContactCache.getInstance().get(id, ctr.newInstance(stmt, id));
-          result.add((VI) tmp);
+          stmt.setString(1, id.toString());
+          rs = stmt.executeQuery();
+          HashSet<ContactType> set = new HashSet<ContactType>();
+          while (rs.next()) {
+            set.add(ContactType.valueOf(rs.getString("name")));
+          }
+          rs.close();
+          if (filter==null || set.contains(filter)) {
+            tmp.put(id, set);
+          }
+        }
+        stmt.close();
+        stmt = conn.prepareStatement("select name,address1,address2,zip,city,country,email,www,description,phone1,phone2,fax,shopaddress "
+                                     + "from contact where id=?");
+        for (Map.Entry<UUID, Set<ContactType>> id : tmp.entrySet()) {
+          result.add(ContactCache.getInstance().get(id.getKey(), new Getter(stmt, id.getKey(), id.getValue())));
         }
       } catch (Exception e) {
         if (e instanceof SQLException) {
@@ -232,6 +180,7 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
     } finally {
       JDBCUtilities.close(stmt, conn);
     }
+    fireDataProviderEvent(new DataProviderEvent(this, Action.DELETED, null, pKey));
   }
 
   @Override
@@ -267,13 +216,14 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
     try {
       if (keyExists(conn, pItem.getId())) {
         stmt = conn.prepareStatement(
-                "update contact set name=?,address1=?,address2=?,city=?,zip=?,country=?,email=?,www=?,description=?,phone1,phone2,fax"
+                "update contact set name=?,address1=?,address2=?,city=?,zip=?,country=?,email=?,www=?,description=?,phone1=?,phone2=?"
+                + ",fax=?,shopaddress=? "
                 + " where id=?");
         result.action = DataProviderEvent.Action.MODIFIED;
       } else {
         stmt = conn.prepareStatement(
-                "insert into contact (name,address1,address2,city,zip,country,email,www,description,phone1,phone2,fax,id) "
-                + "values (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                "insert into contact (name,address1,address2,city,zip,country,email,www,description,phone1,phone2,fax,shopaddress,id) "
+                + "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         result.action = DataProviderEvent.Action.CREATED;
       }
       stmt.setString(1, pItem.getName());
@@ -288,8 +238,20 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
       stmt.setString(10, pItem.getPhone1());
       stmt.setString(11, pItem.getPhone2());
       stmt.setString(12, pItem.getFax());
-      stmt.setString(13, pItem.getId().toString());
+      stmt.setString(13, pItem.getShopAddress());
+      stmt.setString(14, pItem.getId().toString());
       stmt.executeUpdate();
+      stmt.close();
+      stmt = conn.prepareStatement("delete from contacttypes where id=?");
+      stmt.setString(1, pItem.getId().toString());
+      stmt.executeUpdate();
+      stmt.close();
+      stmt = conn.prepareStatement("insert into contacttypes (id,name) values (?,?)");
+      stmt.setString(1, pItem.getId().toString());
+      for (ContactType t : pItem.getTypes()) {
+        stmt.setString(2, t.name());
+        stmt.executeUpdate();
+      }
       result.contact = pItem;
       ContactCache.getInstance().store(result.contact);
     } finally {
@@ -315,13 +277,14 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
     }
   }
 
-  boolean retailerExists(final Connection conn, UUID id) throws SQLException
+  boolean contactTypeExists(final Connection conn, UUID id, ContactType type) throws SQLException
   {
     PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = conn.prepareStatement("select id from retailer where id=?");
+      stmt = conn.prepareStatement("select id from contacttypes where id=? and name=?");
       stmt.setString(1, id.toString());
+      stmt.setString(2, type.name());
       rs = stmt.executeQuery();
       return rs.next();
     } finally {
@@ -329,110 +292,83 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
     }
   }
 
-  boolean manufacturerExists(final Connection conn, UUID id) throws SQLException
+  List<? extends Contact> getAllByContactType(final Connection conn, ContactType type) throws SQLException, DataProviderException
   {
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-    try {
-      stmt = conn.prepareStatement("select id from manufacturer where id=?");
-      stmt.setString(1, id.toString());
-      rs = stmt.executeQuery();
-      return rs.next();
-    } finally {
-      JDBCUtilities.close(rs, stmt);
-    }
-  }
-
-  @Override
-  public List<? extends Retailer> getAllRetailers() throws DataProviderException
-  {
-    Connection conn = null;
     PreparedStatement stmt = null;
     ResultSet rs = null;
     HashSet<UUID> ids = new HashSet<UUID>();
     try {
-      conn = getConnection();
-      stmt = conn.prepareStatement("select r.id from retailer r,contact c where r.id=c.id");
+      stmt = conn.prepareStatement("select c.id from contacttypes t,contact c where t.id=c.id and t.name=?");
+      stmt.setString(1, type.name());
       rs = stmt.executeQuery();
       while (rs.next()) {
         ids.add(JDBCUtilities.getUUID(rs, "id"));
       }
-      return get(conn, ids, RetailerGetter.class);
-    } catch (SQLException e) {
-      throw new DataProviderException(e);
+      return get(conn, ids, type);
     } finally {
-      JDBCUtilities.close(rs, stmt, conn);
+      JDBCUtilities.close(rs, stmt);
     }
   }
 
   @Override
-  public Retailer getRetailer(UUID retailer) throws DataProviderException
+  public List<? extends Contact> getAllRetailers() throws DataProviderException
+  {
+    Connection conn = null;
+    try {
+      conn = getConnection();
+      return getAllByContactType(conn, ContactType.RETAILER);
+    } catch (SQLException e) {
+      throw new DataProviderException(e);
+    } finally {
+      JDBCUtilities.close(conn);
+    }
+  }
+
+  @Override
+  public Contact getRetailer(UUID retailer) throws DataProviderException
   {
     if (retailer != null) {
       Connection conn = null;
-      PreparedStatement stmt = null;
-      ResultSet rs = null;
-      HashSet<UUID> ids = new HashSet<UUID>();
       try {
         conn = getConnection();
-        stmt = conn.prepareStatement("select r.id from retailer r,contact c where r.id=c.id and r.id=?");
-        stmt.setString(1, retailer.toString());
-        rs = stmt.executeQuery();
-        if (rs.next()) {
-          List<? extends Retailer> tmp = get(conn, Collections.singleton(retailer), RetailerGetter.class);
-          return tmp.isEmpty() ? null : tmp.get(0);
-        }
+        List<? extends Contact> tmp = get(conn, Collections.singleton(retailer), ContactType.RETAILER);
+        return tmp.isEmpty() ? null : tmp.get(0);
       } catch (SQLException e) {
         throw new DataProviderException(e);
       } finally {
-        JDBCUtilities.close(rs, stmt, conn);
+        JDBCUtilities.close(conn);
       }
     }
     return null;
   }
 
   @Override
-  public List<? extends Manufacturer> getAllManufacturer() throws DataProviderException
+  public List<? extends Contact> getAllManufacturer() throws DataProviderException
   {
     Connection conn = null;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-    HashSet<UUID> ids = new HashSet<UUID>();
     try {
       conn = getConnection();
-      stmt = conn.prepareStatement("select r.id from manufacturer r,contact c where r.id=c.id");
-      rs = stmt.executeQuery();
-      while (rs.next()) {
-        ids.add(JDBCUtilities.getUUID(rs, "id"));
-      }
-      return get(conn, ids, ManufacturerGetter.class);
+      return getAllByContactType(conn, ContactType.MANUFACTURER);
     } catch (SQLException e) {
       throw new DataProviderException(e);
     } finally {
-      JDBCUtilities.close(rs, stmt, conn);
+      JDBCUtilities.close(conn);
     }
   }
 
   @Override
-  public Manufacturer getManufacturer(UUID manufacturer) throws DataProviderException
+  public Contact getManufacturer(UUID manufacturer) throws DataProviderException
   {
     if (manufacturer != null) {
       Connection conn = null;
-      PreparedStatement stmt = null;
-      ResultSet rs = null;
-      HashSet<UUID> ids = new HashSet<UUID>();
       try {
         conn = getConnection();
-        stmt = conn.prepareStatement("select r.id from manufacturer r,contact c where r.id=c.id");
-        rs = stmt.executeQuery();
-        if (rs.next()) {
-          List<? extends Manufacturer> tmp = get(conn, Collections.singleton(manufacturer), ManufacturerGetter.class);
-          return tmp.isEmpty() ? null : tmp.get(0);
-        }
+        List<? extends Contact> tmp = get(conn, Collections.singleton(manufacturer), ContactType.MANUFACTURER);
+        return tmp.isEmpty() ? null : tmp.get(0);
       } catch (SQLException e) {
         throw new DataProviderException(e);
       } finally {
-        JDBCUtilities.close(rs, stmt, conn);
+        JDBCUtilities.close(conn);
       }
 
     }
@@ -440,29 +376,33 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
   }
 
   @Override
-  public Manufacturer makeManufacturer(Contact contact) throws DataProviderException
+  public Contact makeManufacturer(Contact contact) throws DataProviderException
   {
     Connection conn = null;
+    Contact result;
     try {
       conn = getConnection();
-      return makeManufacturer(conn, contact);
+      result = makeContactType(conn, contact, ContactType.MANUFACTURER);
     } catch (SQLException ex) {
       throw new DataProviderException(ex);
     } finally {
       JDBCUtilities.close(conn);
     }
+    fireDataProviderEvent(new DataProviderEvent(this, Action.MODIFIED, result, result.getId()));
+    return result;
   }
 
-  Manufacturer makeManufacturer(final Connection conn, Contact contact) throws SQLException, DataProviderException
+  Contact makeContactType(final Connection conn, Contact contact, ContactType type) throws SQLException, DataProviderException
   {
     PreparedStatement stmt = null;
     try {
-      if (!manufacturerExists(conn, contact.getId())) {
-        stmt = conn.prepareStatement("insert into manufacturer (id) values (?)");
+      if (!contactTypeExists(conn, contact.getId(), type)) {
+        stmt = conn.prepareStatement("insert into contacttypes (id,name) values (?,?)");
         stmt.setString(1, contact.getId().toString());
+        stmt.setString(2, type.name());
         stmt.executeUpdate();
       }
-      List<? extends Manufacturer> tmp = get(conn, Collections.singleton(contact.getId()), ManufacturerGetter.class);
+      List<? extends Contact> tmp = get(conn, Collections.singleton(contact.getId()), type);
       return tmp.isEmpty() ? null : tmp.get(0);
     } finally {
       JDBCUtilities.close(stmt);
@@ -470,67 +410,54 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
   }
 
   @Override
-  public Retailer makeRetailer(Contact contact) throws DataProviderException
+  public Contact makeRetailer(Contact contact) throws DataProviderException
   {
     Connection conn = null;
+    Contact result;
     try {
       conn = getConnection();
-      return makeRetailer(conn, contact);
+      result = makeContactType(conn, contact, ContactType.RETAILER);
     } catch (SQLException e) {
       throw new DataProviderException(e);
     } finally {
       JDBCUtilities.close(conn);
     }
+    fireDataProviderEvent(new DataProviderEvent(this, Action.MODIFIED, result, result.getId()));
+    return result;
   }
 
-  Retailer makeRetailer(final Connection conn, Contact contact) throws DataProviderException, SQLException
+  Contact removeFromContactType(Contact contact, ContactType type) throws DataProviderException
   {
+    Connection conn = null;
     PreparedStatement stmt = null;
+    Contact result;
     try {
-      if (!retailerExists(conn, contact.getId())) {
-        stmt = conn.prepareStatement("insert into retailer (id) values (?)");
-        stmt.setString(1, contact.getId().toString());
-        stmt.executeUpdate();
-      }
-      List<? extends Retailer> tmp = get(conn, Collections.singleton(contact.getId()), RetailerGetter.class);
-      return tmp.isEmpty() ? null : tmp.get(0);
+      conn = getConnection();
+      stmt = conn.prepareStatement("delete from contacttypes where id=? and name=?");
+      stmt.setString(1, contact.getId().toString());
+      stmt.setString(2, type.name());
+      stmt.executeUpdate();
+      List<? extends Contact> tmp = get(conn, Collections.singleton(contact.getId()), null);
+      result = tmp.isEmpty() ? null : tmp.get(0);
+    } catch (SQLException ex) {
+      throw new DataProviderException(ex);
     } finally {
       JDBCUtilities.close(stmt);
     }
+    fireDataProviderEvent(new DataProviderEvent(this, Action.MODIFIED, result, result.getId()));
+    return result;
   }
 
   @Override
-  public void removeFromManufacturer(Manufacturer contact) throws DataProviderException
+  public Contact removeFromManufacturer(Contact contact) throws DataProviderException
   {
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    try {
-      conn = getConnection();
-      stmt = conn.prepareStatement("delete from manufacturer where id=?");
-      stmt.setString(1, contact.getId().toString());
-      stmt.executeUpdate();
-    } catch (SQLException e) {
-      throw new DataProviderException(e);
-    } finally {
-      JDBCUtilities.close(stmt, conn);
-    }
+    return removeFromContactType(contact, ContactType.MANUFACTURER);
   }
 
   @Override
-  public void removeFromRetailer(Retailer contact) throws DataProviderException
+  public Contact removeFromRetailer(Contact contact) throws DataProviderException
   {
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    try {
-      conn = getConnection();
-      stmt = conn.prepareStatement("delete from retailer where id=?");
-      stmt.setString(1, contact.getId().toString());
-      stmt.executeUpdate();
-    } catch (SQLException e) {
-      throw new DataProviderException(e);
-    } finally {
-      JDBCUtilities.close(stmt, conn);
-    }
+    return removeFromContactType(contact, ContactType.RETAILER);
   }
 
   void checkContacts(Connection conn, Collection<? extends Contact> contacts) throws SQLException, DataProviderException
@@ -538,12 +465,6 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
     for (Contact c : contacts) {
       if (!keyExists(conn, c.getId())) {
         store(conn, c);
-      }
-      if (c instanceof Manufacturer) {
-        makeManufacturer(conn, c);
-      }
-      if (c instanceof Retailer) {
-        makeRetailer(conn, c);
       }
     }
   }
@@ -572,7 +493,7 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
 
   @Override
   public List<? extends Contact> getContacts(Collection<? extends UniversalSearchRequest> requests,
-          ContactType classFilter) throws DataProviderException
+                                             ContactType classFilter) throws DataProviderException
   {
     Set<UUID> ids = null;
     Connection conn = null;
@@ -586,18 +507,7 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
           return Collections.emptyList();
         }
       }
-      Class<? extends Getter<?>> getter = null;
-      switch (classFilter) {
-        case MANUFACTURER:
-          getter = ManufacturerGetter.class;
-          break;
-        case RETAILER:
-          getter = RetailerGetter.class;
-          break;
-        default:
-          getter = GenericGetter.class;
-      }
-      return get(conn, ids, getter);
+      return get(conn, ids, classFilter);
     } catch (SQLException e) {
       throw new DataProviderException(e);
     } finally {
@@ -631,6 +541,29 @@ public class FBContactItemProvider extends AbstractMotrivFBItemProvider<UUID, Co
       }
     } finally {
       JDBCUtilities.close(rs, stmt);
+    }
+    return result;
+  }
+
+  @Override
+  public List<LabelKeyPair<UUID>> getAllLabels(ContactType type) throws DataProviderException
+  {
+    List<LabelKeyPair<UUID>> result = new LinkedList<LabelKeyPair<UUID>>();
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+    try {
+      conn = getConnection();
+      stmt = conn.prepareStatement("select c.id,c.name from contact c,contacttypes m where c.id=m.id and m.name=? order by c.name");
+      stmt.setString(1, type.name());
+      rs = stmt.executeQuery();
+      while (rs.next()) {
+        result.add(new LabelKeyPair<UUID>(JDBCUtilities.getUUID(rs, "id"), rs.getString("name")));
+      }
+    } catch (SQLException ex) {
+      throw new DataProviderException(ex);
+    } finally {
+      JDBCUtilities.close(rs, stmt, conn);
     }
     return result;
   }

@@ -26,15 +26,18 @@
   >
 
 <!--- Put your DTDDoc comment here. -->
-<!ELEMENT contact (name,(memo?|www?|email?|country?|city?|zip?|address2?|address1?|phone1?|phone2?|fax?))>
+<!ELEMENT contact (name,type,(type*),(memo?|www?|email?|country?|city?|zip?|address2?|address1?|phone1?|phone2?|fax?|shopaddress?))>
 <!ATTLIST contact
-    isRetailer CDATA #IMPLIED
-    isManufacturer CDATA #IMPLIED
     id CDATA #REQUIRED
   >
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT name (#PCDATA)>
+
+<!ELEMENT type (EMPTY)>
+<!ATTLIST type
+   name CDATA #REQUIRED
+>
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT address1 (#PCDATA)>
@@ -56,6 +59,9 @@
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT www (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT shopaddress (#PCDATA)>
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT memo (#PCDATA)>

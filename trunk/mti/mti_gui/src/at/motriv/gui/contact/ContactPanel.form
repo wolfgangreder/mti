@@ -19,52 +19,62 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="lbPhone1" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbWWW" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbPhone2" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbFax" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbEmail" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbCountry" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="lbPhone1" alignment="0" pref="48" max="32767" attributes="1"/>
+                          <Component id="lbPhone2" alignment="0" pref="48" max="32767" attributes="1"/>
+                          <Component id="lbShop" alignment="0" max="32767" attributes="1"/>
+                          <Component id="lbWWW" alignment="1" min="-2" pref="50" max="-2" attributes="1"/>
+                          <Component id="lbFax" alignment="0" max="32767" attributes="1"/>
+                          <Component id="lbMemo" alignment="0" max="32767" attributes="1"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jScrollPane1" alignment="0" pref="319" max="32767" attributes="0"/>
+                          <Component id="edPhone1" alignment="1" pref="319" max="32767" attributes="0"/>
+                          <Component id="edPhone2" alignment="1" pref="319" max="32767" attributes="0"/>
+                          <Component id="edFax" alignment="1" pref="319" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-                  <Component id="lbCity" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lbMemo" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Group type="103" alignment="0" groupAlignment="1" attributes="0">
-                      <Component id="lbName" alignment="1" min="-2" max="-2" attributes="0"/>
-                      <Component id="lbAddress" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="lbAddress" alignment="0" max="32767" attributes="1"/>
+                          <Component id="lbCity" alignment="0" max="32767" attributes="1"/>
+                          <Component id="lbName" alignment="0" max="32767" attributes="1"/>
+                          <Component id="lbEmail" alignment="0" pref="50" max="32767" attributes="1"/>
+                          <Component id="lbCountry" alignment="0" max="32767" attributes="1"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="edAddress" alignment="1" pref="319" max="32767" attributes="0"/>
+                          <Component id="edAddress2" alignment="1" pref="319" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="edZip" min="-2" pref="36" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="edCity" pref="277" max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="cbCountry" alignment="0" pref="319" max="32767" attributes="0"/>
+                          <Component id="edName" alignment="1" pref="319" max="32767" attributes="0"/>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="edWWW" pref="291" max="32767" attributes="0"/>
+                                  <Component id="edEmail" alignment="1" pref="291" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="btMail" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btWWW" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Component id="edShop" pref="291" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btShop" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="edAddress" alignment="1" pref="319" max="32767" attributes="0"/>
-                  <Component id="edAddress2" alignment="1" pref="319" max="32767" attributes="0"/>
-                  <Component id="jScrollPane1" alignment="0" pref="319" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Component id="edZip" min="-2" pref="36" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="edCity" pref="277" max="32767" attributes="0"/>
-                  </Group>
-                  <Component id="edFax" alignment="0" pref="319" max="32767" attributes="0"/>
-                  <Component id="edPhone2" alignment="0" pref="319" max="32767" attributes="0"/>
-                  <Component id="edPhone1" alignment="0" pref="319" max="32767" attributes="0"/>
-                  <Group type="102" alignment="1" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="edEmail" alignment="0" pref="291" max="32767" attributes="0"/>
-                          <Component id="edWWW" alignment="1" pref="291" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="btMail" min="-2" max="-2" attributes="0"/>
-                          <Component id="btWWW" alignment="0" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
-                  <Component id="cbCountry" alignment="0" pref="319" max="32767" attributes="0"/>
-                  <Component id="edName" alignment="1" pref="319" max="32767" attributes="0"/>
-              </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -73,8 +83,8 @@
           <Group type="102" alignment="0" max="-2" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lbName" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="edName" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lbName" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -91,12 +101,12 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lbCountry" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="cbCountry" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lbCountry" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Group type="103" groupAlignment="3" attributes="0">
+                  <Group type="103" alignment="1" groupAlignment="3" attributes="0">
                       <Component id="edEmail" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="lbEmail" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -104,13 +114,21 @@
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Group type="103" groupAlignment="3" attributes="0">
+                  <Group type="103" alignment="1" groupAlignment="3" attributes="0">
                       <Component id="edWWW" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="lbWWW" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="btWWW" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="103" alignment="1" groupAlignment="3" attributes="0">
+                      <Component id="edShop" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="lbShop" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Component id="btShop" alignment="1" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lbPhone1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="edPhone1" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -122,15 +140,15 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lbFax" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="edFax" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lbFax" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="lbMemo" min="-2" max="-2" attributes="0"/>
                   <Component id="jScrollPane1" min="-2" pref="111" max="-2" attributes="0"/>
+                  <Component id="lbMemo" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -138,6 +156,7 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="lbName">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="edName"/>
         </Property>
@@ -148,6 +167,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lbAddress">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="edAddress"/>
         </Property>
@@ -158,6 +178,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lbCity">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="edZip"/>
         </Property>
@@ -168,6 +189,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lbCountry">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="cbCountry"/>
         </Property>
@@ -178,6 +200,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lbPhone1">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="edPhone1"/>
         </Property>
@@ -188,6 +211,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lbPhone2">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="edPhone2"/>
         </Property>
@@ -198,6 +222,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lbFax">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="edFax"/>
         </Property>
@@ -208,6 +233,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lbEmail">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="edEmail"/>
         </Property>
@@ -218,6 +244,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lbWWW">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="edWWW"/>
         </Property>
@@ -228,6 +255,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lbMemo">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="edMemo"/>
         </Property>
@@ -242,9 +270,6 @@
           <ResourceString bundle="at/motriv/gui/contact/Bundle.properties" key="ContactPanel.edName.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="edName.getDocument().addDocumentListener(this);"/>
-      </AuxValues>
     </Component>
     <Component class="javax.swing.JTextField" name="edAddress">
       <Properties>
@@ -252,9 +277,6 @@
           <ResourceString bundle="at/motriv/gui/contact/Bundle.properties" key="ContactPanel.edAddress.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="edAddress.getDocument().addDocumentListener(this);"/>
-      </AuxValues>
     </Component>
     <Component class="javax.swing.JTextField" name="edAddress2">
       <Properties>
@@ -262,9 +284,6 @@
           <ResourceString bundle="at/motriv/gui/contact/Bundle.properties" key="ContactPanel.edAddress2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="edAddress2.getDocument().addDocumentListener(this);"/>
-      </AuxValues>
     </Component>
     <Component class="javax.swing.JTextField" name="edZip">
       <Properties>
@@ -272,9 +291,6 @@
           <ResourceString bundle="at/motriv/gui/contact/Bundle.properties" key="ContactPanel.edZip.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="edZip.getDocument().addDocumentListener(this);"/>
-      </AuxValues>
     </Component>
     <Component class="javax.swing.JComboBox" name="cbCountry">
       <Properties>
@@ -310,9 +326,6 @@
           <ResourceString bundle="at/motriv/gui/contact/Bundle.properties" key="ContactPanel.edPhone1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="edPhone1.getDocument().addDocumentListener(this);"/>
-      </AuxValues>
     </Component>
     <Component class="javax.swing.JTextField" name="edPhone2">
       <Properties>
@@ -320,9 +333,6 @@
           <ResourceString bundle="at/motriv/gui/contact/Bundle.properties" key="ContactPanel.edPhone2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="edPhone2.getDocument().addDocumentListener(this);"/>
-      </AuxValues>
     </Component>
     <Component class="javax.swing.JTextField" name="edFax">
       <Properties>
@@ -330,9 +340,6 @@
           <ResourceString bundle="at/motriv/gui/contact/Bundle.properties" key="ContactPanel.edFax.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="edFax.getDocument().addDocumentListener(this);"/>
-      </AuxValues>
     </Component>
     <Component class="javax.swing.JButton" name="btWWW">
       <Properties>
@@ -366,9 +373,6 @@
           <ResourceString bundle="at/motriv/gui/contact/Bundle.properties" key="ContactPanel.edCity.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="edCity.getDocument().addDocumentListener(this);"/>
-      </AuxValues>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
       <AuxValues>
@@ -378,11 +382,42 @@
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
         <Component class="javax.swing.JEditorPane" name="edMemo">
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="edMemo.getDocument().addDocumentListener(this);"/>
-          </AuxValues>
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JButton" name="btShop">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/at/motriv/gui/contact/icon_world.gif"/>
+        </Property>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+          <Insets value="[0, 0, 0, 0]"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btShopActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbShop">
+      <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
+        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="edShop"/>
+        </Property>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="at/motriv/gui/contact/Bundle.properties" key="ContactPanel.lbShop.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="edShop">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="at/motriv/gui/contact/Bundle.properties" key="ContactPanel.edShop.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="edShop.getDocument().addDocumentListener(new ChangeDocumentListener(){&#xa;protected void changed(DocumentEvent evt) {&#xa;  shopChanged(evt);&#xa;}&#xa;});"/>
+      </AuxValues>
+    </Component>
   </SubComponents>
 </Form>

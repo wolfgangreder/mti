@@ -4,6 +4,8 @@
  */
 package at.motriv.datamodel.entities.contact;
 
+import at.mountain_sd.objects.MutatorProvider;
+import java.util.Set;
 import java.util.UUID;
 import org.openide.util.Lookup;
 
@@ -11,7 +13,7 @@ import org.openide.util.Lookup;
  *
  * @author wolfi
  */
-public interface Contact extends Lookup.Provider
+public interface Contact extends Lookup.Provider, MutatorProvider<MutableContact>
 {
 
   public UUID getId();
@@ -32,6 +34,8 @@ public interface Contact extends Lookup.Provider
 
   public String getWWW();
 
+  public String getShopAddress();
+
   public String getMemo();
 
   public String getPhone1();
@@ -39,4 +43,6 @@ public interface Contact extends Lookup.Provider
   public String getPhone2();
 
   public String getFax();
+
+  public Set<ContactType> getTypes();
 }

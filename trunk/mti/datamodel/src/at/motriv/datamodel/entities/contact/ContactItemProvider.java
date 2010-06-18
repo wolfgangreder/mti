@@ -6,6 +6,7 @@ package at.motriv.datamodel.entities.contact;
 
 import at.mountainsd.dataprovider.api.DataProviderException;
 import at.mountainsd.dataprovider.api.ItemProvider;
+import at.mountainsd.dataprovider.api.LabelKeyPair;
 import at.mountainsd.dataprovider.api.UniversalSearchRequest;
 import java.util.Collection;
 import java.util.List;
@@ -19,23 +20,25 @@ public interface ContactItemProvider extends ItemProvider<UUID, Contact>
 {
 
   public List<? extends Contact> getContacts(Collection<? extends UniversalSearchRequest> requests,
-          ContactType classFilter) throws DataProviderException;
+                                             ContactType classFilter) throws DataProviderException;
 
-  public List<? extends Retailer> getAllRetailers() throws DataProviderException;
+  public List<? extends Contact> getAllRetailers() throws DataProviderException;
 
-  public Retailer getRetailer(UUID retailer) throws DataProviderException;
+  public Contact getRetailer(UUID retailer) throws DataProviderException;
 
-  public List<? extends Manufacturer> getAllManufacturer() throws DataProviderException;
+  public List<? extends Contact> getAllManufacturer() throws DataProviderException;
 
-  public Manufacturer getManufacturer(UUID manufacturer) throws DataProviderException;
+  public Contact getManufacturer(UUID manufacturer) throws DataProviderException;
 
-  public void removeFromRetailer(Retailer contact) throws DataProviderException;
+  public Contact removeFromRetailer(Contact contact) throws DataProviderException;
 
-  public void removeFromManufacturer(Manufacturer contact) throws DataProviderException;
+  public Contact removeFromManufacturer(Contact contact) throws DataProviderException;
 
-  public Retailer makeRetailer(Contact contact) throws DataProviderException;
+  public Contact makeRetailer(Contact contact) throws DataProviderException;
 
-  public Manufacturer makeManufacturer(Contact contact) throws DataProviderException;
+  public Contact makeManufacturer(Contact contact) throws DataProviderException;
 
   public List<String> getLookupCountries() throws DataProviderException;
+
+  public List<LabelKeyPair<UUID>> getAllLabels(ContactType type) throws DataProviderException;
 }
