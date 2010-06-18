@@ -6,8 +6,8 @@ package at.motriv.gui.models;
 
 import at.motriv.datamodel.MotrivItemProviderLookup;
 import at.motriv.datamodel.config.MotrivConfig;
+import at.motriv.datamodel.entities.contact.Contact;
 import at.motriv.datamodel.entities.contact.ContactItemProvider;
-import at.motriv.datamodel.entities.contact.Retailer;
 import at.mountainsd.dataprovider.api.DataProviderException;
 import java.util.Collections;
 import java.util.List;
@@ -18,11 +18,11 @@ import org.openide.util.Exceptions;
  *
  * @author wolfi
  */
-public class RetailerComboBoxModel extends AbstractContactComboBoxModel<Retailer>
+public class RetailerComboBoxModel extends AbstractContactComboBoxModel
 {
 
   @Override
-  protected List<? extends Retailer> getCurrentItems()
+  protected List<? extends Contact> getCurrentItems()
   {
     try {
       ContactItemProvider provider = MotrivItemProviderLookup.lookup(ContactItemProvider.class);
@@ -35,13 +35,13 @@ public class RetailerComboBoxModel extends AbstractContactComboBoxModel<Retailer
   }
 
   @Override
-  protected List<? extends Retailer> getDefaultItems()
+  protected List<? extends Contact> getDefaultItems()
   {
-    return Collections.singletonList(DUMMY_RETAILER);
+    return Collections.singletonList(DUMMY_CONTACT);
   }
 
   @Override
-  protected Retailer getDefaultSelection()
+  protected Contact getDefaultSelection()
   {
     UUID defaultId = MotrivConfig.getConfigValue(MotrivConfig.KEY_DEFAULT_RETAILER);
     if (defaultId != null) {

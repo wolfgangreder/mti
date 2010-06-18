@@ -6,12 +6,10 @@ package at.motriv.gui.models;
 
 import at.motriv.datamodel.MotrivItemProviderLookup;
 import at.motriv.datamodel.config.MotrivConfig;
+import at.motriv.datamodel.entities.contact.Contact;
 import at.motriv.datamodel.entities.contact.ContactItemProvider;
-import at.motriv.datamodel.entities.contact.Manufacturer;
 import at.mountainsd.dataprovider.api.DataProviderException;
-import java.text.Collator;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import org.openide.util.Exceptions;
@@ -20,11 +18,11 @@ import org.openide.util.Exceptions;
  *
  * @author wolfi
  */
-public class ManufacturerComboBoxModel extends AbstractContactComboBoxModel<Manufacturer>
+public class ManufacturerComboBoxModel extends AbstractContactComboBoxModel
 {
 
   @Override
-  protected List<? extends Manufacturer> getCurrentItems()
+  protected List<? extends Contact> getCurrentItems()
   {
     try {
       ContactItemProvider provider = MotrivItemProviderLookup.lookup(ContactItemProvider.class);
@@ -37,13 +35,13 @@ public class ManufacturerComboBoxModel extends AbstractContactComboBoxModel<Manu
   }
 
   @Override
-  protected List<? extends Manufacturer> getDefaultItems()
+  protected List<? extends Contact> getDefaultItems()
   {
-    return Collections.singletonList(DUMMY_MANUFACTURER);
+    return Collections.singletonList(DUMMY_CONTACT);
   }
 
   @Override
-  protected Manufacturer getDefaultSelection()
+  protected Contact getDefaultSelection()
   {
     UUID defaultId = MotrivConfig.getConfigValue(MotrivConfig.KEY_DEFAULT_MANUFACTURER);
     if (defaultId != null) {

@@ -29,12 +29,13 @@ public interface ContactXMLSupport extends XMLSupport<Contact>
     memo,
     phone1,
     phone2,
-    fax
+    fax,
+    type,
+    shopaddress
   }
   public static final String ATTR_ID = "id";
   public static final String ATTR_VERSION = "version";
-  public static final String ATTR_IS_MANUFACTURER = "isManufacturer";
-  public static final String ATTR_IS_RETAILER = "isRetailer";
+  public static final String ATTR_NAME = "name";
   public static final String DTD_PUBLIC_ID = "-//at.motriv//contacts//EN";
   public static final String DTD_SYSTEM_ID = "http://www.motriv.at/dtd/contacts.dtd";
 }

@@ -11,60 +11,66 @@
 package at.motriv.gui.contact;
 
 import at.motriv.datamodel.entities.contact.Contact;
-import at.motriv.datamodel.entities.contact.GenericContactBuilder;
-import at.motriv.datamodel.entities.contact.impl.ContactBuilder;
 import at.motriv.gui.contact.model.ContactCountryComboBoxModel;
 import at.motriv.gui.helper.ChangeDocumentListener;
 import java.awt.Desktop;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import org.openide.util.Exceptions;
 
 /**
  *
  * @author wolfi
  */
-public class ContactPanel extends javax.swing.JPanel implements DocumentListener
+public class ContactPanel extends javax.swing.JPanel implements PropertyChangeListener
 {
 
   private static final long serialVersionUID = 1L;
   public static final String PROP_MODIFIED = "modified";
-  public static final String PROP_VALID = "valid";
-  private ContactBuilder<? extends Contact> builder;
-  private Contact original;
-  private boolean isModified;
-  private boolean isValid;
+  public static final String PROP_DATAVALID = "dataValid";
+  private DirtyMutableContact builder;
   private final ContactCountryComboBoxModel countryModel = new ContactCountryComboBoxModel();
 
   /** Creates new form ContactPanel */
   public ContactPanel()
   {
     initComponents();
+    initChangeListener();
     countryModel.refresh();
   }
 
-  public boolean getModified()
+  public boolean isModified()
   {
-    return isModified;
+    return builder.isDirty();
   }
 
-  public ContactBuilder<? extends Contact> getBuilder()
+  public boolean isDataValid()
   {
-    store();
+    return builder.isValid();
+  }
+
+  public DirtyMutableContact getBuilder()
+  {
     return builder;
   }
 
-  public void setBuilder(ContactBuilder<? extends Contact> builder)
+  public Contact getContact()
   {
-    if (builder == null) {
-      this.builder = new GenericContactBuilder();
-    } else {
-      this.builder = builder;
+    return builder.build();
+  }
+
+  public void setContact(Contact builder)
+  {
+    if (this.builder != null) {
+      this.builder.removePropertyChangeListener(this);
     }
-    original = this.builder.build();
+    this.builder = new DirtyMutableContact(builder);
+    this.builder.addPropertyChangeListener(this);
     assignValues();
   }
 
@@ -102,48 +108,57 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
     edCity = new javax.swing.JTextField();
     jScrollPane1 = new javax.swing.JScrollPane();
     edMemo = new javax.swing.JEditorPane();
+    btShop = new javax.swing.JButton();
+    lbShop = new javax.swing.JLabel();
+    edShop = new javax.swing.JTextField();
 
+    lbName.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     lbName.setLabelFor(edName);
     lbName.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.lbName.text")); // NOI18N
 
+    lbAddress.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     lbAddress.setLabelFor(edAddress);
     lbAddress.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.lbAddress.text")); // NOI18N
 
+    lbCity.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     lbCity.setLabelFor(edZip);
     lbCity.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.lbCity.text")); // NOI18N
 
+    lbCountry.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     lbCountry.setLabelFor(cbCountry);
     lbCountry.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.lbCountry.text")); // NOI18N
 
+    lbPhone1.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     lbPhone1.setLabelFor(edPhone1);
     lbPhone1.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.lbPhone1.text")); // NOI18N
 
+    lbPhone2.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     lbPhone2.setLabelFor(edPhone2);
     lbPhone2.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.lbPhone2.text")); // NOI18N
 
+    lbFax.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     lbFax.setLabelFor(edFax);
     lbFax.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.lbFax.text")); // NOI18N
 
+    lbEmail.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     lbEmail.setLabelFor(edEmail);
     lbEmail.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.lbEmail.text")); // NOI18N
 
+    lbWWW.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     lbWWW.setLabelFor(edWWW);
     lbWWW.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.lbWWW.text")); // NOI18N
 
+    lbMemo.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     lbMemo.setLabelFor(edMemo);
     lbMemo.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.lbMemo.text")); // NOI18N
 
     edName.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.edName.text")); // NOI18N
-    edName.getDocument().addDocumentListener(this);
 
     edAddress.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.edAddress.text")); // NOI18N
-    edAddress.getDocument().addDocumentListener(this);
 
     edAddress2.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.edAddress2.text")); // NOI18N
-    edAddress2.getDocument().addDocumentListener(this);
 
     edZip.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.edZip.text")); // NOI18N
-    edZip.getDocument().addDocumentListener(this);
 
     cbCountry.setEditable(true);
     cbCountry.setModel(countryModel);
@@ -163,13 +178,10 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
     });
 
     edPhone1.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.edPhone1.text")); // NOI18N
-    edPhone1.getDocument().addDocumentListener(this);
 
     edPhone2.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.edPhone2.text")); // NOI18N
-    edPhone2.getDocument().addDocumentListener(this);
 
     edFax.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.edFax.text")); // NOI18N
-    edFax.getDocument().addDocumentListener(this);
 
     btWWW.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/motriv/gui/contact/icon_world.gif"))); // NOI18N
     btWWW.setMargin(new java.awt.Insets(0, 0, 0, 0));
@@ -188,10 +200,27 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
     });
 
     edCity.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.edCity.text")); // NOI18N
-    edCity.getDocument().addDocumentListener(this);
 
-    edMemo.getDocument().addDocumentListener(this);
     jScrollPane1.setViewportView(edMemo);
+
+    btShop.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/motriv/gui/contact/icon_world.gif"))); // NOI18N
+    btShop.setMargin(new java.awt.Insets(0, 0, 0, 0));
+    btShop.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btShopActionPerformed(evt);
+      }
+    });
+
+    lbShop.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    lbShop.setLabelFor(edShop);
+    lbShop.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.lbShop.text")); // NOI18N
+
+    edShop.setText(org.openide.util.NbBundle.getMessage(ContactPanel.class, "ContactPanel.edShop.text")); // NOI18N
+    edShop.getDocument().addDocumentListener(new ChangeDocumentListener(){
+      protected void changed(DocumentEvent evt) {
+        shopChanged(evt);
+      }
+    });
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -201,41 +230,48 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
         .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
-            .addGap(14, 14, 14)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-              .addComponent(lbPhone1)
-              .addComponent(lbWWW)
-              .addComponent(lbPhone2)
-              .addComponent(lbFax)
-              .addComponent(lbEmail)
-              .addComponent(lbCountry)))
-          .addComponent(lbCity)
-          .addComponent(lbMemo)
-          .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(lbName)
-            .addComponent(lbAddress)))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(edAddress, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
-          .addComponent(edAddress2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
-          .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+              .addComponent(lbPhone1, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+              .addComponent(lbPhone2, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+              .addComponent(lbShop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+              .addComponent(lbWWW, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+              .addComponent(lbFax, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+              .addComponent(lbMemo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+              .addComponent(edPhone1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+              .addComponent(edPhone2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+              .addComponent(edFax, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)))
           .addGroup(layout.createSequentialGroup()
-            .addComponent(edZip, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(edCity, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE))
-          .addComponent(edFax, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
-          .addComponent(edPhone2, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
-          .addComponent(edPhone1, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
-          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(edEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
-              .addComponent(edWWW, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+              .addComponent(lbAddress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+              .addComponent(lbCity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+              .addComponent(lbName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+              .addComponent(lbEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+              .addComponent(lbCountry, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(btMail)
-              .addComponent(btWWW)))
-          .addComponent(cbCountry, 0, 319, Short.MAX_VALUE)
-          .addComponent(edName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE))
+              .addComponent(edAddress, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+              .addComponent(edAddress2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+              .addGroup(layout.createSequentialGroup()
+                .addComponent(edZip, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edCity, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE))
+              .addComponent(cbCountry, 0, 319, Short.MAX_VALUE)
+              .addComponent(edName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+              .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                  .addComponent(edWWW, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+                  .addComponent(edEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                  .addComponent(btMail)
+                  .addComponent(btWWW)))
+              .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(edShop, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btShop)))))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -243,8 +279,8 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(lbName)
-          .addComponent(edName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addComponent(edName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(lbName))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(lbAddress)
@@ -258,8 +294,8 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
           .addComponent(edCity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(lbCountry)
-          .addComponent(cbCountry, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addComponent(cbCountry, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(lbCountry))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
           .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -273,6 +309,12 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
             .addComponent(lbWWW))
           .addComponent(btWWW))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+            .addComponent(edShop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(lbShop))
+          .addComponent(btShop))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(lbPhone1)
           .addComponent(edPhone1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -282,13 +324,13 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
           .addComponent(edPhone2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(lbFax)
-          .addComponent(edFax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addComponent(edFax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(lbFax))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(lbMemo)
-          .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addContainerGap())
+          .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(lbMemo))
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -315,8 +357,21 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
       }
     }
   }//GEN-LAST:event_btWWWActionPerformed
+
+  private void btShopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btShopActionPerformed
+  {//GEN-HEADEREND:event_btShopActionPerformed
+    URI uri = getShopURI();
+    if (uri != null && getCanWWW()) {
+      try {
+        Desktop.getDesktop().browse(uri);
+      } catch (IOException ex) {
+        Exceptions.printStackTrace(ex);
+      }
+    }
+  }//GEN-LAST:event_btShopActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton btMail;
+  private javax.swing.JButton btShop;
   private javax.swing.JButton btWWW;
   private javax.swing.JComboBox cbCountry;
   private javax.swing.JTextField edAddress;
@@ -328,6 +383,7 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
   private javax.swing.JTextField edName;
   private javax.swing.JTextField edPhone1;
   private javax.swing.JTextField edPhone2;
+  private javax.swing.JTextField edShop;
   private javax.swing.JTextField edWWW;
   private javax.swing.JTextField edZip;
   private javax.swing.JScrollPane jScrollPane1;
@@ -340,6 +396,7 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
   private javax.swing.JLabel lbName;
   private javax.swing.JLabel lbPhone1;
   private javax.swing.JLabel lbPhone2;
+  private javax.swing.JLabel lbShop;
   private javax.swing.JLabel lbWWW;
   // End of variables declaration//GEN-END:variables
 
@@ -353,31 +410,18 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
     cbCountry.setSelectedItem(builder.getCountry());
     edEmail.setText(builder.getEmail());
     edWWW.setText(builder.getWWW());
+    edShop.setText(builder.getShopAddress());
     edPhone1.setText(builder.getPhone1());
     edPhone2.setText(builder.getPhone2());
     edFax.setText(builder.getFax());
     edMemo.setText(builder.getMemo());
   }
 
-  private void store()
-  {
-    builder.setName(edName.getText());
-    builder.setAddress1(edAddress.getText());
-    builder.setAddress2(edAddress2.getText());
-    builder.setZip(edZip.getText());
-    builder.setCity(edCity.getText());
-    builder.setCountry((String) cbCountry.getSelectedItem());
-    builder.setEmail(edEmail.getText());
-    builder.setWWW(edWWW.getText());
-    builder.setPhone1(edPhone1.getText());
-    builder.setPhone2(edPhone2.getText());
-    builder.setFax(edFax.getText());
-    builder.setMemo(edMemo.getText());
-  }
-
   private void emailChanged(DocumentEvent evt)
   {
-    checkModified();
+    if (builder != null) {
+      builder.setEmail(edEmail.getText());
+    }
     btMail.setEnabled(getEmailURI() != null && getCanEmail());
   }
 
@@ -399,8 +443,18 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
 
   private void wwwChanged(DocumentEvent evt)
   {
-    checkModified();
+    if (builder != null) {
+      builder.setWWW(edWWW.getText());
+    }
     btWWW.setEnabled(getWWWURI() != null && getCanWWW());
+  }
+
+  private void shopChanged(DocumentEvent evt)
+  {
+    if (builder != null) {
+      builder.setShopAddress(edShop.getText());
+    }
+    btShop.setEnabled(getShopURI() != null && getCanWWW());
   }
 
   private URI getWWWURI()
@@ -419,68 +473,161 @@ public class ContactPanel extends javax.swing.JPanel implements DocumentListener
     return null;
   }
 
+  private URI getShopURI()
+  {
+    try {
+      String str = edShop.getText();
+      URI uri;
+      if (str.toLowerCase().startsWith("http://")) {
+        uri = new URI(str);
+      } else {
+        uri = new URI("http", str, null);
+      }
+      return uri;
+    } catch (URISyntaxException ex) {
+    }
+    return null;
+  }
+
   private boolean getCanWWW()
   {
     return Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
   }
 
   @Override
-  public void insertUpdate(DocumentEvent e)
+  public void propertyChange(final PropertyChangeEvent evt)
   {
-    checkModified();
-  }
+    if ("valid".equals(evt.getPropertyName())) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        firePropertyChange(PROP_DATAVALID, evt.getOldValue(), evt.getNewValue());
+      } else {
+        SwingUtilities.invokeLater(new Runnable()
+        {
 
-  @Override
-  public void removeUpdate(DocumentEvent e)
-  {
-    checkModified();
-  }
+          @Override
+          public void run()
+          {
+            firePropertyChange(PROP_DATAVALID, evt.getOldValue(), evt.getNewValue());
+          }
+        });
+      }
+    } else if ("dirty".equals(evt.getPropertyName())) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        firePropertyChange(PROP_MODIFIED, evt.getOldValue(), evt.getNewValue());
+      } else {
+        SwingUtilities.invokeLater(new Runnable()
+        {
 
-  @Override
-  public void changedUpdate(DocumentEvent e)
-  {
-    checkModified();
-  }
-
-  private boolean isModified(Object s1, Object s2)
-  {
-    if (s1 == null && s2 == null) {
-      return false;
-    }
-    if (s1 != null) {
-      return !s1.equals(s2);
-    } else {
-      return !s2.equals(s1);
-    }
-  }
-
-  private void checkModified()
-  {
-    boolean wasModified = isModified;
-    isModified = isModified(edName.getText(), original.getName())
-            || isModified(edAddress.getText(), original.getAddress1())
-            || isModified(edAddress2.getText(), original.getAddress2())
-            || isModified(edZip.getText(), original.getZip())
-            || isModified(edCity.getText(), original.getCity())
-            || isModified(cbCountry.getSelectedItem(), original.getCountry())
-            || isModified(edEmail.getText(), original.getEmail())
-            || isModified(edWWW.getText(), original.getWWW())
-            || isModified(edPhone1.getText(), original.getPhone1())
-            || isModified(edPhone2.getText(), original.getPhone2())
-            || isModified(edFax.getText(), original.getFax())
-            || isModified(edMemo.getText(), original.getMemo());
-    if (wasModified != isModified) {
-      firePropertyChange(PROP_MODIFIED, wasModified, isModified);
-      checkValid();
+          @Override
+          public void run()
+          {
+            firePropertyChange(PROP_MODIFIED, evt.getOldValue(), evt.getNewValue());
+          }
+        });
+      }
     }
   }
 
-  private void checkValid()
+  private void initChangeListener()
   {
-    boolean wasValid = isValid;
-    isValid = edName.getText() != null && edName.getText().trim().length() > 0;
-    if (wasValid != isValid) {
-      firePropertyChange(PROP_VALID, wasValid, isValid);
-    }
+    edAddress.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (builder != null) {
+          builder.setAddress1(edAddress.getText());
+        }
+      }
+    });
+    edAddress2.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (builder != null) {
+          builder.setAddress2(edAddress2.getText());
+        }
+      }
+    });
+    edCity.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (builder != null) {
+          builder.setCity(edCity.getText());
+        }
+      }
+    });
+    edFax.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (builder != null) {
+          builder.setFax(edFax.getText());
+        }
+      }
+    });
+    edMemo.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (builder != null) {
+          builder.setMemo(edMemo.getText());
+        }
+      }
+    });
+    edName.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (builder != null) {
+          builder.setName(edName.getText());
+        }
+      }
+    });
+    edPhone1.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (builder != null) {
+          builder.setPhone1(edPhone1.getText());
+        }
+      }
+    });
+    edPhone2.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (builder != null) {
+          builder.setPhone2(edPhone2.getText());
+        }
+      }
+    });
+    edZip.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (builder != null) {
+          builder.setZip(edZip.getText());
+        }
+      }
+    });
   }
 }

@@ -15,7 +15,7 @@ import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
-public class NewContactWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor>,PropertyChangeListener
+public class NewContactWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor>, PropertyChangeListener
 {
 
   /**
@@ -28,6 +28,7 @@ public class NewContactWizardPanel1 implements WizardDescriptor.Panel<WizardDesc
   // is kept separate. This can be more efficient: if the wizard is created
   // but never displayed, or not all panels are displayed, it is better to
   // create only those which really need to be visible.
+
   @Override
   public Component getComponent()
   {
@@ -52,6 +53,7 @@ public class NewContactWizardPanel1 implements WizardDescriptor.Panel<WizardDesc
   {
     return component.getSelection() != null;
   }
+
   private final Set<ChangeListener> listeners = new CopyOnWriteArraySet<ChangeListener>(); // or can use ChangeSupport in NB 6.0
 
   @Override
@@ -92,7 +94,7 @@ public class NewContactWizardPanel1 implements WizardDescriptor.Panel<WizardDesc
   @Override
   public void storeSettings(WizardDescriptor settings)
   {
-    NewContactWizardData tmpdata = (NewContactWizardData)settings.getProperty(WizardDescriptor.PROP_CONTENT_DATA);
+    NewContactWizardData tmpdata = (NewContactWizardData) settings.getProperty(WizardDescriptor.PROP_CONTENT_DATA);
     data = new WeakReference<NewContactWizardData>(tmpdata);
     tmpdata.setCreationMode(component.getSelection());
   }
@@ -100,8 +102,8 @@ public class NewContactWizardPanel1 implements WizardDescriptor.Panel<WizardDesc
   @Override
   public void propertyChange(PropertyChangeEvent evt)
   {
-    NewContactWizardData myData = data!=null ? data.get() : null;
-    if (myData!=null) {
+    NewContactWizardData myData = data != null ? data.get() : null;
+    if (myData != null) {
       myData.setCreationMode(component.getSelection());
       fireChangeEvent();
     }

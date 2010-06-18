@@ -5,13 +5,15 @@
 package at.motriv.datamodel.entities.contact.impl;
 
 import at.motriv.datamodel.entities.contact.Contact;
+import at.motriv.datamodel.entities.contact.ContactType;
 import at.motriv.datamodel.entities.contact.ContactXMLSupport;
-import at.motriv.datamodel.entities.contact.ManufacturerBuilder;
-import at.motriv.datamodel.entities.contact.RetailerBuilder;
+import at.motriv.datamodel.entities.contact.MutableContact;
 import java.io.IOException;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -42,8 +44,8 @@ public class ContactParser extends DefaultHandler2
   private String phone1;
   private String phone2;
   private String fax;
-  private boolean isManufacturer;
-  private boolean isRetailer;
+  private String shopAddress;
+  private Set<ContactType> types = new HashSet<ContactType>();
   private final Deque<ContactXMLSupport.Elements> elementStack = new LinkedList<ContactXMLSupport.Elements>();
 
   public List<? extends Contact> getItems()
@@ -104,15 +106,27 @@ public class ContactParser extends DefaultHandler2
       case fax:
         fax = builder.toString();
         break;
-      case contact:
-        if (isManufacturer) {
-          items.add(new ManufacturerBuilder().address1(address1).address2(address2).city(city).country(country).email(email).id(id).
-                  memo(memo).name(name).www(www).zip(zip).phone1(phone1).phone2(phone2).fax(fax).build());
-        }
-        if (isRetailer) {
-          items.add(new RetailerBuilder().address1(address1).address2(address2).city(city).country(country).email(email).id(id).
-                  memo(memo).name(name).www(www).zip(zip).phone1(phone1).phone2(phone2).fax(fax).build());
-        }
+      case shopaddress:
+        shopAddress = builder.toString();
+        break;
+      case contact: {
+        MutableContact b = new DefaultMutableContact(types);
+        b.setAddress1(address1);
+        b.setAddress2(address2);
+        b.setCity(city);
+        b.setCountry(country);
+        b.setEmail(email);
+        b.setFax(fax);
+        b.setId(id);
+        b.setMemo(memo);
+        b.setName(name);
+        b.setPhone1(phone1);
+        b.setPhone2(phone2);
+        b.setShopAddress(shopAddress);
+        b.setTypes(types);
+        b.setWWW(www);
+        b.setZip(zip);
+        items.add(b.build());
         name = null;
         memo = null;
         id = null;
@@ -126,9 +140,10 @@ public class ContactParser extends DefaultHandler2
         phone1 = null;
         phone2 = null;
         fax = null;
-        isManufacturer = false;
-        isRetailer = false;
-        break;
+        shopAddress = null;
+        types.clear();
+      }
+      break;
     }
   }
 
@@ -141,6 +156,9 @@ public class ContactParser extends DefaultHandler2
       case contact:
         processStartContact(attributes);
         break;
+      case type:
+        processStartType(attributes);
+        break;
     }
   }
 
@@ -148,8 +166,16 @@ public class ContactParser extends DefaultHandler2
   {
     try {
       id = UUID.fromString(attributes.getValue(ContactXMLSupport.ATTR_ID));
-      isManufacturer = Boolean.parseBoolean(attributes.getValue(ContactXMLSupport.ATTR_IS_MANUFACTURER));
-      isRetailer = Boolean.parseBoolean(attributes.getValue(ContactXMLSupport.ATTR_IS_RETAILER));
+    } catch (IllegalArgumentException e) {
+      throw new SAXException(e);
+    }
+  }
+
+  private void processStartType(Attributes attributes) throws SAXException
+  {
+    try {
+      String n = attributes.getValue(ContactXMLSupport.ATTR_NAME);
+      types.add(ContactType.valueOf(n));
     } catch (IllegalArgumentException e) {
       throw new SAXException(e);
     }

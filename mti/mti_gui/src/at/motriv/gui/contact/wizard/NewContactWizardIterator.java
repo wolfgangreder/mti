@@ -18,6 +18,7 @@ import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.WizardDescriptor.Panel;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 public final class NewContactWizardIterator implements WizardDescriptor.Iterator<WizardDescriptor>
 {
@@ -58,7 +59,7 @@ public final class NewContactWizardIterator implements WizardDescriptor.Iterator
   {
     if (panels == null) {
       panels = new WizardDescriptor.Panel[]{new NewContactWizardPanel1(),
-                new NewContactWizardPanel2()};
+                                            new NewContactWizardPanel2()};
       for (int i = 0; i < panels.length; i++) {
         Component c = panels[i].getComponent();
         // Default step name to component name of panel.
@@ -94,7 +95,7 @@ public final class NewContactWizardIterator implements WizardDescriptor.Iterator
   @Override
   public String name()
   {
-    return index + 1 + ". from " + getPanels().length;
+    return NbBundle.getMessage(getClass(), "NewContactWizard.steps", index + 1, getPanels().length);
   }
 
   @Override
@@ -160,7 +161,7 @@ public final class NewContactWizardIterator implements WizardDescriptor.Iterator
     // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
     // {1} will be replaced by WizardDescriptor.Iterator.name()
     wizardDescriptor.setTitleFormat(new MessageFormat("{0} ({1})"));
-    wizardDescriptor.setTitle("Your wizard dialog title here");
+    wizardDescriptor.setTitle(NbBundle.getMessage(NewContactWizardIterator.class, "NewContactWizard.title"));
     NewContactWizardData data = new NewContactWizardData(allowedModes);
     wizardDescriptor.putProperty(WizardDescriptor.PROP_CONTENT_DATA, data);
     iterator.setData(data);

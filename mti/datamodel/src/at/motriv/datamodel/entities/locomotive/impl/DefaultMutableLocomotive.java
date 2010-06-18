@@ -5,18 +5,19 @@
 package at.motriv.datamodel.entities.locomotive.impl;
 
 import at.motriv.datamodel.Decoder;
-import at.motriv.datamodel.External;
-import at.motriv.datamodel.ExternalKind;
+import at.motriv.datamodel.externals.External;
+import at.motriv.datamodel.externals.ExternalKind;
 import at.motriv.datamodel.ModelCondition;
 import at.motriv.datamodel.ServiceEntry;
-import at.motriv.datamodel.entities.contact.Manufacturer;
-import at.motriv.datamodel.entities.contact.Retailer;
+import at.motriv.datamodel.entities.contact.Contact;
+import at.motriv.datamodel.entities.contact.ContactType;
 import at.motriv.datamodel.entities.era.Era;
 import at.motriv.datamodel.entities.locomotive.Locomotive;
 import at.motriv.datamodel.entities.locomotive.MutableLocomotive;
 import at.motriv.datamodel.entities.scale.Scale;
 import at.mountainsd.util.Money;
 import at.mountainsd.util.Utils;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -46,9 +47,9 @@ public class DefaultMutableLocomotive extends AbstractLocomotive implements Muta
   private double height;
   private double width;
   private double length;
-  private Manufacturer manufacturer;
+  private Contact manufacturer;
   private String productNumber;
-  private Retailer retailer;
+  private Contact retailer;
   private Date dateOfPurchase;
   private Money price;
   private ModelCondition condition;
@@ -138,15 +139,23 @@ public class DefaultMutableLocomotive extends AbstractLocomotive implements Muta
   }
 
   @Override
-  public void setManufacturer(Manufacturer manufacturer)
+  public void setManufacturer(Contact manufacturer)
   {
-    this.manufacturer = manufacturer;
+    if (manufacturer.getTypes().contains(ContactType.MANUFACTURER)) {
+      this.manufacturer = manufacturer;
+    } else {
+      throw new IllegalArgumentException(MessageFormat.format("contact {0} is no manufacturer", manufacturer.getId()));
+    }
   }
 
   @Override
-  public void setRetailer(Retailer retailer)
+  public void setRetailer(Contact retailer)
   {
-    this.retailer = retailer;
+    if (retailer.getTypes().contains(ContactType.RETAILER)) {
+      this.retailer = retailer;
+    } else {
+      throw new IllegalArgumentException(MessageFormat.format("contact {0} is no retailer", manufacturer.getId()));
+    }
   }
 
   @Override
@@ -373,13 +382,13 @@ public class DefaultMutableLocomotive extends AbstractLocomotive implements Muta
   }
 
   @Override
-  public Manufacturer getManufacturer()
+  public Contact getManufacturer()
   {
     return manufacturer;
   }
 
   @Override
-  public Retailer getRetailer()
+  public Contact getRetailer()
   {
     return retailer;
   }
@@ -442,8 +451,9 @@ public class DefaultMutableLocomotive extends AbstractLocomotive implements Muta
   public Locomotive build()
   {
     return new DefaultLocomotive(id, name, locoClass, wheelArrangement, kind, era, company, country, scale, weight, height, width,
-            length, manufacturer, productNumber, retailer, Utils.copyDate(dateOfPurchase), price, condition, description,
-            masterImage, externals.values(), decoder, lastModified, locNumber);
+                                 length, manufacturer, productNumber, retailer, Utils.copyDate(dateOfPurchase), price, condition,
+                                 description,
+                                 masterImage, externals.values(), decoder, lastModified, locNumber);
   }
 
   @Override

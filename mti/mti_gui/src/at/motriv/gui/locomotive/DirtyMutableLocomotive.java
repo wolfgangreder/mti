@@ -5,12 +5,11 @@
 package at.motriv.gui.locomotive;
 
 import at.motriv.datamodel.Decoder;
-import at.motriv.datamodel.External;
+import at.motriv.datamodel.externals.External;
 import at.motriv.datamodel.ModelCondition;
 import at.motriv.datamodel.MotrivItemProviderLookup;
 import at.motriv.datamodel.ServiceEntry;
-import at.motriv.datamodel.entities.contact.Manufacturer;
-import at.motriv.datamodel.entities.contact.Retailer;
+import at.motriv.datamodel.entities.contact.Contact;
 import at.motriv.datamodel.entities.era.Era;
 import at.motriv.datamodel.entities.locomotive.Locomotive;
 import at.motriv.datamodel.entities.locomotive.LocomotiveItemProvider;
@@ -199,7 +198,7 @@ public class DirtyMutableLocomotive implements MutableLocomotive
   }
 
   @Override
-  public void setRetailer(Retailer retailer)
+  public void setRetailer(Contact retailer)
   {
     current.setRetailer(retailer);
     checkDirty();
@@ -234,7 +233,7 @@ public class DirtyMutableLocomotive implements MutableLocomotive
   }
 
   @Override
-  public void setManufacturer(Manufacturer manufacturer)
+  public void setManufacturer(Contact manufacturer)
   {
     current.setManufacturer(manufacturer);
     checkDirty();
@@ -369,7 +368,7 @@ public class DirtyMutableLocomotive implements MutableLocomotive
   }
 
   @Override
-  public Retailer getRetailer()
+  public Contact getRetailer()
   {
     return current.getRetailer();
   }
@@ -405,7 +404,7 @@ public class DirtyMutableLocomotive implements MutableLocomotive
   }
 
   @Override
-  public Manufacturer getManufacturer()
+  public Contact getManufacturer()
   {
     return current.getManufacturer();
   }

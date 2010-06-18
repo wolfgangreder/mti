@@ -6,17 +6,17 @@
             <file name="at-motriv-gui-contact-wizard-NewContactAction.instance">
                 <attr name="delegate" newvalue="at.motriv.gui.contact.wizard.NewContactAction"/>
                 <attr name="displayName" bundlevalue="at.motriv.gui.contact.wizard.Bundle#CTL_NewContactAction"/>
-                <attr name="iconBase" stringvalue="at/motriv/gui/contact/wizard/vcard_add.png"/>
+                <attr name="iconBase" stringvalue="at/motriv/gui/contact/vcard_add.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
             </file>
-            <file name="at-motriv-gui-locomotive-OpenLocomotiveAction.instance">
+            <file name="at-motriv-gui-OpenAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="at.motriv.gui.locomotive.Bundle#CTL_OpenLocomotiveAction"/>
-                <attr name="injectable" stringvalue="at.motriv.gui.locomotive.OpenLocomotiveAction"/>
+                <attr name="displayName" bundlevalue="at.motriv.gui.Bundle#CTL_OpenAction"/>
+                <attr name="injectable" stringvalue="at.motriv.gui.OpenAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
-                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
+                <attr name="selectionType" stringvalue="ANY"/>
                 <attr name="type" stringvalue="org.openide.cookies.OpenCookie"/>
             </file>
         </folder>
@@ -28,11 +28,29 @@
                 <attr name="noIconInMenu" boolvalue="false"/>
             </file>
         </folder>
+        <folder name="View">
+            <file name="at-motriv-gui-RefreshAction.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
+                <attr name="displayName" bundlevalue="at.motriv.gui.Bundle#CTL_RefreshAction"/>
+                <attr name="iconBase" stringvalue="at/motriv/gui/action_refresh.gif"/>
+                <attr name="injectable" stringvalue="at.motriv.gui.RefreshAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="selectionType" stringvalue="ANY"/>
+                <attr name="type" stringvalue="at.motriv.gui.RefreshCookie"/>
+            </file>
+        </folder>
         <folder name="Window">
             <file name="at-motriv-gui-MasterExplorerAction.instance">
                 <attr name="component" methodvalue="at.motriv.gui.MasterExplorerTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="at.motriv.gui.Bundle#CTL_MasterExplorerAction"/>
                 <attr name="iconBase" stringvalue="at/motriv/gui/folder.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
+            <file name="at-motriv-gui-contact-ContactTopComponentAction.instance">
+                <attr name="component" methodvalue="at.motriv.gui.contact.ContactTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="at.motriv.gui.contact.Bundle#CTL_ContactTopComponentAction"/>
+                <attr name="iconBase" stringvalue="at/motriv/gui/contact/vcard.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
         </folder>
@@ -48,6 +66,12 @@
                 <attr name="position" intvalue="300"/>
             </file>
         </folder>
+        <folder name="View">
+            <file name="at-motriv-gui-RefreshAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/View/at-motriv-gui-RefreshAction.instance"/>
+                <attr name="position" intvalue="1300"/>
+            </file>
+        </folder>
         <folder name="Window">
             <file name="MasterExplorerAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/at-motriv-gui-MasterExplorerAction.instance"/>
@@ -56,6 +80,10 @@
     </folder>
     <folder name="Toolbars">
         <folder name="File">
+            <file name="at-motriv-gui-RefreshAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/View/at-motriv-gui-RefreshAction.instance"/>
+                <attr name="position" intvalue="500"/>
+            </file>
             <file name="at-motriv-gui-contact-wizard-NewContactAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/File/at-motriv-gui-contact-wizard-NewContactAction.instance"/>
                 <attr name="position" intvalue="0"/>

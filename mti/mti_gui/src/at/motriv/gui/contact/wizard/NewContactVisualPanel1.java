@@ -9,8 +9,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.JPanel;
+import org.openide.util.NbBundle;
 
-public final class NewContactVisualPanel1 extends JPanel
+public final class NewContactVisualPanel1 extends JPanel 
 {
 
   private static final long serialVersionUID = 1L;
@@ -55,20 +56,20 @@ public final class NewContactVisualPanel1 extends JPanel
   public void setSelection(CreationMode mode)
   {
     CreationMode old = selection;
-    jRadioButton1.setSelected(jRadioButton1.isEnabled() && mode==CreationMode.NEW_MANUFACTURER);
-    jRadioButton2.setSelected(jRadioButton2.isEnabled() && mode==CreationMode.NEW_RETAILER);
-    jRadioButton3.setSelected(jRadioButton3.isEnabled() && mode==CreationMode.NEW_MANUFACTURER_FROM_RETAILER);
-    jRadioButton4.setSelected(jRadioButton4.isEnabled() && mode==CreationMode.NEW_RETAILER_FROM_MANUFACTURER);
+    jRadioButton1.setSelected(jRadioButton1.isEnabled() && mode == CreationMode.NEW_MANUFACTURER);
+    jRadioButton2.setSelected(jRadioButton2.isEnabled() && mode == CreationMode.NEW_RETAILER);
+    jRadioButton3.setSelected(jRadioButton3.isEnabled() && mode == CreationMode.NEW_MANUFACTURER_FROM_RETAILER);
+    jRadioButton4.setSelected(jRadioButton4.isEnabled() && mode == CreationMode.NEW_RETAILER_FROM_MANUFACTURER);
     selection = calcSelection();
-    if (old!=selection) {
+    if (old != selection) {
       firePropertyChange("selection", old, selection);
     }
   }
-  
+
   @Override
   public String getName()
   {
-    return "Step #1";
+    return NbBundle.getMessage(getClass(),"NewContactWizard.step1.name");
   }
 
   /** This method is called from within the constructor to
@@ -128,7 +129,7 @@ public final class NewContactVisualPanel1 extends JPanel
           .addComponent(jRadioButton2)
           .addComponent(jRadioButton3)
           .addComponent(jRadioButton4))
-        .addContainerGap(189, Short.MAX_VALUE))
+        .addContainerGap(30, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -141,17 +142,16 @@ public final class NewContactVisualPanel1 extends JPanel
         .addComponent(jRadioButton3)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(jRadioButton4)
-        .addContainerGap(200, Short.MAX_VALUE))
+        .addContainerGap(24, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 
   private void jRadioButton1ItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_jRadioButton1ItemStateChanged
   {//GEN-HEADEREND:event_jRadioButton1ItemStateChanged
-    if (evt.getStateChange()==ItemEvent.SELECTED) {
+    if (evt.getStateChange() == ItemEvent.SELECTED) {
       setSelection(calcSelection());
     }
   }//GEN-LAST:event_jRadioButton1ItemStateChanged
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.ButtonGroup buttonGroup1;
   private javax.swing.JRadioButton jRadioButton1;
@@ -159,5 +159,6 @@ public final class NewContactVisualPanel1 extends JPanel
   private javax.swing.JRadioButton jRadioButton3;
   private javax.swing.JRadioButton jRadioButton4;
   // End of variables declaration//GEN-END:variables
+
 }
 

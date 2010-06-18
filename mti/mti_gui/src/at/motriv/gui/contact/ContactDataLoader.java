@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package at.motriv.gui.contact;
 
 import at.mountainsd.dataprovider.api.NullDataLoader;
@@ -15,8 +14,17 @@ import org.openide.loaders.DataObject;
  *
  * @author wolfi
  */
-public class ContactDataLoader extends NullDataLoader {
+public class ContactDataLoader extends NullDataLoader
+{
+
   private static final long serialVersionUID = 1L;
+  private static final ContactDataLoader instance = new ContactDataLoader();
+
+  public static ContactDataLoader getInstance()
+  {
+    return instance;
+  }
+
   private ContactDataLoader()
   {
     super(ContactDataObject.class.getName());
@@ -27,5 +35,4 @@ public class ContactDataLoader extends NullDataLoader {
   {
     return new ContactDataObject(fo, this);
   }
-
 }

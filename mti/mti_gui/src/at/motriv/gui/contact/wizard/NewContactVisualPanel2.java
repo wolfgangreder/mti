@@ -8,16 +8,17 @@ import at.motriv.datamodel.MotrivItemProviderLookup;
 import at.motriv.datamodel.entities.contact.Contact;
 import at.motriv.datamodel.entities.contact.ContactItemProvider;
 import at.motriv.datamodel.entities.contact.ContactType;
-import at.motriv.datamodel.entities.contact.ManufacturerBuilder;
-import at.motriv.datamodel.entities.contact.RetailerBuilder;
-import at.motriv.datamodel.entities.contact.impl.ContactBuilder;
+import at.motriv.datamodel.entities.contact.MutableContact;
+import at.motriv.datamodel.entities.contact.impl.DefaultMutableContact;
 import at.motriv.gui.contact.ChooseContactPanel;
 import at.motriv.gui.contact.ContactPanel;
 import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 import javax.swing.JPanel;
+import org.openide.util.NbBundle;
 
 public final class NewContactVisualPanel2 extends JPanel implements PropertyChangeListener
 {
@@ -39,29 +40,36 @@ public final class NewContactVisualPanel2 extends JPanel implements PropertyChan
     }
     this.data = data;
     switch (data.getCreationMode()) {
-      case NEW_MANUFACTURER:
+      case NEW_MANUFACTURER: {
+        ContactPanel ctPanel = new ContactPanel();
+        ctPanel.setContact(new DefaultMutableContact(Collections.singleton(ContactType.MANUFACTURER)));
+        content = ctPanel;
+      }
+      break;
       case NEW_RETAILER: {
         ContactPanel ctPanel = new ContactPanel();
-        ctPanel.setBuilder(data.getCreationMode() == CreationMode.NEW_MANUFACTURER ? new ManufacturerBuilder() : new RetailerBuilder());
+        ctPanel.setContact(new DefaultMutableContact(Collections.singleton(ContactType.RETAILER)));
         content = ctPanel;
       }
       break;
       case NEW_MANUFACTURER_FROM_RETAILER:
       case NEW_RETAILER_FROM_MANUFACTURER: {
         ChooseContactPanel ctPanel = new ChooseContactPanel();
-        ctPanel.setFilter(data.getCreationMode() == CreationMode.NEW_MANUFACTURER_FROM_RETAILER ? ContactType.MANUFACTURER : ContactType.RETAILER);
+        ctPanel.setFilter(
+                data.getCreationMode() == CreationMode.NEW_MANUFACTURER_FROM_RETAILER ? ContactType.RETAILER : ContactType.MANUFACTURER);
         content = ctPanel;
       }
       break;
     }
-    content.addPropertyChangeListener("valid", this);
+    content.addPropertyChangeListener(ContactPanel.PROP_DATAVALID, this);
+    content.addPropertyChangeListener(ChooseContactPanel.PROP_SELECTION, this);
     add(content, BorderLayout.CENTER);
   }
 
   @Override
   public String getName()
   {
-    return "Step #2";
+    return NbBundle.getMessage(getClass(), "NewContactWizard.step2.name");
   }
 
   /** This method is called from within the constructor to
@@ -79,8 +87,8 @@ public final class NewContactVisualPanel2 extends JPanel implements PropertyChan
   {
     switch (data.getCreationMode()) {
       case NEW_MANUFACTURER:
-      case NEW_RETAILER:
-        final ContactBuilder<? extends Contact> builder = ((ContactPanel) content).getBuilder();
+      case NEW_RETAILER: {
+        final MutableContact builder = ((ContactPanel) content).getBuilder();
         final CreationMode cm = data.getCreationMode();
         return new Callable<Contact>()
         {
@@ -90,7 +98,7 @@ public final class NewContactVisualPanel2 extends JPanel implements PropertyChan
           {
             ContactItemProvider provider = MotrivItemProviderLookup.lookup(ContactItemProvider.class);
             if (provider != null) {
-              Contact tmp= provider.store(builder.build());
+              Contact tmp = provider.store(builder.build());
               switch (cm) {
                 case NEW_MANUFACTURER:
                   return provider.makeManufacturer(tmp);
@@ -101,8 +109,30 @@ public final class NewContactVisualPanel2 extends JPanel implements PropertyChan
             return null;
           }
         };
+      }
       case NEW_MANUFACTURER_FROM_RETAILER:
-      case NEW_RETAILER_FROM_MANUFACTURER:
+      case NEW_RETAILER_FROM_MANUFACTURER: {
+        final Contact contact = ((ChooseContactPanel) content).getSelectedContact();
+        final CreationMode cm = data.getCreationMode();
+        return new Callable<Contact>()
+        {
+
+          @Override
+          public Contact call() throws Exception
+          {
+            ContactItemProvider provider = MotrivItemProviderLookup.lookup(ContactItemProvider.class);
+            if (provider != null) {
+              switch (cm) {
+                case NEW_MANUFACTURER_FROM_RETAILER:
+                  return provider.makeManufacturer(contact);
+                case NEW_RETAILER_FROM_MANUFACTURER:
+                  return provider.makeRetailer(contact);
+              }
+            }
+            return null;
+          }
+        };
+      }
     }
     return null;
   }
@@ -110,12 +140,22 @@ public final class NewContactVisualPanel2 extends JPanel implements PropertyChan
   @Override
   public void propertyChange(PropertyChangeEvent evt)
   {
-    if ("valid".equals(evt.getPropertyName())) {
+    Object old = data.getFinisher();
+    if (ContactPanel.PROP_DATAVALID.equals(evt.getPropertyName())) {
       if ((Boolean) evt.getNewValue()) {
         data.setFinisher(getFinisher());
       } else {
         data.setFinisher(null);
       }
+    } else if (ChooseContactPanel.PROP_SELECTION.equals(evt.getPropertyName())) {
+      if ((Contact) evt.getNewValue() != null) {
+        data.setFinisher(getFinisher());
+      } else {
+        data.setFinisher(null);
+      }
+    }
+    if (old != data.getFinisher()) {
+      firePropertyChange("selection", old, data.getFinisher());
     }
   }
   // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -5,11 +5,10 @@
 package at.motriv.datamodel.entities.locomotive;
 
 import at.motriv.datamodel.Decoder;
-import at.motriv.datamodel.External;
+import at.motriv.datamodel.externals.External;
 import at.motriv.datamodel.ModelCondition;
 import at.motriv.datamodel.ServiceEntry;
-import at.motriv.datamodel.entities.contact.Manufacturer;
-import at.motriv.datamodel.entities.contact.Retailer;
+import at.motriv.datamodel.entities.contact.Contact;
 import at.motriv.datamodel.entities.era.Era;
 import at.motriv.datamodel.entities.scale.Scale;
 import at.mountainsd.util.Builder;
@@ -36,9 +35,9 @@ public interface MutableLocomotive extends Locomotive, Builder<Locomotive>
 
   public void setProductNumber(String productNumber);
 
-  public void setManufacturer(Manufacturer manufacturer);
+  public void setManufacturer(Contact manufacturer);
 
-  public void setRetailer(Retailer retailer);
+  public void setRetailer(Contact retailer);
 
   public void setCondition(ModelCondition modelCondition);
 

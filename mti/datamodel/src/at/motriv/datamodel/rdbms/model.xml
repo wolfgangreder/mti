@@ -10,6 +10,59 @@
 
 <!DOCTYPE database SYSTEM 'http://db.apache.org/torque/dtd/database.dtd'>
 <database name="mti">
+  <!-- filesystem implementation -->
+  <table name="fileobjects">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="parent" type="CHAR" size="36" required="true" primaryKey="false"/>
+    <column name="name" type="VARCHAR" size="100" required="true"/>
+    <column name="folder" type="BIT" required="true" default="0"/>
+    <unique name="ndx_fileobjects_name">
+      <unique-column name="name"/>
+      <unique-column name="parent"/>
+    </unique>
+    <foreign-key name="fk_fileobjects_parent" foreignTable="fileobjects" onUpdate="cascade" onDelete="restrict">
+      <reference foreign="id" local="parent"/>
+    </foreign-key>
+  </table>
+
+  <table name="filecontent">
+    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="content" type="BLOB"/>
+    <column name="contentsize" type="BIGINT" required="true" default="-1"/>
+    <column name="mime" type="VARCHAR" size="100" required="true" default=""/>
+  </table>
+
+  <table name="fileattr">
+    <column name="fileobject" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="name" type="VARCHAR" size="100" required="true" primaryKey="true"/>
+    <column name="content" type="BLOB"/>
+    <column name="contentsize" type="BIGINT" required="true" default="-1"/>
+    <column name="mime" type="VARCHAR" size="100" required="true" default=""/>
+    <foreign-key name="fk_fileattr_fileobject" foreignTable="fileobjects" onDelete="cascade" onUpdate="cascade">
+      <reference foreign="id" local="fileobject"/>
+    </foreign-key>
+  </table>
+
+  <table name="fileobject_content">
+    <column name="fileobject" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="filecontent" type="CHAR" size="36" required="true"/>
+    <index name="ndx_fileobject_content">
+      <index-column name="filecontent"/>
+    </index>
+    <foreign-key name="fk_fileobject_content_fo" foreignTable="fileobjects" onDelete="cascade" onUpdate="cascade">
+      <reference local="fileobject" foreign="id"/>
+    </foreign-key>
+    <foreign-key name="fk_fileobject_content_co" foreignTable="filecontent" onDelete="cascade" onUpdate="cascade">
+      <reference foreign="id" local="filecontent"/>
+    </foreign-key>
+  </table>
+
+  <!-- end filesystem implementation -->
+
+
+  <table name="contacttype">
+    <column name="name" type="VARCHAR" size="50" required="true" primaryKey="true"/>
+  </table>
 
   <table name="externalkind">
     <column name="name" type="VARCHAR" size="50" required="true" primaryKey="true"/>
@@ -23,6 +76,10 @@
     <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
     <column name="name" type="VARCHAR" size="50" required="true"/>
     <column name="baseurl" type="VARCHAR" size="250" required="true"/>
+    <column name="kinds" type="VARCHAR" size="250" required="true"/>
+    <column name="readonly" type="BIT" required="true" default="0"/>
+    <column name="immutable" type="BIT" required="true" default="0"/>
+    <column name="description" type="CLOB" required="false"/>
     <unique name="ndx_externalrepository_name">
       <unique-column name="name"/>
     </unique>
@@ -30,6 +87,8 @@
 
   <table name="externals">
     <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
+    <column name="filename" type="VARCHAR" size="100" required="true"/>
+    <column name="orig_filename" type="VARCHAR" size="100" required="false"/>
     <column name="repository" type="CHAR" size="36" required="true"/>
     <column name="kind" type="VARCHAR" size="50" required="true"/>
     <column name="mime_type" type="VARCHAR" size="100"/>
@@ -67,6 +126,7 @@
     <column name="phone2" type="VARCHAR" size="50" required="false"/>
     <column name="fax" type="VARCHAR" size="50" required="false"/>
     <column name="description" type="CLOB" required="false"/>
+    <column name="shopaddress" type="VARCHAR" size="100" required="false"/>
     <unique name="ndx_contact_name">
       <unique-column name="name"/>
     </unique>
@@ -75,17 +135,14 @@
     </index>
   </table>
 
-  <table name="manufacturer">
+  <table name="contacttypes">
     <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
-    <foreign-key foreignTable="contact" onDelete="cascade" onUpdate="cascade" name="fk_manufacturer_contact">
+    <column name="name" type="VARCHAR" size="50" required="true" primaryKey="true"/>
+    <foreign-key foreignTable="contact" onDelete="cascade" onUpdate="cascade" name="fk_contacttype_contact">
       <reference foreign="id" local="id"/>
     </foreign-key>
-  </table>
-
-  <table name="retailer">
-    <column name="id" type="CHAR" size="36" required="true" primaryKey="true"/>
-    <foreign-key foreignTable="contact" onDelete="cascade" onUpdate="cascade" name="fk_retailer_contact">
-      <reference foreign="id" local="id"/>
+    <foreign-key foreignTable="contacttype" onDelete="restrict" onUpdate="cascade" name="fk_contacttype_types">
+      <reference foreign="name" local="name"/>
     </foreign-key>
   </table>
 
@@ -101,10 +158,10 @@
     <column name="condition" type="VARCHAR" size="50" required="true" default="NEW"/>
     <column name="masterimage" type="CHAR" size="36"/>
     <column name="lastModified" type="TIMESTAMP" required="true"/>
-    <foreign-key foreignTable="manufacturer" onDelete="restrict" onUpdate="cascade" name="fk_invetoryobj_manufacturer">
+    <foreign-key foreignTable="contact" onDelete="restrict" onUpdate="cascade" name="fk_invetoryobj_manufacturer">
       <reference foreign="id" local="manufacturer"/>
     </foreign-key>
-    <foreign-key foreignTable="retailer" onDelete="restrict" onUpdate="cascade" name="fk_invetoryobj_retailer">
+    <foreign-key foreignTable="contact" onDelete="restrict" onUpdate="cascade" name="fk_invetoryobj_retailer">
       <reference foreign="id" local="retailer"/>
     </foreign-key>
     <foreign-key foreignTable="modelcondition" onDelete="restrict" onUpdate="cascade" name="fk_inventoryobj_modelcondition">
@@ -262,4 +319,7 @@
       <index-column name="kind"/>
     </index>
   </table>
+
+
+
 </database>

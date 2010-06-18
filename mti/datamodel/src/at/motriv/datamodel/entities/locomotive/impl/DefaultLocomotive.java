@@ -5,17 +5,18 @@
 package at.motriv.datamodel.entities.locomotive.impl;
 
 import at.motriv.datamodel.Decoder;
-import at.motriv.datamodel.External;
-import at.motriv.datamodel.ExternalKind;
+import at.motriv.datamodel.externals.External;
+import at.motriv.datamodel.externals.ExternalKind;
 import at.motriv.datamodel.ModelCondition;
 import at.motriv.datamodel.entities.locomotive.MutableLocomotive;
 import at.motriv.datamodel.entities.scale.Scale;
 import at.motriv.datamodel.ServiceEntry;
-import at.motriv.datamodel.entities.contact.Manufacturer;
-import at.motriv.datamodel.entities.contact.Retailer;
+import at.motriv.datamodel.entities.contact.Contact;
+import at.motriv.datamodel.entities.contact.ContactType;
 import at.motriv.datamodel.entities.era.Era;
 import at.mountainsd.util.Money;
 import at.mountainsd.util.Utils;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -45,9 +46,9 @@ public class DefaultLocomotive extends AbstractLocomotive
   private final double height;
   private final double width;
   private final double length;
-  private final Manufacturer manufacturer;
+  private final Contact manufacturer;
   private final String productNumber;
-  private final Retailer retailer;
+  private final Contact retailer;
   private final Date dateOfPurchase;
   private final Money price;
   private final ModelCondition condition;
@@ -59,10 +60,11 @@ public class DefaultLocomotive extends AbstractLocomotive
   private final String locNumber;
 
   public DefaultLocomotive(UUID id, String name, String locoClass, String wheelArrangement, String kind, Era era, String company,
-          String country, Scale scale,
-          double weight, double height, double width, double length, Manufacturer manufacturer, String productNumber, Retailer retailer,
-          Date dateOfPurchase, Money price, ModelCondition condition, String descritpion, External masterImage,
-          Collection<? extends External> externals, Decoder decoder, Date lastModified, String locNumber)
+                           String country, Scale scale,
+                           double weight, double height, double width, double length, Contact manufacturer, String productNumber,
+                           Contact retailer,
+                           Date dateOfPurchase, Money price, ModelCondition condition, String descritpion, External masterImage,
+                           Collection<? extends External> externals, Decoder decoder, Date lastModified, String locNumber)
   {
     this.id = id;
     this.name = name;
@@ -77,9 +79,17 @@ public class DefaultLocomotive extends AbstractLocomotive
     this.height = height;
     this.width = width;
     this.length = length;
-    this.manufacturer = manufacturer;
+    if (manufacturer.getTypes().contains(ContactType.MANUFACTURER)) {
+      this.manufacturer = manufacturer;
+    } else {
+      throw new IllegalArgumentException(MessageFormat.format("contact {0} is no manufacturer", manufacturer.getId()));
+    }
     this.productNumber = productNumber;
-    this.retailer = retailer;
+    if (retailer.getTypes().contains(ContactType.RETAILER)) {
+      this.retailer = retailer;
+    } else {
+      throw new IllegalArgumentException(MessageFormat.format("contact {0} is no retailer", retailer.getId()));
+    }
     this.dateOfPurchase = Utils.copyDate(dateOfPurchase);
     this.price = price;
     this.condition = condition;
@@ -204,13 +214,13 @@ public class DefaultLocomotive extends AbstractLocomotive
   }
 
   @Override
-  public Manufacturer getManufacturer()
+  public Contact getManufacturer()
   {
     return manufacturer;
   }
 
   @Override
-  public Retailer getRetailer()
+  public Contact getRetailer()
   {
     return retailer;
   }

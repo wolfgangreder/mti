@@ -51,14 +51,10 @@ public class NewContactWizardPanel2 implements WizardDescriptor.Panel<WizardDesc
   @Override
   public boolean isValid()
   {
-    // If it is always OK to press Next or Finish, then:
-    return true;
-    // If it depends on some condition (form filled out...), then:
-    // return someCondition();
-    // and when this condition changes (last form field filled in...) then:
-    // fireChangeEvent();
-    // and uncomment the complicated stuff below.
+    NewContactWizardData tmp = data.get();
+    return tmp!=null && tmp.getFinisher()!=null;
   }
+  
   private final Set<ChangeListener> listeners = new CopyOnWriteArraySet<ChangeListener>();
 
   @Override
@@ -106,6 +102,7 @@ public class NewContactWizardPanel2 implements WizardDescriptor.Panel<WizardDesc
   @Override
   public void propertyChange(PropertyChangeEvent evt)
   {
+    fireChangeEvent();
   }
 }
 

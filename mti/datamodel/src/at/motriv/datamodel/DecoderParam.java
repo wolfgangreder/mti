@@ -4,6 +4,8 @@
  */
 package at.motriv.datamodel;
 
+import at.motriv.datamodel.externals.External;
+
 /**
  *
  * @author wolfi

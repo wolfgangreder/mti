@@ -3,6 +3,18 @@
 <!-- for some information on what you could do (e.g. targets to override). -->
 <!-- If you delete this file and reopen the project it will be recreated. -->
 <project name="mti" basedir=".">
-    <description>Builds the module suite mti.</description>
-    <import file="nbproject/build-impl.xml"/>
+  <description>Builds the module suite mti.</description>
+  <import file="nbproject/build-impl.xml"/>
+  <import file="installer/build.xml"/>
+  <target name="build-zip" depends="build-installer">
+    <zip destfile="${dist.dir}/${app.name}_platform.zip" compress="true" level="9" encoding="UTF-8">
+      <zipfileset dir="${installer.dir}" prefix="mti">
+        <exclude name="**/bin/*"/>
+      </zipfileset>
+      <zipfileset dir="${installer.dir}/bin" prefix="mti/bin" filemode="755"/>
+    </zip>
+    <zip destfile="${dist.dir}/${app.name}.zip" compress="true" level="9" encoding="UTF-8">
+      <zipfileset dir="${installer.dir}/${app.name}" prefix="mti/${app.name}"/>
+    </zip>
+  </target>
 </project>

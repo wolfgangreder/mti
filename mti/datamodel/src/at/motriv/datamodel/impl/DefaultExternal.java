@@ -4,9 +4,9 @@
  */
 package at.motriv.datamodel.impl;
 
-import at.motriv.datamodel.External;
-import at.motriv.datamodel.ExternalKind;
-import at.motriv.datamodel.ExternalRepository;
+import at.motriv.datamodel.externals.External;
+import at.motriv.datamodel.externals.ExternalKind;
+import at.motriv.datamodel.externals.ExternalRepository;
 import at.mountainsd.util.StreamFactory;
 import java.awt.Image;
 import java.io.IOException;
@@ -30,10 +30,13 @@ public class DefaultExternal implements External
   private final String file;
   private final String description;
   private final String mime;
+  private final String fileName;
+  private final String originalFileName;
   private final InstanceContent content;
   private final AbstractLookup lookup;
 
-  public DefaultExternal(UUID id, ExternalRepository repository, ExternalKind kind, String file, String description, String mime)
+  public DefaultExternal(UUID id, ExternalRepository repository, ExternalKind kind, String file, String description, String mime,
+                         String fileName, String originalFileName)
   {
     this.id = id;
     this.repository = repository;
@@ -51,7 +54,9 @@ public class DefaultExternal implements External
       case DOCUMENT:
       case PARAMETER:
     }
-    content.add(file,new StreamFactoryConvertor());
+    content.add(file, new StreamFactoryConvertor());
+    this.fileName = fileName;
+    this.originalFileName = originalFileName;
   }
 
   @Override
@@ -88,6 +93,18 @@ public class DefaultExternal implements External
   public String getMimeType()
   {
     return mime;
+  }
+
+  @Override
+  public String getFileName()
+  {
+    return fileName;
+  }
+
+  @Override
+  public String getOriginalFileName()
+  {
+    return originalFileName;
   }
 
   @Override
@@ -149,7 +166,7 @@ public class DefaultExternal implements External
     }
   }
 
-  private class StreamFactoryConvertor implements InstanceContent.Convertor<String,StreamFactory>,StreamFactory
+  private class StreamFactoryConvertor implements InstanceContent.Convertor<String, StreamFactory>, StreamFactory
   {
 
     @Override
@@ -167,7 +184,7 @@ public class DefaultExternal implements External
     @Override
     public String id(String t)
     {
-      return "StreamFactoryConvertor_"+t;
+      return "StreamFactoryConvertor_" + t;
     }
 
     @Override
@@ -187,6 +204,5 @@ public class DefaultExternal implements External
     {
       return null;
     }
-
   }
 }

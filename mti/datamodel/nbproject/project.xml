@@ -128,6 +128,8 @@
                 <package>at.motriv.datamodel.entities.locomotive</package>
                 <package>at.motriv.datamodel.entities.locomotive.impl</package>
                 <package>at.motriv.datamodel.entities.scale</package>
+                <package>at.motriv.datamodel.externals</package>
+                <package>at.motriv.datamodel.externals.impl</package>
             </public-packages>
         </data>
     </configuration>

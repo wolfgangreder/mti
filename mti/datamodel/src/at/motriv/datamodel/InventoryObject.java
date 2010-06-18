@@ -4,8 +4,8 @@
  */
 package at.motriv.datamodel;
 
-import at.motriv.datamodel.entities.contact.Manufacturer;
-import at.motriv.datamodel.entities.contact.Retailer;
+import at.motriv.datamodel.externals.External;
+import at.motriv.datamodel.entities.contact.Contact;
 import at.mountainsd.util.Money;
 import java.util.Collection;
 import java.util.Date;
@@ -31,9 +31,9 @@ public interface InventoryObject extends Lookup.Provider
 
   public String getProductNumber();
 
-  public Manufacturer getManufacturer();
+  public Contact getManufacturer();
 
-  public Retailer getRetailer();
+  public Contact getRetailer();
 
   public ModelCondition getCondition();
 

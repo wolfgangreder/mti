@@ -7,8 +7,6 @@ package at.motriv.gui.locomotive;
 import at.motriv.datamodel.ModelCondition;
 import at.motriv.datamodel.MotrivItemProviderLookup;
 import at.motriv.datamodel.entities.contact.Contact;
-import at.motriv.datamodel.entities.contact.Manufacturer;
-import at.motriv.datamodel.entities.contact.Retailer;
 import at.motriv.datamodel.entities.era.Era;
 import at.motriv.datamodel.entities.locomotive.Locomotive;
 import at.motriv.datamodel.entities.locomotive.LocomotiveItemProvider;
@@ -28,6 +26,7 @@ import at.motriv.gui.models.ScaleComboBoxModel;
 import at.motriv.gui.locomotive.model.WheelArrangementComboBoxModel;
 import at.mountainsd.dataprovider.api.DataProviderException;
 import at.mountainsd.util.Money;
+import at.mountainsd.util.Utils;
 import java.awt.event.ItemEvent;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -42,6 +41,8 @@ import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 //import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.cookies.SaveCookie;
 import org.openide.nodes.Node;
 import org.openide.util.RequestProcessor;
@@ -754,7 +755,7 @@ public final class LocomotiveTopComponent extends TopComponent
   private void cbManufacturerItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_cbManufacturerItemStateChanged
   {//GEN-HEADEREND:event_cbManufacturerItemStateChanged
     if (evt.getStateChange() == ItemEvent.SELECTED && current != null) {
-      Manufacturer m = (Manufacturer) cbManufacturer.getSelectedItem();
+      Contact m = (Contact) cbManufacturer.getSelectedItem();
       if (ManufacturerComboBoxModel.isDummy(m)) {
         SwingUtilities.invokeLater(new Runnable()
         {
@@ -780,7 +781,7 @@ public final class LocomotiveTopComponent extends TopComponent
   private void cbRetailerItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_cbRetailerItemStateChanged
   {//GEN-HEADEREND:event_cbRetailerItemStateChanged
     if (evt.getStateChange() == ItemEvent.SELECTED && current != null) {
-      Retailer r = (Retailer) cbRetailer.getSelectedItem();
+      Contact r = (Contact) cbRetailer.getSelectedItem();
       if (RetailerComboBoxModel.isDummy(r)) {
         SwingUtilities.invokeLater(new Runnable()
         {
@@ -835,7 +836,11 @@ public final class LocomotiveTopComponent extends TopComponent
   private void edHeightPropertyChange(java.beans.PropertyChangeEvent evt)//GEN-FIRST:event_edHeightPropertyChange
   {//GEN-HEADEREND:event_edHeightPropertyChange
     if ("value".equals(evt.getPropertyName()) && current != null) {
-      current.setHeight(((Number) edHeight.getValue()).doubleValue());
+      if (edHeight.getValue() != null) {
+        current.setHeight(((Number) edHeight.getValue()).doubleValue());
+      } else {
+        current.setHeight(0);
+      }
       checkDirty();
     }
   }//GEN-LAST:event_edHeightPropertyChange
@@ -843,7 +848,11 @@ public final class LocomotiveTopComponent extends TopComponent
   private void edLengthPropertyChange(java.beans.PropertyChangeEvent evt)//GEN-FIRST:event_edLengthPropertyChange
   {//GEN-HEADEREND:event_edLengthPropertyChange
     if ("value".equals(evt.getPropertyName()) && current != null) {
-      current.setLength(((Number) edLength.getValue()).doubleValue());
+      if (edLength.getValue() != null) {
+        current.setLength(((Number) edLength.getValue()).doubleValue());
+      } else {
+        current.setLength(0);
+      }
       checkDirty();
     }
   }//GEN-LAST:event_edLengthPropertyChange
@@ -851,7 +860,11 @@ public final class LocomotiveTopComponent extends TopComponent
   private void edWidthPropertyChange(java.beans.PropertyChangeEvent evt)//GEN-FIRST:event_edWidthPropertyChange
   {//GEN-HEADEREND:event_edWidthPropertyChange
     if ("value".equals(evt.getPropertyName()) && current != null) {
-      current.setWidth(((Number) edWidth.getValue()).doubleValue());
+      if (edWidth.getValue() != null) {
+        current.setWidth(((Number) edWidth.getValue()).doubleValue());
+      } else {
+        current.setWidth(0);
+      }
       checkDirty();
     }
   }//GEN-LAST:event_edWidthPropertyChange
@@ -859,7 +872,11 @@ public final class LocomotiveTopComponent extends TopComponent
   private void edWeightPropertyChange(java.beans.PropertyChangeEvent evt)//GEN-FIRST:event_edWeightPropertyChange
   {//GEN-HEADEREND:event_edWeightPropertyChange
     if ("value".equals(evt.getPropertyName()) && current != null) {
-      current.setWeight(((Number) edWeight.getValue()).doubleValue());
+      if (edWeight.getValue() != null) {
+        current.setWeight(((Number) edWeight.getValue()).doubleValue());
+      } else {
+        current.setWeight(0);
+      }
       checkDirty();
     }
   }//GEN-LAST:event_edWeightPropertyChange
@@ -1047,9 +1064,17 @@ public final class LocomotiveTopComponent extends TopComponent
     cbDateOfPurchase.setDate(current.getDateOfPurchase());
     edDescription.setText(current.getDescription());
     eraModel.setSelectedItem(current.getEra());
-    edHeight.setValue(current.getHeight());
+    if (current.getHeight() != 0) {
+      edHeight.setValue(current.getHeight());
+    } else {
+      edHeight.setValue(null);
+    }
     kindModel.setSelectedItem(current.getKind());
-    edLength.setValue(current.getLength());
+    if (current.getLength() != 0) {
+      edLength.setValue(current.getLength());
+    } else {
+      edLength.setValue(null);
+    }
     edClass.setText(current.getLocomotiveClass());
     manufacturerModel.setSelectedItem(current.getManufacturer());
     edName.setText(current.getName());
@@ -1058,15 +1083,23 @@ public final class LocomotiveTopComponent extends TopComponent
     edProductNumber.setText(current.getProductNumber());
     retailerModel.setSelectedItem(current.getRetailer());
     scaleModel.setSelectedItem(current.getScale());
-    edWeight.setValue(current.getWeight());
+    if (current.getWeight() != 0) {
+      edWeight.setValue(current.getWeight());
+    } else {
+      edWeight.setValue(null);
+    }
     cbWheelArrangement.setSelectedItem(current.getWheelArragement());
-    edWidth.setValue(current.getWidth());
+    if (current.getWeight() != 0) {
+      edWidth.setValue(current.getWidth());
+    } else {
+      edWidth.setValue(null);
+    }
     scaleModel.weakSetDefaultValue();
     manufacturerModel.weakSetDefaultValue();
     retailerModel.weakSetDefaultValue();
     conditionModel.weakSetDefaultValue();
     eraModel.weakSetDefaultValue();
-    if (equals(current.getName(), current.getLocomotiveClass())) {
+    if (Utils.equals(current.getName(), current.getLocomotiveClass())) {
       nameState = NameState.WRITE_THROUGH;
     }
     locNumberState = getLocNumberWriteThroughState();
@@ -1078,16 +1111,11 @@ public final class LocomotiveTopComponent extends TopComponent
     }
   }
 
-  private boolean equals(Object obj1, Object obj2)
-  {
-    return obj1 == obj2 || obj1 != null && obj1.equals(obj2) || obj2 != null && obj2.equals(obj1);
-  }
-
   private NameState getLocNumberWriteThroughState()
   {
     String className = edClass.getText();
     String locNumber = edLocNumber.getText();
-    if (equals(className, locNumber)) {
+    if (Utils.equals(className, locNumber)) {
       if (nameState == NameState.WRITE_THROUGH) {
         return NameState.WRITE_THROUGH;
       } else {
@@ -1105,11 +1133,19 @@ public final class LocomotiveTopComponent extends TopComponent
     current.setDateOfPurchase(cbDateOfPurchase.getDate());
     current.setDescription(edDescription.getText());
     current.setEra((Era) cbEra.getSelectedItem());
-    current.setHeight(((Number) edHeight.getValue()).doubleValue());
+    if (edHeight.getValue() != null) {
+      current.setHeight(((Number) edHeight.getValue()).doubleValue());
+    } else {
+      current.setHeight(0);
+    }
     current.setKind((String) cbKind.getSelectedItem());
-    current.setLength(((Number) edLength.getValue()).doubleValue());
+    if (edLength.getValue() != null) {
+      current.setLength(((Number) edLength.getValue()).doubleValue());
+    } else {
+      current.setLength(0);
+    }
     current.setLocomotiveClass(edClass.getText());
-    current.setManufacturer((Manufacturer) cbManufacturer.getSelectedItem());
+    current.setManufacturer((Contact) cbManufacturer.getSelectedItem());
     current.setName(edName.getText());
     current.setLocomotiveNumber(edLocNumber.getText());
     Number num = (Number) edPrice.getValue();
@@ -1119,11 +1155,19 @@ public final class LocomotiveTopComponent extends TopComponent
       current.setPrice(null);
     }
     current.setProductNumber(edProductNumber.getText());
-    current.setRetailer((Retailer) cbRetailer.getSelectedItem());
+    current.setRetailer((Contact) cbRetailer.getSelectedItem());
     current.setScale((Scale) cbScale.getSelectedItem());
-    current.setWeight(((Number) edWeight.getValue()).doubleValue());
+    if (edWeight.getValue() != null) {
+      current.setWeight(((Number) edWeight.getValue()).doubleValue());
+    } else {
+      current.setWeight(0);
+    }
     current.setWheelArragement((String) cbWheelArrangement.getSelectedItem());
-    current.setWidth(((Number) edWidth.getValue()).doubleValue());
+    if (edWidth.getValue() != null) {
+      current.setWidth(((Number) edWidth.getValue()).doubleValue());
+    } else {
+      current.setWidth(0);
+    }
   }
 
   private void initChangeListener()
@@ -1203,6 +1247,70 @@ public final class LocomotiveTopComponent extends TopComponent
         }
       }
     });
+    edHeight.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (current != null) {
+          if (edHeight.getValue() != null) {
+            current.setHeight(((Number) edHeight.getValue()).doubleValue());
+          } else {
+            current.setHeight(0);
+          }
+          checkDirty();
+        }
+      }
+    });
+    edLength.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (current != null) {
+          if (edLength.getValue() != null) {
+            current.setLength(((Number) edLength.getValue()).doubleValue());
+          } else {
+            current.setLength(0);
+          }
+          checkDirty();
+        }
+      }
+    });
+    edWeight.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (current != null) {
+          if (edWeight.getValue() != null) {
+            current.setWeight(((Number) edWeight.getValue()).doubleValue());
+          } else {
+            current.setWeight(0);
+          }
+          checkDirty();
+        }
+      }
+    });
+    edWidth.getDocument().addDocumentListener(new ChangeDocumentListener()
+    {
+
+      @Override
+      protected void changed(DocumentEvent e)
+      {
+        if (current != null) {
+          if (edWidth.getValue() != null) {
+            current.setWidth(((Number) edWidth.getValue()).doubleValue());
+          } else {
+            current.setWidth(0);
+          }
+          checkDirty();
+        }
+      }
+    });
   }
 
   private void innerSave()
@@ -1218,7 +1326,7 @@ public final class LocomotiveTopComponent extends TopComponent
 
   private void checkDirty()
   {
-    if (current.isDirty()) {
+    if (current != null && current.isDirty()) {
       node.setDirty(new SaveCookie()
       {
 
@@ -1240,7 +1348,7 @@ public final class LocomotiveTopComponent extends TopComponent
           }
         }
       });
-    } else {
+    } else if (node != null) {
       node.setDirty(null);
     }
     setCaption();
@@ -1248,10 +1356,36 @@ public final class LocomotiveTopComponent extends TopComponent
 
   private void setCaption()
   {
-    setHtmlDisplayName(NbBundle.getMessage(LocomotiveTopComponent.class,
-            "LocomotiveTopComponent.htmlDisplayName",
-            current.getName(),
-            current.isDirty() ? "<b>" : "",
-            current.isDirty() ? " *" : ""));
+    if (current != null) {
+      setHtmlDisplayName(NbBundle.getMessage(LocomotiveTopComponent.class,
+                                             "LocomotiveTopComponent.htmlDisplayName",
+                                             current.getName(),
+                                             current.isDirty() ? "<b>" : "",
+                                             current.isDirty() ? " *" : ""));
+    }
+  }
+
+  @Override
+  public boolean canClose()
+  {
+    checkDirty();
+    if (current!=null && current.isDirty()) {
+      NotifyDescriptor d = new NotifyDescriptor(NbBundle.getMessage(getClass(), "LocomotiveTopComponent.ask.canclose",
+                                                                    current.getName()),
+                                                NbBundle.getMessage(getClass(), "LocomotiveTopComponent.title.canclose"),
+                                                NotifyDescriptor.YES_NO_CANCEL_OPTION,
+                                                NotifyDescriptor.QUESTION_MESSAGE,
+                                                null,
+                                                null);
+      Object retVal = DialogDisplayer.getDefault().notify(d);
+      if (retVal == NotifyDescriptor.CANCEL_OPTION) {
+        return false;
+      } else if (retVal == NotifyDescriptor.NO_OPTION) {
+        node.setDirty(null);
+      } else if (retVal == NotifyDescriptor.YES_OPTION) {
+        innerSave();
+      }
+    }
+    return true;
   }
 }

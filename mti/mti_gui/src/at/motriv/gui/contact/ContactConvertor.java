@@ -7,9 +7,8 @@ package at.motriv.gui.contact;
 import at.motriv.datamodel.MotrivItemProviderLookup;
 import at.motriv.datamodel.entities.contact.Contact;
 import at.motriv.datamodel.entities.contact.ContactItemProvider;
-import at.motriv.datamodel.entities.contact.Manufacturer;
-import at.motriv.datamodel.entities.contact.Retailer;
 import at.mountainsd.dataprovider.api.DataProviderException;
+import java.util.UUID;
 import org.openide.util.Exceptions;
 import org.openide.util.lookup.InstanceContent.Convertor;
 
@@ -17,21 +16,15 @@ import org.openide.util.lookup.InstanceContent.Convertor;
  *
  * @author wolfi
  */
-public class ContactConvertor implements Convertor<ContactLookupKey, Contact>
+public class ContactConvertor implements Convertor<UUID, Contact>
 {
 
   @Override
-  public Contact convert(ContactLookupKey t)
+  public Contact convert(UUID t)
   {
     ContactItemProvider provider = MotrivItemProviderLookup.lookup(ContactItemProvider.class);
     try {
-      if (Manufacturer.class.isAssignableFrom(t.getClassKey())) {
-        return provider.getManufacturer(t.getId());
-      } else if (Retailer.class.isAssignableFrom(t.getClassKey())) {
-        return provider.getRetailer(t.getId());
-      } else {
-        return provider.get(t.getId());
-      }
+      return provider.get(t);
     } catch (DataProviderException ex) {
       Exceptions.printStackTrace(ex);
     }
@@ -39,19 +32,19 @@ public class ContactConvertor implements Convertor<ContactLookupKey, Contact>
   }
 
   @Override
-  public Class<? extends Contact> type(ContactLookupKey t)
+  public Class<? extends Contact> type(UUID t)
   {
-    return t.getClassKey();
+    return Contact.class;
   }
 
   @Override
-  public String id(ContactLookupKey t)
+  public String id(UUID t)
   {
     return "contact_" + t.toString();
   }
 
   @Override
-  public String displayName(ContactLookupKey t)
+  public String displayName(UUID t)
   {
     return id(t);
   }

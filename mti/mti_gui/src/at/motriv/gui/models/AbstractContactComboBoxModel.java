@@ -6,11 +6,9 @@ package at.motriv.gui.models;
 
 import at.motriv.datamodel.entities.contact.Contact;
 import at.motriv.datamodel.entities.contact.ContactItemProvider;
-import at.motriv.datamodel.entities.contact.GenericContactBuilder;
-import at.motriv.datamodel.entities.contact.Manufacturer;
-import at.motriv.datamodel.entities.contact.ManufacturerBuilder;
-import at.motriv.datamodel.entities.contact.Retailer;
-import at.motriv.datamodel.entities.contact.RetailerBuilder;
+import at.motriv.datamodel.entities.contact.ContactType;
+import at.motriv.datamodel.entities.contact.MutableContact;
+import at.motriv.datamodel.entities.contact.impl.DefaultMutableContact;
 import at.mountainsd.dataprovider.api.DataProviderEvent;
 import at.mountainsd.dataprovider.api.DataProviderEventListener;
 import java.text.Collator;
@@ -26,21 +24,24 @@ import org.openide.util.WeakListeners;
  *
  * @author wolfi
  */
-public abstract class AbstractContactComboBoxModel<C extends Contact> extends DefaultValuesComboBoxModel<C> implements
+public abstract class AbstractContactComboBoxModel extends DefaultValuesComboBoxModel<Contact> implements
         DataProviderEventListener
 {
 
-  public static Contact DUMMY_CONTACT = new GenericContactBuilder().id(UUID.fromString("00000000-0000-0000-0004-000000000000")).name(
-          NbBundle.getMessage(AbstractContactComboBoxModel.class,"AbstractContactComboBoxModel.dummy.name")).build();
-  public static Manufacturer DUMMY_MANUFACTURER = new ManufacturerBuilder().id(UUID.fromString("00000000-0000-0000-0004-000000000000")).
-          name(NbBundle.getMessage(AbstractContactComboBoxModel.class,"AbstractContactComboBoxModel.dummy.name")).build();
-  public static Retailer DUMMY_RETAILER = new RetailerBuilder().id(UUID.fromString("00000000-0000-0000-0004-000000000000")).name(
-          NbBundle.getMessage(AbstractContactComboBoxModel.class,"AbstractContactComboBoxModel.dummy.name")).build();
+  public static Contact DUMMY_CONTACT = createDummyContact();
   private DataProviderEventListener weakListener;
+
+  private static Contact createDummyContact()
+  {
+    MutableContact builder = new DefaultMutableContact(ContactType.ALL);
+    builder.setId(UUID.fromString("00000000-0000-0000-0004-000000000000"));
+    builder.setName(NbBundle.getMessage(AbstractContactComboBoxModel.class, "AbstractContactComboBoxModel.dummy.name"));
+    return builder.build();
+  }
 
   public static boolean isDummy(Contact contact)
   {
-    return contact == DUMMY_CONTACT || contact == DUMMY_MANUFACTURER || contact == DUMMY_RETAILER;
+    return contact == DUMMY_CONTACT;
   }
 
   @Override
@@ -66,15 +67,15 @@ public abstract class AbstractContactComboBoxModel<C extends Contact> extends De
   }
 
   @Override
-  protected void sortItems(List<? extends C> items)
+  protected void sortItems(List<? extends Contact> items)
   {
-    Collections.sort(items, new Comparator<C>()
+    Collections.sort(items, new Comparator<Contact>()
     {
 
       private final Collator coll = Collator.getInstance();
 
       @Override
-      public int compare(C o1, C o2)
+      public int compare(Contact o1, Contact o2)
       {
         if (o1 == o2 || (isDummy(o1) && isDummy(o2))) {
           return 0;
@@ -91,13 +92,13 @@ public abstract class AbstractContactComboBoxModel<C extends Contact> extends De
   }
 
   @Override
-  protected List<? extends C> getDefaultItems()
+  protected List<? extends Contact> getDefaultItems()
   {
     return Collections.emptyList();
   }
 
   @Override
-  protected C getDefaultSelection()
+  protected Contact getDefaultSelection()
   {
     return null;
   }
