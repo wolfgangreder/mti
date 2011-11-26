@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE eras PUBLIC "-//at.motriv//era//EN" "http://www.motriv.at/dtd/era.dtd">
+<eras country="AT" version="1.0">
+  <!--Eisenbahnepochen Österreich nach nem801_a
+            http://www.morop.org/de/normes/nem801a_d.pdf
+  -->
+  <era id="c4566b51-1f65-45e8-bc5f-42d20cf004c2" yearfrom="1837" yearto="1920">
+    <name xml:lang="de">Epoche I</name>
+    <comment xml:lang="de"><![CDATA[<html>Epoche des Eisenbahnbaus von den Anfängen bis zur Vollendung eines zusammenhängenden Streckennetzes.<br>Entstehung von Privat- und Staatsbahnen; letztere 1858 reprivatisiert.<br>Ab 1882 Entstehung des großen Staatsbahnnetzes (k.k.St.B) durch Übernahme defizitärer Bahnen und Neubauten.<br>Entwicklung der Dampflokomotive bis zum Abschluss ihrer Grundform.<br>Im Wagenbau wird der Abteil-(Coupé-)wagen von den Durchgangswagen mit Mittel- oder Seitengang verdrängt.]]></comment>
+  </era>
+  <era id="65fcfdde-28f7-4bf4-92db-a76938ef240d" yearfrom="1837" yearto="1858">
+    <name xml:lang="de">Epoche Ia</name>
+    <comment xml:lang="de"><![CDATA[<html>Entstehung erster Territorialeisenbahnen, welche später zu zusammenhängenden Netzen verwachsen.]]></comment>
+  </era>
+  <era id="25369840-2971-11df-b1e4-90e6ba2f496e" yearfrom="1858" yearto="1884">
+    <name xml:lang="de">Epoche Ib/c</name>
+    <comment xml:lang="de"><![CDATA[<html>Verknüpfung der einzelnen Privatbahnen zu einem zusammenhängenden Hauptnetz.<br>Erste Vereinheitlichungen im Fahrzeugbau, um einen Übergang von Fahrzeugen von einer Bahn auf eine andere zu ermöglichen.]]></comment>
+  </era>
+  <era id="57e3c010-b48e-4bc5-8754-6cf273ce739f" yearfrom="1884" yearto="1891">
+    <name xml:lang="de">Epoche Id</name>
+    <comment xml:lang="de"><![CDATA[<html>Der Ausbau der Hauptstrecken und Lokalbahnen wird unter der neugegründeten k.k.St.B. fortgesetzt.]]></comment>
+  </era>
+  <era id="2666870c-2971-11df-9fac-90e6ba2f496e" yearfrom="1891" yearto="1913">
+    <name xml:lang="de">Epoche Ie</name>
+    <comment xml:lang="de"><![CDATA[<html>Mit Ausnahme der Südbahn werden alle noch bestehenden großen Privatbahnen verstaatlicht und von den k.k.St.B. übernommen.<br>Entwicklung der Heißdampflokomotive.<br>Bau der ersten fünffach gekuppelten Dampflokomotiven.<br>Ersatz vieler alter, von den Privatbahnen übernommener Wagen durch einheitliche Neubaufahrzeuge.<br>Einführung der automatischen Vakuumbremse.<br>Erste vierachsige Reisezugwagen (1894).]]></comment>
+  </era>
+  <era id="a8270626-23df-475b-8424-97bf89034fd8" yearfrom="1913" yearto="1920">
+    <name xml:lang="de">Epoche If</name>
+    <comment xml:lang="de"><![CDATA[<html>Der Streckenneubau ist im Wesentlichen abgeschlossen.<br>Entstehung der ersten elektrifizierten Vollbahnstrecken.<br>Vereinheitlichung der Signale und Stellwerke (Bauart 5007).<br>Für den Schnellzugdienst vermehrter Einsatz der elektrischen Beleuchtung.<br>Ab 1913 Umzeichnung aller Wagen auf ein neu gegliedertes System (Bindestrich-Nummern).]]></comment>
+  </era>
+  <era id="2bb797e6-2971-11df-8bd0-90e6ba2f496e" yearfrom="1920" yearto="1945">
+    <name xml:lang="de">Epoche II</name>
+    <comment xml:lang="de"><![CDATA[<html>Nach dem Zerfall der Donaumonarchie entstehen über die D.Ö.St.B. und Ö.St.B die Österreichischen Bundesbahnen.<br>Übernahme der Südbahn und NÖLB in den Staatsbetrieb.<br>Ausbau des elektrischen Zugbetriebes und Entwicklung des Triebwagenbaues.]]></comment>
+  </era>
+  <era id="1eaebc0e-c11a-4d49-afce-21056b1a9b0c" yearfrom="1920" yearto="1928">
+    <name xml:lang="de">Epoche IIa</name>
+    <comment xml:lang="de"><![CDATA[<html>Übergang von k.k.St.B. auf B.B.Österreich nach Klärung der Eigentumsverhältnisse.<br>Weiterführung des Fahrzeugbaues in Anlehnung an die von den k.k.St.B. gebauten Fahrzeuge mit verstärkter Zug- und Stoßvorrichtung.]]></comment>
+  </era>
+  <era id="d5590dbb-16ec-4dc1-913f-ed8231e70b08" yearfrom="1928" yearto="1938">
+    <name xml:lang="de">Epoche IIb</name>
+    <comment xml:lang="de"><![CDATA[<html>Elektrischer Betrieb im Salzkammergut und auf den Hauptstrecken westlich von Salzburg.<br>Einsatz von Lichtsignalen und ab 1935 Änderung der Signalfarben für „Vorsicht“ und „frei“ auf gelb und grün.<br>Großzügiges Beschaffungsprogramm nach dem Prinzip des Austauschbaues (N 28, 36).<br>Entscheidung, künftig nur mehr Reisezugwagen mit eisernem Gerippe zu bauen. Neuordnung des Wagenparks und entsprechende Kennzeichnung (1928).<br>Übernahme der Österreichischen Bundesbahnen durch die Deutsche Reichsbahn DR (1938).]]></comment>
+  </era>
+  <era id="5415792d-6c9b-42f1-a6ac-f30c73861d90" yearfrom="1938" yearto="1945">
+    <name xml:lang="de">Epoche IIc</name>
+    <comment xml:lang="de"><![CDATA[<html>Eingliederung der Eisenbahnen des Saarlandes und der Österreichischen Bundesbahnen.<br>Änderung der Signalordnung.<br>Anbringung des Reichsadlers an Triebfahrzeugen und Personenwagen.<br>Personenwagen flaschengrün, geänderte Kennzeichnung.<br>Entwicklung von Kriegs-Lokomotiven, Behelfs-Personenwagen und Kriegs-Güterwagen.<br>Nach Kriegsende Entfernung der Reichsembleme an Fahrzeugen und Einrichtungen.<br>Beschriftung der Güterwagen mit der Bezeichnung der Besatzungszone.<br>Einstellung des elektrischen Zugbetriebs im Bereich der sowjetischen Besatzungszone.]]></comment>
+  </era>
+  <era id="9a2ec84a-aa9c-4ef6-bc54-3e89a7cdac4a" yearfrom="1945" yearto="1970">
+    <name xml:lang="de">Epoche III</name>
+    <comment xml:lang="de"><![CDATA[<html>Umorganisation der Österreichischen Eisenbahnen auf den Stand von 1938 und Wiederaufbau des durch den Weltkrieg in Mitleidenschaft gezogenen Eisenbahnwesens.<br>Fortführung der Elektrifizierung und des Einsatz der Diesellokomotive.<br>Entwicklung eines modernen Fahrzeugparks nach nationalen und übernationalen (UIC) Richtlinien.<br>Rascher Ersatz der Formsignale durch Lichtsignale und Entwicklung einer neuen Sicherungstechnik (Gleisbildstellwerke).]]></comment>
+  </era>
+  <era id="5d3e11c8-f117-45b0-97bb-062a8bf8ac48" yearfrom="1945" yearto="1952">
+    <name xml:lang="de">Epoche IIIa</name>
+    <comment xml:lang="de"><![CDATA[<html>Wiederaufbauzeit nach dem Kriege.<br>Nach Zuerkennung eines definitiven Fahrzeugparks durch die Alliierten (1948) erfolgt die Umschreibung auf B B Österreich.<br>Ein Umbauprogramm alter Holzwagen auf „Spantenwagen“ wird begonnen.]]></comment>
+  </era>
+  <era id="c0c6769d-f8c6-4e44-8629-162d84f4dc6e" yearfrom="1952" yearto="1956">
+    <name xml:lang="de">Epoche IIIb</name>
+    <comment xml:lang="de"><![CDATA[<html>Neue Signal- und Fahrdienstvorschriften (V 2, V 3).<br>Neubau von Elektrolokomotiven und vermehrter Bau von Dieselverschublokomotiven.<br>Beitritt der ÖBB zum EUROP-Güterwagenpark.<br>Bau von Standard-Güterwagen nach UIC-Richtlinien.<br>Neukennzeichnung des Fahrzeugparks (1953).]]></comment>
+  </era>
+  <era id="d11c1008-429a-4b0a-828a-f36927502337" yearfrom="1956" yearto="1970">
+    <name xml:lang="de">Epoche IIIc</name>
+    <comment xml:lang="de"><![CDATA[<html>Aufhebung der 3. Wagenklasse.<br>Änderung der Eigentumsbezeichnung auf Österreichische Bundesbahnen „ÖBB“ (1956).<br>Abschluss des Umbauprogramms von Holz- auf Spantenwagen.<br>Ersatz der Einfachschleifstücke durch Doppelschleifstücke bei allen Elektrolokomotiven.]]></comment>
+  </era>
+  <era id="3f38f104-2530-4a30-9148-2b391dcf67a4" yearfrom="1970" yearto="1990">
+    <name xml:lang="de">Epoche IV</name>
+    <comment xml:lang="de"><![CDATA[<html>Abschluss der Traktionsumstellung auf E- oder Dieselbetrieb.<br>Einführung einer international verbindlichen Wagen-Beschriftung.<br>Beginn einer neuen Farbgebung beim Fahrzeugpark.]]></comment>
+  </era>
+  <era id="b189db7a-59e4-476c-acd0-f80e3a577112" yearfrom="1970" yearto="1975">
+    <name xml:lang="de">Epoche IVa</name>
+    <comment xml:lang="de"><![CDATA[<html>Großzügiger Neubau von Lokomotiven und Triebwagen.<br>Rasche Modernisierung des Inlandfahrzeugparks.<br>Vermehrter Einsatz von Spezialgüterwagen.]]></comment>
+  </era>
+  <era id="078c507b-0da3-4a50-bb20-00c8f6696e1c" yearfrom="1975" yearto="1980">
+    <name xml:lang="de">Epoche IVb</name>
+    <comment xml:lang="de"><![CDATA[<html>Beginn einer „bunten“ Lackierung.]]></comment>
+  </era>
+  <era id="750f312e-8b60-4a40-8653-32833e55123a" yearfrom="1980" yearto="1990">
+    <name xml:lang="de">Epoche IVc</name>
+    <comment xml:lang="de"><![CDATA[<html>Neue Signalvorschrift (1980).<br>Neue Kennzeichnung der Güterwagen nach UIC (1980-1983).<br>Die Zusammenstellung der Reisezüge wird im Aussehen durch Neubautypen (Schlieren, EUROFIMA, UIC-Z und „Neue Generation“) geprägt.<br>Ausscheiden der zweiachsigen Reisezug- und Gepäckwagen aus dem Personenverkehr (1984).<br>Die grüne Farbgebung von Lokomotiven und Reisezugwagen wird durch eine freundlichere Farbgebung abgelöst.]]></comment>
+  </era>
+  <era id="d2130960-f631-4e42-a7a5-796abab13f2d" yearfrom="1990" yearto="2005">
+    <name xml:lang="de">Epoche V</name>
+    <comment xml:lang="de"><![CDATA[<html>Typenbereinigung bei den Elektro- und Diesellokomotiven und Beschaffung neuer Fahrzeuggenerationen.<br>Das „Corporate Identity Design“ bestimmt das Erscheinungsbild.<br>Ausführung von Teilbereichen eines Schnellfahrnetzes.<br>Formsignale verschwinden zusehends, die Bauformen mit Laternen sind vollzählig gegen jene mit Rückstrahlern umgebaut.<br>Einsatz von Hochgeschwindigkeitsgarnituren und Umwandlung der Bahnen in Eisenbahn-Verkehrs-Unternehmen (EVU).]]></comment>
+  </era>
+  <era id="ed41eb7a-b9ba-4d84-974e-d8ee67f5c942" yearfrom="1990" yearto="2000">
+    <name xml:lang="de">Epoche Va</name>
+    <comment xml:lang="de"><![CDATA[<html>Bau von Doppelstockwagen.<br>Überlegung über den Einsatz von Wendezügen und Umgestaltung von bestehenden Reisezugwagen hierzu.<br>Farbgebung mit hellen Großflächen für Werbeeinsätze.]]></comment>
+  </era>
+  <era id="3182614f-b6bd-461b-81c9-4f2019f8f34f" yearfrom="2000" yearto="2005">
+    <name xml:lang="de">Epoche Vb</name>
+    <comment xml:lang="de"><![CDATA[<html>Einsatz von DB AG-ICE-Garnituren, Nahverkehr mit Doppelstockgarnituren bzw. Wendezüge.<br>Fernverkehrswendezüge mit DB-Steuerwagen.<br>Traktion mit vereinheitlichten Triebfahrzeugen (1016, 2068, 2070).<br>Beginn einer neuen Farbgebung (Upgrading) der Fernreisewagen.<br>Zugang von netzfremden Triebfahrzeugen.<br>Auflösung des EUROP-Pools.]]></comment>
+  </era>
+  <era id="c1462e1b-8544-428b-a637-2732d8a352e5" yearfrom="2005">
+    <name xml:lang="de">Epoche VI</name>
+    <comment xml:lang="de"><![CDATA[<html>Fahrzeuge der ersten Nachkriegsgeneration (1040,1041, 1010 4030,UIC-X Mitteleinstiegwagen u.s.w.) ausgemustert.<br>Markante Umstellung des Nahverkehrs auf Triebwagengeneration „Talent“.<br>Fernverkehrswagen weitgehend dem Upgrading zugeführt.<br>Neukennzeichnung der Fahrzeuge mit Ländercode und EVU-Kennzeichen.]]></comment>
+  </era>
+</eras>
+

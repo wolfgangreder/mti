@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : script.xml
+    Created on : 22. Januar 2010, 10:45
+    Author     : MOUNTAIN-SD\reder
+    Description:
+        Purpose of the document follows.
+-->
+
+<installation version="1.0">
+  <info>
+    <appname>MTI</appname>
+    <appversion>2010</appversion>
+    <appsubpath>mti/mti</appsubpath>
+    <url>http://www.motriv.at</url>
+    <authors>
+      <author name="Wolfgang Reder" email="w.reder@motriv.at"/>
+    </authors>
+    <uninstaller/>
+    <javaversion>1.6</javaversion>
+    <pack2000/>
+    <!--run-privileged/-->
+  </info>
+  <variables>
+
+  </variables>
+  <guiprefs resizable="no" width="800" height="600">
+  </guiprefs>
+  <panels>
+    <!--panel classname="HelloPanel"/-->
+    <panel classname="TargetPanel"/>
+    <!--panel classname="ShortcutPanel"/-->
+    <panel classname="InstallPanel"/>
+    <panel classname="FinishPanel"/>
+  </panels>
+  <locale>
+    <langpack iso3="deu"/>
+  </locale>
+  <packs>
+    <pack name="Base" required="yes" preselected="yes" id="base">
+      <depends packname="mti"/>
+      <description></description>
+    </pack>
+    <pack name="mti" required="yes" preselected="yes" id="mti" hidden="yes" >
+      <file src="mti" targetdir="$INSTALL_PATH" override="update"/>
+      <description></description>
+    </pack>
+  </packs>
+</installation>

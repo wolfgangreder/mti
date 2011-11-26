@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+    TODO define vocabulary identification
+    PUBLIC ID: -//vendor//vocabulary//EN
+    SYSTEM ID: http://server/path/scales.dtd
+
+-->
+
+<!--
+    An example how to use this DTD from your XML document:
+
+    <?xml version="1.0"?>
+
+    <!DOCTYPE scales SYSTEM "scales.dtd">
+
+    <scales>
+    ...
+    </scales>
+-->
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT scales (scale)*>
+<!ATTLIST scales
+    version CDATA #REQUIRED
+  >
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT scale (name)*>
+<!ATTLIST scale
+    family CDATA #REQUIRED
+    trackwidth CDATA #REQUIRED
+    scale CDATA #REQUIRED
+    id CDATA #REQUIRED
+  >
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT name (#PCDATA)>
+<!ATTLIST name
+    xml:lang CDATA #IMPLIED
+  >
