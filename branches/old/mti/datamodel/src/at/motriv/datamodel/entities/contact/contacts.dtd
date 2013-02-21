@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+    TODO define vocabulary identification
+    PUBLIC ID: -//vendor//vocabulary//EN
+    SYSTEM ID: http://server/path/contacts.dtd
+
+-->
+
+<!--
+    An example how to use this DTD from your XML document:
+
+    <?xml version="1.0"?>
+
+    <!DOCTYPE contacts SYSTEM "contacts.dtd">
+
+    <contacts>
+    ...
+    </contacts>
+-->
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT contacts (contact)*>
+<!ATTLIST contacts
+    version CDATA #IMPLIED
+  >
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT contact (name,type,(type*),(memo?|www?|email?|country?|city?|zip?|address2?|address1?|phone1?|phone2?|fax?|shopaddress?))>
+<!ATTLIST contact
+    id CDATA #REQUIRED
+  >
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT name (#PCDATA)>
+
+<!ELEMENT type (EMPTY)>
+<!ATTLIST type
+   name CDATA #REQUIRED
+>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT address1 (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT address2 (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT zip (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT city (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT country (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT email (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT www (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT shopaddress (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT memo (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT phone1 (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT phone2 (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT fax (#PCDATA)>
