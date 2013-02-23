@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: at.motriv.datamodel/0
-OpenIDE-Module-Implementation-Version: 1
-OpenIDE-Module-Install: at/motriv/datamodel/infrastructure/Installer.class
-OpenIDE-Module-Layer: at/motriv/datamodel/infrastructure/layer.xml
-OpenIDE-Module-Localizing-Bundle: at/motriv/datamodel/infrastructure/Bundle.properties
-
