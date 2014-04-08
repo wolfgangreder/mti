@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+  <folder name="Menu">
+    <folder name="File">
+      <folder name="New">
+        <attr name="displayName" bundlevalue="at.reder.mti.api.Bundle#Folder_New"/>
+      </folder>
+    </folder>
+  </folder>
+</filesystem>

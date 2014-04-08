@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.xml;
 
@@ -68,8 +68,8 @@ public final class XLocomotive extends AbstractXVehicle
 
   public Locomotive toLocomotive()
   {
-    Locomotive.Builder<? extends Locomotive> builder = Lookup.getDefault().lookup(Locomotive.BuilderFactory.class).createBuilder();
-    initBuilder(builder);
+    Locomotive.Builder builder = Lookup.getDefault().lookup(Locomotive.BuilderFactory.class).createBuilder();
+    builder.copy(this);
     builder.company(company);
     builder.country(country);
     builder.kind(kind);

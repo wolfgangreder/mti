@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel;
 
@@ -15,20 +15,6 @@ package at.reder.mti.api.datamodel;
  */
 public interface ScaledObject
 {
-
-  public interface Builder<S extends ScaledObject>
-  {
-
-    /**
-     * Setzt den Masstab
-     *
-     * @param scale
-     * @return {@code this}
-     * @throws NullPointerException wenn {@code scale==null}
-     */
-    public ScaledObject.Builder<? extends ScaledObject> scale(Scale scale) throws NullPointerException;
-
-  }
 
   /**
    * Der Masstab des Modells

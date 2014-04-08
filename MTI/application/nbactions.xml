@@ -8,4 +8,19 @@
                 <goal>nbm:run-platform</goal>
             </goals>
         </action>
+        <action>
+            <actionName>debug</actionName>
+            <preAction>build-with-dependencies</preAction>
+            <packagings>
+                <packaging>nbm-application</packaging>
+            </packagings>
+            <goals>
+                <goal>nbm:cluster-app</goal>
+                <goal>nbm:run-platform</goal>
+            </goals>
+            <properties>
+                <jpda.listen>true</jpda.listen>
+                <netbeans.run.params.ide>-J-Dsun.awt.disablegrab=true -J-Xdebug -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=${jpda.address}</netbeans.run.params.ide>
+            </properties>
+        </action>
     </actions>

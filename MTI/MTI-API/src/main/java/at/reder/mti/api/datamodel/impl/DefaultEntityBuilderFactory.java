@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
@@ -20,7 +20,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.Lookups;
@@ -34,7 +33,6 @@ import org.openide.util.lookup.ServiceProvider;
 public final class DefaultEntityBuilderFactory implements Entity.BuilderFactory
 {
 
-  @XmlSeeAlso(XEntity.class)
   @XmlJavaTypeAdapter(value = XEntity.Adapter.class)
   public static final class DefaultEntity implements Entity
   {
@@ -64,15 +62,7 @@ public final class DefaultEntityBuilderFactory implements Entity.BuilderFactory
       this.size = size;
       this.tmpFile = tmpFile;
       if (tmpFile != null) {
-        lookup = Lookups.singleton(new Entity.Data()
-        {
-          @Override
-          public Path getTmpFile()
-          {
-            return DefaultEntity.this.tmpFile;
-          }
-
-        });
+        lookup = Lookups.singleton((Entity.Data) () -> DefaultEntity.this.tmpFile);
       } else {
         lookup = Lookup.EMPTY;
       }
@@ -154,15 +144,12 @@ public final class DefaultEntityBuilderFactory implements Entity.BuilderFactory
         return false;
       }
       final DefaultEntity other = (DefaultEntity) obj;
-      if (!Objects.equals(this.uri, other.uri)) {
-        return false;
-      }
-      return true;
+      return Objects.equals(this.uri, other.uri);
     }
 
   }
 
-  public static final class DefaultEntityBuilder implements Entity.Builder<Entity>
+  public static final class DefaultEntityBuilder implements Entity.Builder
   {
 
     private static final Collection<? extends Class<? extends Entity>> implementingClasses = Collections.singleton(
@@ -176,7 +163,7 @@ public final class DefaultEntityBuilderFactory implements Entity.BuilderFactory
     private Path tmpFile;
 
     @Override
-    public Entity.Builder<? extends Entity> copy(Entity e) throws NullPointerException
+    public Entity.Builder copy(Entity e) throws NullPointerException
     {
       if (e == null) {
         throw new NullPointerException("entity==null");
@@ -191,14 +178,14 @@ public final class DefaultEntityBuilderFactory implements Entity.BuilderFactory
     }
 
     @Override
-    public Entity.Builder<? extends Entity> data(Path tmpFile)
+    public Entity.Builder data(Path tmpFile)
     {
       this.tmpFile = tmpFile;
       return this;
     }
 
     @Override
-    public Entity.Builder<? extends Entity> description(String descr)
+    public Entity.Builder description(String descr)
     {
       if (descr == null) {
         this.description = "";
@@ -209,14 +196,14 @@ public final class DefaultEntityBuilderFactory implements Entity.BuilderFactory
     }
 
     @Override
-    public Entity.Builder<? extends Entity> fileName(String fileName)
+    public Entity.Builder fileName(String fileName)
     {
       this.fileName = fileName;
       return this;
     }
 
     @Override
-    public Entity.Builder<? extends Entity> kind(EntityKind kind) throws NullPointerException
+    public Entity.Builder kind(EntityKind kind) throws NullPointerException
     {
       if (kind == null) {
         throw new NullPointerException("kind==null");
@@ -226,7 +213,7 @@ public final class DefaultEntityBuilderFactory implements Entity.BuilderFactory
     }
 
     @Override
-    public Entity.Builder<? extends Entity> mimeType(String mimeType) throws NullPointerException, IllegalArgumentException
+    public Entity.Builder mimeType(String mimeType) throws NullPointerException, IllegalArgumentException
     {
       if (mimeType == null) {
         throw new NullPointerException("mimeType==null");
@@ -239,7 +226,7 @@ public final class DefaultEntityBuilderFactory implements Entity.BuilderFactory
     }
 
     @Override
-    public Entity.Builder<? extends Entity> size(int size) throws IllegalArgumentException
+    public Entity.Builder size(int size) throws IllegalArgumentException
     {
       if (size < -1) {
         throw new IllegalArgumentException("size<-1");
@@ -249,7 +236,7 @@ public final class DefaultEntityBuilderFactory implements Entity.BuilderFactory
     }
 
     @Override
-    public Entity.Builder<? extends Entity> uri(URI uri) throws NullPointerException
+    public Entity.Builder uri(URI uri) throws NullPointerException
     {
       if (uri == null) {
         throw new NullPointerException("uri==null");
@@ -288,7 +275,7 @@ public final class DefaultEntityBuilderFactory implements Entity.BuilderFactory
   }
 
   @Override
-  public Entity.Builder<? extends Entity> createBuilder()
+  public Entity.Builder createBuilder()
   {
     return new DefaultEntityBuilder();
   }

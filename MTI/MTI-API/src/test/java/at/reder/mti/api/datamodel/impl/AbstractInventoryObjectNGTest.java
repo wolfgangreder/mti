@@ -1,55 +1,53 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
-import at.reder.mti.api.datamodel.impl.dummies.AbstractInventoryObjectImpl;
 import at.reder.mti.api.datamodel.Contact;
 import at.reder.mti.api.datamodel.Entity;
 import at.reder.mti.api.datamodel.InventoryObject;
 import at.reder.mti.api.datamodel.ModelCondition;
+import at.reder.mti.api.datamodel.impl.dummies.AbstractInventoryObjectImpl;
 import at.reder.mti.api.datamodel.impl.dummies.DummyContact;
 import at.reder.mti.api.datamodel.impl.dummies.DummyEntity;
-import at.reder.mti.api.utils.MTIUtils;
 import at.reder.mti.api.utils.Money;
-import at.reder.mti.api.utils.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
-/**
- *
- * @author wolfi
- */
 public class AbstractInventoryObjectNGTest
 {
 
   private final UUID id = UUID.randomUUID();
-  private final Timestamp ts = new Timestamp();
-  private final Timestamp date = MTIUtils.getDayPart(ts);
+  private final Instant ts = Instant.now();
+  private final LocalDate date = LocalDate.now();
   private final Contact retailer = new DummyContact();
   private final Contact manufacturer = new DummyContact();
   private final Entity image = new DummyEntity();
   private final Entity entity = new DummyEntity("http://www.sun.com");
-  private InventoryObject testInstance = new AbstractInventoryObjectImpl(id,
-                                                                         "name",
-                                                                         ModelCondition.ORIGINAL,
-                                                                         date,
-                                                                         "description",
-                                                                         ts,
-                                                                         manufacturer,
-                                                                         image,
-                                                                         Money.TEN,
-                                                                         "product",
-                                                                         retailer,
-                                                                         Arrays.asList(image, entity));
+  private final InventoryObject testInstance = new AbstractInventoryObjectImpl(id,
+                                                                               "name",
+                                                                               ModelCondition.ORIGINAL,
+                                                                               date,
+                                                                               "description",
+                                                                               ts,
+                                                                               manufacturer,
+                                                                               image,
+                                                                               Money.TEN,
+                                                                               "product",
+                                                                               retailer,
+                                                                               Arrays.asList(image, entity));
 
   public AbstractInventoryObjectNGTest()
   {
@@ -129,4 +127,5 @@ public class AbstractInventoryObjectNGTest
   {
     assertEquals(testInstance.getLastModified(), ts);
   }
+
 }

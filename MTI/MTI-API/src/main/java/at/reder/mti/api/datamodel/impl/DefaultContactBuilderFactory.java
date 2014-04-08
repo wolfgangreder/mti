@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
+ *
  * Copyright 2013 Wolfgang Reder
- * 
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
@@ -12,6 +12,8 @@ import at.reder.mti.api.datamodel.Contact;
 import at.reder.mti.api.datamodel.ContactType;
 import at.reder.mti.api.datamodel.xml.XContact;
 import java.net.URI;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -21,6 +23,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.Lookups;
@@ -44,7 +47,8 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     private final String address2;
     private final String city;
     private final String country;
-    private final URI email;
+    private final URI shopEmail;
+    private final URI serviceEmail;
     private final String fax;
     private final UUID id;
     private final Lookup lookup;
@@ -56,6 +60,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     private final Set<ContactType> types;
     private final URI www;
     private final String zip;
+    private final Instant lastModified;
 
     private ContactImpl(UUID id,
                         String name,
@@ -67,18 +72,21 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
                         String phone1,
                         String phone2,
                         String fax,
-                        URI email,
+                        URI shopEmail,
+                        URI serviceEmail,
                         URI www,
                         URI shopAddress,
                         String memo,
                         Collection<ContactType> types,
+                        Instant lastModified,
                         Lookup lookup)
     {
       this.address1 = address1;
       this.address2 = address2;
       this.city = city;
       this.country = country;
-      this.email = email;
+      this.shopEmail = shopEmail;
+      this.serviceEmail = serviceEmail;
       this.fax = fax;
       this.id = id;
       this.lookup = lookup;
@@ -90,6 +98,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       this.types = Collections.unmodifiableSet(EnumSet.copyOf(types));
       this.www = www;
       this.zip = zip;
+      this.lastModified = lastModified;
     }
 
     @Override
@@ -135,9 +144,15 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public URI getEmail()
+    public URI getEmailShop()
     {
-      return email;
+      return shopEmail;
+    }
+
+    @Override
+    public URI getEmailService()
+    {
+      return serviceEmail;
     }
 
     @Override
@@ -189,10 +204,31 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
+    public Instant getLastModified()
+    {
+      return lastModified;
+    }
+
+    @Override
     public int hashCode()
     {
-      int hash = 5;
-      hash = 23 * hash + Objects.hashCode(this.id);
+      int hash = 7;
+      hash = 61 * hash + Objects.hashCode(this.address1);
+      hash = 61 * hash + Objects.hashCode(this.address2);
+      hash = 61 * hash + Objects.hashCode(this.city);
+      hash = 61 * hash + Objects.hashCode(this.country);
+      hash = 61 * hash + Objects.hashCode(this.shopEmail);
+      hash = 61 * hash + Objects.hashCode(this.serviceEmail);
+      hash = 61 * hash + Objects.hashCode(this.fax);
+      hash = 61 * hash + Objects.hashCode(this.id);
+      hash = 61 * hash + Objects.hashCode(this.memo);
+      hash = 61 * hash + Objects.hashCode(this.name);
+      hash = 61 * hash + Objects.hashCode(this.phone1);
+      hash = 61 * hash + Objects.hashCode(this.phone2);
+      hash = 61 * hash + Objects.hashCode(this.shopAddress);
+      hash = 61 * hash + Objects.hashCode(this.types);
+      hash = 61 * hash + Objects.hashCode(this.www);
+      hash = 61 * hash + Objects.hashCode(this.zip);
       return hash;
     }
 
@@ -202,17 +238,56 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       if (obj == null) {
         return false;
       }
-      if (this == obj) {
-        return true;
-      }
       if (getClass() != obj.getClass()) {
         return false;
       }
       final ContactImpl other = (ContactImpl) obj;
+      if (!Objects.equals(this.address1, other.address1)) {
+        return false;
+      }
+      if (!Objects.equals(this.address2, other.address2)) {
+        return false;
+      }
+      if (!Objects.equals(this.city, other.city)) {
+        return false;
+      }
+      if (!Objects.equals(this.country, other.country)) {
+        return false;
+      }
+      if (!Objects.equals(this.shopEmail, other.shopEmail)) {
+        return false;
+      }
+      if (!Objects.equals(this.serviceEmail, other.serviceEmail)) {
+        return false;
+      }
+      if (!Objects.equals(this.fax, other.fax)) {
+        return false;
+      }
       if (!Objects.equals(this.id, other.id)) {
         return false;
       }
-      return true;
+      if (!Objects.equals(this.memo, other.memo)) {
+        return false;
+      }
+      if (!Objects.equals(this.name, other.name)) {
+        return false;
+      }
+      if (!Objects.equals(this.phone1, other.phone1)) {
+        return false;
+      }
+      if (!Objects.equals(this.phone2, other.phone2)) {
+        return false;
+      }
+      if (!Objects.equals(this.shopAddress, other.shopAddress)) {
+        return false;
+      }
+      if (!Objects.equals(this.types, other.types)) {
+        return false;
+      }
+      if (!Objects.equals(this.www, other.www)) {
+        return false;
+      }
+      return Objects.equals(this.zip, other.zip);
     }
 
     @Override
@@ -223,14 +298,16 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
 
   }
 
-  public static class ContactBuilder implements Contact.Builder<Contact>
+  public static class ContactBuilder implements Contact.Builder
   {
 
     private String address1 = "";
     private String address2 = "";
     private String city = "";
     private String country = "";
-    private URI email;
+    private URI shopEmail;
+    private URI serviceEmail;
+    private Instant lastModified;
     private String fax = "";
     private UUID id;
     private String memo = "";
@@ -241,10 +318,10 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     private final Set<ContactType> types = EnumSet.noneOf(ContactType.class);
     private URI www;
     private String zip = "";
-    private Set<Object> lookupContent = new HashSet<>();
+    private final Set<Object> lookupContent = new HashSet<>();
 
     @Override
-    public Contact.Builder<? extends Contact> copy(Contact contact) throws NullPointerException
+    public Contact.Builder copy(Contact contact) throws NullPointerException
     {
       if (contact == null) {
         throw new NullPointerException("contact==null");
@@ -253,7 +330,9 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       this.address2 = contact.getAddress2();
       this.city = contact.getCity();
       this.country = contact.getCountry();
-      this.email = contact.getEmail();
+      this.shopEmail = contact.getEmailShop();
+      this.serviceEmail = contact.getEmailService();
+      this.lastModified = contact.getLastModified();
       this.fax = contact.getFax();
       this.id = contact.getId();
       this.memo = contact.getMemo();
@@ -269,7 +348,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> id(UUID id) throws NullPointerException
+    public Contact.Builder id(UUID id) throws NullPointerException
     {
       if (id == null) {
         throw new NullPointerException("id==null");
@@ -279,7 +358,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> name(String name) throws NullPointerException, IllegalArgumentException
+    public Contact.Builder name(String name) throws NullPointerException, IllegalArgumentException
     {
       if (name == null) {
         throw new NullPointerException("name==null");
@@ -292,7 +371,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> address1(String address1)
+    public Contact.Builder address1(String address1)
     {
       if (address1 == null) {
         this.address1 = "";
@@ -303,7 +382,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> address2(String address2)
+    public Contact.Builder address2(String address2)
     {
       if (address2 == null) {
         this.address2 = "";
@@ -314,7 +393,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> city(String city)
+    public Contact.Builder city(String city)
     {
       if (city == null) {
         this.city = "";
@@ -325,7 +404,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> zip(String zip)
+    public Contact.Builder zip(String zip)
     {
       if (zip == null) {
         this.zip = "";
@@ -336,7 +415,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> country(String country)
+    public Contact.Builder country(String country)
     {
       if (country == null) {
         this.country = "";
@@ -354,21 +433,32 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
         }
         try {
           InternetAddress.parse(email.getSchemeSpecificPart(), true);
-        } catch (Throwable th) {
-          th.getMessage();
+        } catch (AddressException th) {
+          return th.getMessage();
         }
       }
       return null;
     }
 
     @Override
-    public Contact.Builder<? extends Contact> email(URI email) throws IllegalArgumentException
+    public Contact.Builder emailShop(URI email) throws IllegalArgumentException
     {
       String tmp = testEmail(email);
       if (tmp != null) {
         throw new IllegalArgumentException(tmp);
       }
-      this.email = email;
+      this.shopEmail = email;
+      return this;
+    }
+
+    @Override
+    public Contact.Builder emailService(URI email) throws IllegalArgumentException
+    {
+      String tmp = testEmail(email);
+      if (tmp != null) {
+        throw new IllegalArgumentException(tmp);
+      }
+      this.serviceEmail = email;
       return this;
     }
 
@@ -386,7 +476,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> www(URI www) throws IllegalArgumentException
+    public Contact.Builder www(URI www) throws IllegalArgumentException
     {
       String tmp = testWWW(www);
       if (tmp != null) {
@@ -397,7 +487,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> shopAddress(URI shopAddress) throws IllegalArgumentException
+    public Contact.Builder shopAddress(URI shopAddress) throws IllegalArgumentException
     {
       String tmp = testWWW(shopAddress);
       if (tmp != null) {
@@ -422,7 +512,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> phone1(String phone) throws IllegalArgumentException
+    public Contact.Builder phone1(String phone) throws IllegalArgumentException
     {
       String tmp = testPhone(phone);
       if (tmp != null) {
@@ -433,7 +523,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> phone2(String phone) throws IllegalArgumentException
+    public Contact.Builder phone2(String phone) throws IllegalArgumentException
     {
       String tmp = testPhone(phone);
       if (tmp != null) {
@@ -444,7 +534,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> fax(String fax) throws IllegalArgumentException
+    public Contact.Builder fax(String fax) throws IllegalArgumentException
     {
       String tmp = testPhone(fax);
       if (tmp != null) {
@@ -455,7 +545,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> addType(ContactType type) throws NullPointerException
+    public Contact.Builder addType(ContactType type) throws NullPointerException
     {
       if (type == null) {
         throw new NullPointerException("type==null");
@@ -465,7 +555,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> removeType(ContactType type)
+    public Contact.Builder removeType(ContactType type)
     {
       if (type != null) {
         this.types.remove(type);
@@ -474,14 +564,14 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> clearTypes()
+    public Contact.Builder clearTypes()
     {
       this.types.clear();
       return this;
     }
 
     @Override
-    public Contact.Builder<? extends Contact> setTypes(Collection<ContactType> types) throws NullPointerException
+    public Contact.Builder setTypes(Collection<ContactType> types) throws NullPointerException
     {
       if (types == null || types.contains(null)) {
         throw new NullPointerException("types==null");
@@ -491,7 +581,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> addLookupItem(Object item) throws NullPointerException
+    public Contact.Builder addLookupItem(Object item) throws NullPointerException
     {
       if (item == null) {
         throw new NullPointerException("item==null");
@@ -501,7 +591,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> removeLookupItem(Object item)
+    public Contact.Builder removeLookupItem(Object item)
     {
       if (item != null) {
         lookupContent.remove(item);
@@ -510,7 +600,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> removeInstancesOfFromLookup(Class<?> clazz) throws NullPointerException
+    public Contact.Builder removeInstancesOfFromLookup(Class<?> clazz) throws NullPointerException
     {
       if (clazz == null) {
         throw new NullPointerException("clazz==null");
@@ -526,16 +616,26 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder<? extends Contact> clearLookup()
+    public Contact.Builder clearLookup()
     {
       lookupContent.clear();
       return this;
     }
 
     @Override
-    public Contact.Builder<? extends Contact> memo(String memo)
+    public Contact.Builder memo(String memo)
     {
       this.memo = memo != null ? memo : "";
+      return this;
+    }
+
+    @Override
+    public Contact.Builder lastModified(Instant lm) throws NullPointerException
+    {
+      if (lm == null) {
+        throw new NullPointerException("lastModified==null");
+      }
+      this.lastModified = lm;
       return this;
     }
 
@@ -575,7 +675,11 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       if (tmp != null) {
         throw new IllegalStateException(tmp);
       }
-      tmp = testEmail(email);
+      tmp = testEmail(shopEmail);
+      if (tmp != null) {
+        throw new IllegalStateException(tmp);
+      }
+      tmp = testEmail(serviceEmail);
       if (tmp != null) {
         throw new IllegalStateException(tmp);
       }
@@ -593,6 +697,9 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       if (types.isEmpty()) {
         throw new IllegalStateException("no type set");
       }
+      if (lastModified == null) {
+        lastModified = Clock.systemUTC().instant();
+      }
       Lookup lookup;
       if (lookupContent.isEmpty()) {
         lookup = Lookup.EMPTY;
@@ -609,11 +716,13 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
                              phone1,
                              phone2,
                              fax,
-                             email,
+                             shopEmail,
+                             serviceEmail,
                              www,
                              shopAddress,
                              memo,
                              types,
+                             lastModified,
                              lookup);
     }
 
@@ -632,7 +741,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
   }
 
   @Override
-  public Contact.Builder<? extends Contact> createBuilder()
+  public Contact.Builder createBuilder()
   {
     return new ContactBuilder();
   }

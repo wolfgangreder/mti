@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.xml;
 
@@ -44,19 +44,6 @@ public abstract class AbstractXVehicle extends AbstractXInventoryObject
   protected AbstractXVehicle(Vehicle v)
   {
     super(v);
-  }
-
-  protected void initBuilder(Vehicle.Builder<?> builder)
-  {
-    super.initBuilder(builder);
-    builder.addDecoder(decoder).
-            era(era).
-            height(height).
-            length(length).
-            weight(weight).
-            width(width);
-    builder.scale(scale);
-    builder.addServiceEntries(serviceEntries);
   }
 
   @XmlAttribute(name = "era", namespace = "mti")

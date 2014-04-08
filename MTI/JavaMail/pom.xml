@@ -34,14 +34,6 @@
         </repository>
     </repositories>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-api-annotations-common</artifactId>
-            <version>RELEASE73</version>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>

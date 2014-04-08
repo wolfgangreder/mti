@@ -1,26 +1,24 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel;
 
-import at.reder.mti.api.utils.Timestamp;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
- * Dieses Interface beschreibt einen Defekt.
- * <code><pre>
+ * Dieses Interface beschreibt einen Defekt.  <code><pre>
  * Defect.BuilderFactory factory = Lookup.getDefault().lookup(Defect.BuilderFactory.class);
  * Defect.Builder&lt? extends Defect&gt builder = factory.createBuilder();
  * // attribute setzen
  * Defect instance = builder.build();
  * </pre></code>
  *
- * @author wolfi
  */
 public interface Defect
 {
@@ -29,9 +27,8 @@ public interface Defect
    * Erzeugt instanzen des Interfaces {@code Defect}. Instanzen dieses Interfaces können mittels des Interfaces
    * {@link Defect.BuilderFactory} erzeugt werden (siehe auch {@link Defect}).
    *
-   * @param <D>
    */
-  public static interface Builder<D extends Defect> extends BaseBuilder<D>
+  public static interface Builder extends BaseBuilder<Defect>
   {
 
     /**
@@ -41,7 +38,7 @@ public interface Defect
      * @return {@code this}
      * @throws NullPointerException wenn {@code defect==null}.
      */
-    public Defect.Builder<? extends Defect> copy(Defect defect) throws NullPointerException;
+    public Defect.Builder copy(Defect defect) throws NullPointerException;
 
     /**
      * Setzt die id
@@ -50,7 +47,7 @@ public interface Defect
      * @return {@code this}
      * @throws NullPointerException wenn {@code id==null}.
      */
-    public Defect.Builder<? extends Defect> id(UUID id) throws NullPointerException;
+    public Defect.Builder id(UUID id) throws NullPointerException;
 
     /**
      * Setzt das Datum
@@ -59,7 +56,7 @@ public interface Defect
      * @return {@code this}
      * @throws NullPointerException wenn {@code date==null}.
      */
-    public Defect.Builder<? extends Defect> date(Timestamp date) throws NullPointerException;
+    public Defect.Builder date(LocalDate date) throws NullPointerException;
 
     /**
      * Setzt die Beschreibung des Defekts
@@ -69,7 +66,7 @@ public interface Defect
      * @throws NullPointerException wenn {@code descr==null}
      * @throws IllegalArgumentException wenn {@code descr.trim().isEmpty()}
      */
-    public Defect.Builder<? extends Defect> description(String descr) throws NullPointerException, IllegalArgumentException;
+    public Defect.Builder description(String descr) throws NullPointerException, IllegalArgumentException;
 
   }
 
@@ -81,7 +78,7 @@ public interface Defect
   public static interface BuilderFactory
   {
 
-    public Defect.Builder<? extends Defect> createBuilder();
+    public Defect.Builder createBuilder();
 
   }
 
@@ -97,7 +94,7 @@ public interface Defect
    *
    * @return datum, niemals {@code null}
    */
-  public Timestamp getDate();
+  public LocalDate getDate();
 
   /**
    * Beschreibung des Defekts.

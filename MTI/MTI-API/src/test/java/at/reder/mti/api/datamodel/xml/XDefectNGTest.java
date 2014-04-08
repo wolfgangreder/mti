@@ -1,25 +1,29 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
+ *
  * Copyright 2013 Wolfgang Reder
- * 
+ *
  */
 package at.reder.mti.api.datamodel.xml;
 
 import at.reder.mti.api.datamodel.Defect;
 import at.reder.mti.api.datamodel.impl.DefaultDefectBuilderFactory;
-import at.reder.mti.api.utils.Timestamp;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.time.LocalDate;
 import java.util.UUID;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertSame;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -69,9 +73,9 @@ public class XDefectNGTest
   @Test(dependsOnMethods = "testJAXBContext")
   public void testStreaming() throws JAXBException
   {
-    Timestamp ts = new Timestamp();
+    LocalDate ld = LocalDate.now();
     UUID id = UUID.randomUUID();
-    Defect defect = new DefaultDefectBuilderFactory().createBuilder().date(ts).description("descr").id(id).build();
+    Defect defect = new DefaultDefectBuilderFactory().createBuilder().date(ld).description("descr").id(id).build();
     XDefect xdefect = new XDefect(defect);
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     context.createMarshaller().marshal(xdefect, os);
@@ -125,9 +129,9 @@ public class XDefectNGTest
   public void testWrappedStreaming() throws JAXBException
   {
     JAXBContext ctx = JAXBContext.newInstance(Wrapper.class);
-    Timestamp ts = new Timestamp();
+    LocalDate ld = LocalDate.now();
     UUID id = UUID.randomUUID();
-    Defect defect = new DefaultDefectBuilderFactory().createBuilder().date(ts).description("descr").id(id).build();
+    Defect defect = new DefaultDefectBuilderFactory().createBuilder().date(ld).description("descr").id(id).build();
     Wrapper wrapper = new Wrapper();
     wrapper.setDefect(defect);
     ByteArrayOutputStream os = new ByteArrayOutputStream();

@@ -1,22 +1,26 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
+ *
  * Copyright 2013 Wolfgang Reder
- * 
+ *
  */
 package at.reder.mti.api.datamodel.xml;
 
 import at.reder.mti.api.datamodel.Entity;
 import at.reder.mti.api.datamodel.EntityKind;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
@@ -25,11 +29,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.openide.util.Lookup;
 
-/**
- *
- * @author wolfi
- */
 @XmlRootElement(name = "entity", namespace = "mti")
+//@XmlSeeAlso(DefaultEntityBuilderFactory.DefaultEntity.class)
 public class XEntity
 {
 
@@ -108,7 +109,7 @@ public class XEntity
 
   public Entity toEntity()
   {
-    Entity.Builder<? extends Entity> builder = Lookup.getDefault().lookup(Entity.BuilderFactory.class).createBuilder();
+    Entity.Builder builder = Lookup.getDefault().lookup(Entity.BuilderFactory.class).createBuilder();
     builder.description(description);
     builder.fileName(fileName);
     builder.kind(kind);
@@ -127,11 +128,16 @@ public class XEntity
     return kind;
   }
 
-  @XmlElement(name = "id")
+  @XmlAttribute(name = "id", namespace = "mti")
   @XmlID
   public String getId()
   {
     return uri.toString();
+  }
+
+  public void setId(String id) throws URISyntaxException
+  {
+    uri = new URI(id);
   }
 
   @XmlTransient
@@ -164,27 +170,47 @@ public class XEntity
     return size;
   }
 
-  @XmlElement(name = "data", namespace = "mti", required = false, nillable = true)
-  public InputStream getData() throws IOException
+  private InputStream openStream() throws IOException
   {
     if (tmpFile != null) {
       return Files.newInputStream(tmpFile, StandardOpenOption.READ);
     } else {
       return uri.toURL().openStream();
     }
+
   }
 
-  public void setData(InputStream is) throws IOException
+  @XmlElement(name = "data", namespace = "mti", required = false, nillable = true)
+  public String getData() throws IOException
+  {
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    try (InputStream is = openStream()) {
+      if (is == null) {
+        return null;
+      }
+      byte[] buffer = new byte[4096];
+      int read;
+      while ((read = is.read(buffer)) > 0) {
+        os.write(buffer, 0, read);
+      }
+    }
+    return DatatypeConverter.printBase64Binary(os.toByteArray());
+  }
+
+  public void setData(String data) throws IOException
   {
     tmpFile = Files.createTempFile("ent", ".tmp");
     tmpFile.toFile().deleteOnExit();
     size = 0;
-    try (OutputStream os = Files.newOutputStream(tmpFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
-      byte[] buffer = new byte[4096];
-      int read;
-      while ((read = is.read(buffer)) > 0) {
-        size += read;
-        os.write(buffer, 0, read);
+    if (data != null) {
+      ByteArrayInputStream is = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(data));
+      try (OutputStream os = Files.newOutputStream(tmpFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+        byte[] buffer = new byte[4096];
+        int read;
+        while ((read = is.read(buffer)) > 0) {
+          size += read;
+          os.write(buffer, 0, read);
+        }
       }
     }
   }

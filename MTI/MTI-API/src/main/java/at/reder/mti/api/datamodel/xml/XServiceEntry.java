@@ -1,17 +1,18 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.xml;
 
 import at.reder.mti.api.datamodel.Defect;
 import at.reder.mti.api.datamodel.ServiceEntry;
 import at.reder.mti.api.datamodel.UsedSparePart;
-import at.reder.mti.api.utils.Timestamp;
+import at.reder.mti.api.utils.xml.ISODateXmlAdapter;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -58,7 +59,7 @@ public final class XServiceEntry
 
   }
   private UUID id;
-  private Timestamp date;
+  private LocalDate date;
   private final List<Defect> defects = new LinkedList<>();
   private final List<UsedSparePart> parts = new LinkedList<>();
   private String description;
@@ -96,8 +97,8 @@ public final class XServiceEntry
   }
 
   @XmlAttribute(name = "date", namespace = "mti")
-  @XmlJavaTypeAdapter(value = Timestamp.DateAdapter.class)
-  public Timestamp getDate()
+  @XmlJavaTypeAdapter(value = ISODateXmlAdapter.class)
+  public LocalDate getDate()
   {
     return date;
   }
@@ -129,7 +130,7 @@ public final class XServiceEntry
     this.id = id;
   }
 
-  public void setDate(Timestamp date)
+  public void setDate(LocalDate date)
   {
     this.date = date;
   }

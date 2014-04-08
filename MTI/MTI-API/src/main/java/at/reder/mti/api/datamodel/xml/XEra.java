@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.xml;
 
@@ -80,18 +80,18 @@ public final class XEra
     yearFrom = era.getYearFrom();
     yearTo = era.getYearTo();
     comment = era.getComment();
-    for (String l : era.getCountries()) {
-      if (l != null && !l.trim().isEmpty()) {
-        countries.add(l.trim());
-      }
-    }
+    era.getCountries().stream().
+            filter((l) -> (l != null && !l.trim().isEmpty())).
+            forEach((l) -> {
+              countries.add(l.trim());
+            });
   }
 
   public Era toEra() throws IllegalArgumentException, NullPointerException
   {
     Era.BuilderFactory factory = Lookup.getDefault().lookup(Era.BuilderFactory.class);
     assert (factory != null);
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     for (String c : countries) {
       if (c != null && !c.trim().isEmpty()) {
         builder.addCountry(c);

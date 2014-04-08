@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
@@ -13,7 +13,8 @@ import at.reder.mti.api.datamodel.Entity;
 import at.reder.mti.api.datamodel.InventoryObject;
 import at.reder.mti.api.datamodel.ModelCondition;
 import at.reder.mti.api.utils.Money;
-import at.reder.mti.api.utils.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,12 +29,12 @@ import java.util.UUID;
 public abstract class AbstractInventoryObject implements InventoryObject
 {
 
-  protected final List<? extends Entity> entities;
+  protected final List<Entity> entities;
   protected final ModelCondition condition;
-  protected final Timestamp dateOfPurchase;
+  protected final LocalDate dateOfPurchase;
   protected final String description;
   protected final UUID id;
-  protected final Timestamp lastModified;
+  protected final Instant lastModified;
   protected final Contact manufacturer;
   protected final Entity masterImage;
   protected final String name;
@@ -44,9 +45,9 @@ public abstract class AbstractInventoryObject implements InventoryObject
   protected AbstractInventoryObject(UUID id,
                                     String name,
                                     ModelCondition condition,
-                                    Timestamp dateOfPurchase,
+                                    LocalDate dateOfPurchase,
                                     String description,
-                                    Timestamp lastModified,
+                                    Instant lastModified,
                                     Contact manufacturer,
                                     Entity masterImage,
                                     Money price,
@@ -68,7 +69,7 @@ public abstract class AbstractInventoryObject implements InventoryObject
     this.masterImage = masterImage;
     this.name = name;
     this.price = price;
-    this.productNumber = productNumber!=null ? productNumber : "";
+    this.productNumber = productNumber != null ? productNumber : "";
     this.retailer = retailer;
   }
 
@@ -97,7 +98,7 @@ public abstract class AbstractInventoryObject implements InventoryObject
   }
 
   @Override
-  public Timestamp getDateOfPurchase()
+  public LocalDate getDateOfPurchase()
   {
     return dateOfPurchase;
   }
@@ -127,7 +128,7 @@ public abstract class AbstractInventoryObject implements InventoryObject
   }
 
   @Override
-  public List<? extends Entity> getEntities()
+  public List<Entity> getEntities()
   {
     return entities;
   }
@@ -139,7 +140,7 @@ public abstract class AbstractInventoryObject implements InventoryObject
   }
 
   @Override
-  public Timestamp getLastModified()
+  public Instant getLastModified()
   {
     return lastModified;
   }
@@ -162,10 +163,7 @@ public abstract class AbstractInventoryObject implements InventoryObject
       return false;
     }
     final AbstractInventoryObject other = (AbstractInventoryObject) obj;
-    if (!Objects.equals(this.id, other.id)) {
-      return false;
-    }
-    return true;
+    return Objects.equals(this.id, other.id);
   }
 
 }

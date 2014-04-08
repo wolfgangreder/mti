@@ -1,16 +1,16 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
+ *
  * Copyright 2013 Wolfgang Reder
- * 
+ *
  */
 package at.reder.mti.api.datamodel;
 
 import at.reder.mti.api.utils.Money;
-import at.reder.mti.api.utils.Timestamp;
-import java.util.Collection;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,144 +21,6 @@ import java.util.UUID;
  */
 public interface InventoryObject
 {
-
-  public static interface Builder<I extends InventoryObject> 
-  {
-
-    /**
-     * Setzt den Zustand des Objekts
-     *
-     * @param cond
-     * @return {@code this}
-     * @throws NullPointerException wenn {@code cond==null}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> condition(ModelCondition cond) throws
-            NullPointerException;
-
-    /**
-     * Setzt das Kaufdatum.
-     *
-     * @param ts Das Kaufdatum oder {@code null} falls nicht bekannt.
-     * @return {@code this}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> dateOfPurchase(Timestamp ts);
-
-    /**
-     * Setzt die Beschreibung.
-     *
-     * @param descr
-     * @return {@code this}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> description(String descr);
-
-    /**
-     * Füngt eine Entität hinzu
-     *
-     * @param e
-     * @return {@code this}
-     * @throws NullPointerException wenn {@code e==null}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> addEntity(Entity e) throws NullPointerException;
-
-    /**
-     * Entfernt falls vorhanden die Entität.
-     *
-     * @param e
-     * @return {@code this}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> removeEntity(Entity e);
-
-    /**
-     * Fügt die in {@code e} übergebenen Entitäten hinzu.
-     *
-     * @param e Sammlung von Entitäten
-     * @return {@code this}
-     * @throws NullPointerException wenn {@code e==null}.
-     * @throws IllegalArgumentException wenn {@code e null} enthält.
-     */
-    public InventoryObject.Builder<? extends InventoryObject> addEntities(Collection<? extends Entity> e) throws
-            NullPointerException, IllegalArgumentException;
-
-    /**
-     * Entfernt alle Entitäten
-     *
-     * @return {@code this}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> clearEntities();
-
-    /**
-     * Setzt die Id
-     *
-     * @param id
-     * @return {@code this}
-     * @throws NullPointerException wenn {@code id==null}.
-     */
-    public InventoryObject.Builder<? extends InventoryObject> id(UUID id) throws NullPointerException;
-
-    /**
-     * Setzt den Zeitpunkt der letzten Änderung
-     *
-     * @param ts
-     * @return {@code this}
-     * @throws NullPointerException wenn {@code ts==null}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> lastModified(Timestamp ts) throws
-            NullPointerException;
-
-    /**
-     * Setzt den Hersteller.
-     *
-     * @param contact Der Hersteller oder {@code null} falls unbekannt.
-     * @return {@code this}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> manufacturer(Contact contact);
-
-    /**
-     * Setzt das Bild des Objekts. Wenn {@code e!=null} wird {
-     *
-     * @¢ode e} auch zur Liste der Entitäten hinzugefügt. Falls das Bild bereits gesetzt war, wird das alte Bild aber nicht aus
-     * der Liste entfernt.
-     * @param e Das Bild des Objekts oder {@code null} falls nicht vorhanden.
-     * @return {@code this}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> masterImage(Entity e);
-
-    /**
-     * Der Name des Objects
-     *
-     * @param name
-     * @return {@code this}
-     * @throws NullPointerException wenn {@code name==null}
-     * @throws IllegalArgumentException wenn {@code name.trim().isEmpty()}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> name(String name) throws NullPointerException,
-                                                                                                      IllegalArgumentException;
-
-    /**
-     * Der Preis des Objekts.
-     *
-     * @param price Der Preis oder {@code null} wenn nicht bekannt.
-     * @return {@code this}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> price(Money price);
-
-    /**
-     * Artikelnummer des Herstellers
-     *
-     * @param productNumber Artikelnummer oder {@code null} falls nicht bekannt.
-     * @return {@code this}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> productNumber(String productNumber);
-
-    /**
-     * Der Händer bei dem das Objekt gekauft wurde.
-     *
-     * @param contact Der Händler, oder {@code null} falls nicht bekannt.
-     * @return {@code this}
-     */
-    public InventoryObject.Builder<? extends InventoryObject> retailer(Contact contact);
-
-  }
 
   /**
    * Id des Objekts
@@ -193,7 +55,7 @@ public interface InventoryObject
    *
    * @return das Datum oder {@code null} falls unbekannt.
    */
-  public Timestamp getDateOfPurchase();
+  public LocalDate getDateOfPurchase();
 
   /**
    * Artikelnummer der Herstellers
@@ -228,7 +90,7 @@ public interface InventoryObject
    *
    * @return niemals {@code null}
    */
-  public List<? extends Entity> getEntities();
+  public List<Entity> getEntities();
 
   /**
    * Bild des Objekts
@@ -242,6 +104,6 @@ public interface InventoryObject
    *
    * @return zeitstempel der letzten Änderung, niemals {@code null}
    */
-  public Timestamp getLastModified();
+  public Instant getLastModified();
 
 }

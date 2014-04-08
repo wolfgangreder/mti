@@ -1,16 +1,18 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.xml;
 
 import at.reder.mti.api.datamodel.Contact;
 import at.reder.mti.api.datamodel.ContactType;
+import at.reder.mti.api.utils.xml.InstantXmlAdapter;
 import java.net.URI;
+import java.time.Instant;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.UUID;
@@ -21,6 +23,7 @@ import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.openide.util.Lookup;
 
 /**
@@ -58,7 +61,8 @@ public final class XContact
   private String address2 = "";
   private String city = "";
   private String country = "";
-  private URI email;
+  private URI emailShop;
+  private URI emailService;
   private String fax = "";
   private UUID id;
   private String memo = "";
@@ -69,6 +73,7 @@ public final class XContact
   private final Set<ContactType> types = EnumSet.noneOf(ContactType.class);
   private URI www;
   private String zip = "";
+  private Instant lastModified;
 
   public XContact()
   {
@@ -80,7 +85,8 @@ public final class XContact
     this.address2 = contact.getAddress2();
     this.city = contact.getCity();
     this.country = contact.getCountry();
-    this.email = contact.getEmail();
+    this.emailShop = contact.getEmailShop();
+    this.emailService = contact.getEmailService();
     this.fax = contact.getFax();
     this.id = contact.getId();
     this.memo = contact.getMemo();
@@ -91,13 +97,15 @@ public final class XContact
     this.types.addAll(contact.getTypes());
     this.www = contact.getWWW();
     this.zip = contact.getZip();
+    this.lastModified = contact.getLastModified();
   }
 
   public Contact toContact() throws NullPointerException, IllegalArgumentException, IllegalStateException
   {
     return Lookup.getDefault().lookup(Contact.BuilderFactory.class).createBuilder().setTypes(types).address1(address1).address2(
-            address2).city(city).country(country).email(email).fax(fax).id(id).memo(memo).name(name).phone1(phone1).phone2(
-            phone2).shopAddress(shopAddress).www(www).zip(zip).build();
+            address2).city(city).country(country).emailShop(emailShop).fax(fax).id(id).memo(memo).name(name).phone1(phone1).
+            phone2(phone2).shopAddress(shopAddress).www(www).zip(zip).emailService(emailService).lastModified(
+                    lastModified).build();
   }
 
   @XmlElement(name = "address1", namespace = "mti")
@@ -144,15 +152,26 @@ public final class XContact
     this.country = country;
   }
 
-  @XmlElement(name = "email", namespace = "mti")
-  public URI getEmail()
+  @XmlElement(name = "emailShop", namespace = "mti")
+  public URI getEmailShop()
   {
-    return email;
+    return emailShop;
   }
 
-  public void setEmail(URI email)
+  public void setEmailShop(URI email)
   {
-    this.email = email;
+    this.emailShop = email;
+  }
+
+  @XmlElement(name = "emailService", namespace = "mti")
+  public URI getEmailService()
+  {
+    return emailService;
+  }
+
+  public void setEmailService(URI email)
+  {
+    this.emailService = email;
   }
 
   @XmlElement(name = "fax", namespace = "mti")
@@ -275,6 +294,18 @@ public final class XContact
   public Set<ContactType> getTypes()
   {
     return types;
+  }
+
+  @XmlAttribute(name = "lastModified", namespace = "mti", required = true)
+  @XmlJavaTypeAdapter(InstantXmlAdapter.class)
+  public Instant getLastModified()
+  {
+    return lastModified;
+  }
+
+  public void setLastModified(Instant lm)
+  {
+    lastModified = lm;
   }
 
 }

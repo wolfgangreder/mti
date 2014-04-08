@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
@@ -12,8 +12,7 @@ import at.reder.mti.api.datamodel.Defect;
 import at.reder.mti.api.datamodel.ServiceEntry;
 import at.reder.mti.api.datamodel.UsedSparePart;
 import at.reder.mti.api.datamodel.xml.XServiceEntry;
-import at.reder.mti.api.utils.MTIUtils;
-import at.reder.mti.api.utils.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,10 +24,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.openide.util.lookup.ServiceProvider;
 
-/**
- *
- * @author wolfi
- */
 @ServiceProvider(service = ServiceEntry.BuilderFactory.class)
 public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.BuilderFactory
 {
@@ -39,13 +34,13 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
   {
 
     private final UUID id;
-    private final Timestamp date;
-    private final List<? extends Defect> defects;
+    private final LocalDate date;
+    private final List<Defect> defects;
     private final List<UsedSparePart> parts;
     private final String description;
 
     private DefaultServiceEntry(UUID id,
-                                Timestamp date,
+                                LocalDate date,
                                 String description,
                                 Collection<? extends Defect> defects,
                                 Collection<UsedSparePart> parts)
@@ -72,7 +67,7 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
     }
 
     @Override
-    public Timestamp getDate()
+    public LocalDate getDate()
     {
       return date;
     }
@@ -84,7 +79,7 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
     }
 
     @Override
-    public List<? extends Defect> getDefectsResolved()
+    public List<Defect> getDefectsResolved()
     {
       return defects;
     }
@@ -113,25 +108,22 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
         return false;
       }
       final DefaultServiceEntry other = (DefaultServiceEntry) obj;
-      if (!Objects.equals(this.id, other.id)) {
-        return false;
-      }
-      return true;
+      return Objects.equals(this.id, other.id);
     }
 
   }
 
-  public static final class ServiceEntryBuilder implements ServiceEntry.Builder<ServiceEntry>
+  public static final class ServiceEntryBuilder implements ServiceEntry.Builder
   {
 
     private UUID id;
-    private Timestamp date;
+    private LocalDate date;
     private final List<Defect> defects = new LinkedList<>();
     private final List<UsedSparePart> parts = new LinkedList<>();
     private String description;
 
     @Override
-    public ServiceEntry.Builder<? extends ServiceEntry> copy(ServiceEntry se) throws NullPointerException
+    public ServiceEntry.Builder copy(ServiceEntry se) throws NullPointerException
     {
       if (se == null) {
         throw new NullPointerException("serviceEntry==null");
@@ -147,7 +139,7 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
     }
 
     @Override
-    public ServiceEntry.Builder<? extends ServiceEntry> id(UUID id) throws NullPointerException
+    public ServiceEntry.Builder id(UUID id) throws NullPointerException
     {
       if (id == null) {
         throw new NullPointerException("id==null");
@@ -157,17 +149,17 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
     }
 
     @Override
-    public ServiceEntry.Builder<? extends ServiceEntry> date(Timestamp date) throws NullPointerException
+    public ServiceEntry.Builder date(LocalDate date) throws NullPointerException
     {
       if (date == null) {
         throw new NullPointerException("date==null");
       }
-      this.date = MTIUtils.getDayPart(date);
+      this.date = date;
       return this;
     }
 
     @Override
-    public ServiceEntry.Builder<? extends ServiceEntry> description(String description)
+    public ServiceEntry.Builder description(String description)
     {
       if (description == null) {
         this.description = "";
@@ -178,7 +170,7 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
     }
 
     @Override
-    public ServiceEntry.Builder<? extends ServiceEntry> addDefect(Defect def) throws NullPointerException
+    public ServiceEntry.Builder addDefect(Defect def) throws NullPointerException
     {
       if (def == null) {
         throw new NullPointerException("defect==null");
@@ -188,7 +180,7 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
     }
 
     @Override
-    public ServiceEntry.Builder<? extends ServiceEntry> removeDefect(Defect def)
+    public ServiceEntry.Builder removeDefect(Defect def)
     {
       if (def != null) {
         defects.remove(def);
@@ -197,14 +189,14 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
     }
 
     @Override
-    public ServiceEntry.Builder<? extends ServiceEntry> clearDefects()
+    public ServiceEntry.Builder clearDefects()
     {
       defects.clear();
       return this;
     }
 
     @Override
-    public ServiceEntry.Builder<? extends ServiceEntry> addDefects(
+    public ServiceEntry.Builder addDefects(
             Collection<? extends Defect> defects) throws NullPointerException,
                                                          IllegalArgumentException
     {
@@ -219,7 +211,7 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
     }
 
     @Override
-    public ServiceEntry.Builder<? extends ServiceEntry> addSparePart(UsedSparePart sp) throws NullPointerException
+    public ServiceEntry.Builder addSparePart(UsedSparePart sp) throws NullPointerException
     {
       if (sp == null) {
         throw new NullPointerException("sparePart==null");
@@ -229,7 +221,7 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
     }
 
     @Override
-    public ServiceEntry.Builder<? extends ServiceEntry> removeSparePart(UsedSparePart sp)
+    public ServiceEntry.Builder removeSparePart(UsedSparePart sp)
     {
       if (sp != null) {
         parts.remove(sp);
@@ -238,16 +230,16 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
     }
 
     @Override
-    public ServiceEntry.Builder<? extends ServiceEntry> clearSpareParts()
+    public ServiceEntry.Builder clearSpareParts()
     {
       parts.clear();
       return this;
     }
 
     @Override
-    public ServiceEntry.Builder<? extends ServiceEntry> addSpareParts(
-            Collection<UsedSparePart> sp) throws NullPointerException,
-                                                 IllegalArgumentException
+    public ServiceEntry.Builder addSpareParts(Collection<? extends UsedSparePart> sp) throws
+            NullPointerException,
+            IllegalArgumentException
     {
       if (sp == null) {
         throw new NullPointerException("parts==null");
@@ -289,7 +281,7 @@ public final class DefaultServiceEntryBuilderFactory implements ServiceEntry.Bui
   }
 
   @Override
-  public ServiceEntry.Builder<? extends ServiceEntry> createBuilder()
+  public ServiceEntry.Builder createBuilder()
   {
     return new ServiceEntryBuilder();
   }

@@ -10,11 +10,13 @@ package at.reder.mti.api.datamodel.impl.dummies;
 
 import at.reder.mti.api.datamodel.Entity;
 import at.reder.mti.api.datamodel.EntityKind;
+import at.reder.mti.api.datamodel.xml.XEntity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
@@ -22,6 +24,7 @@ import org.openide.util.Lookup;
  *
  * @author wolfi
  */
+@XmlJavaTypeAdapter(value=XEntity.Adapter.class)
 public class DummyEntity implements Entity
 {
 

@@ -1,29 +1,35 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.xml;
 
 import at.reder.mti.api.datamodel.Contact;
 import at.reder.mti.api.datamodel.ContactType;
+import at.reder.mti.api.utils.xml.InstantXmlAdapter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.UUID;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.openide.util.Lookup;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
-import static org.testng.Assert.*;
 
 /**
  *
@@ -32,7 +38,8 @@ import static org.testng.Assert.*;
 public class XContactTest
 {
 
-  private final URI email;
+  private final URI emailShop;
+  private final URI emailService;
   private final UUID id = UUID.randomUUID();
   private final URI shop;
   private final URI www;
@@ -47,25 +54,28 @@ public class XContactTest
   private final String phone1 = "2";
   private final String phone2 = "3";
   private final String zip = "zip";
+  private final Instant lastModified = Instant.now();
 
   public XContactTest() throws URISyntaxException
   {
-    email = new URI("mailto:w.reder@mountain-sd.at");
+    emailShop = new URI("mailto:w.reder@mountain-sd.at");
+    emailService = new URI("mailto:wolfgang.reder@mountain-sd.at");
     shop = new URI("http://www.roco.co.at");
     www = new URI("http://www.zimo.at");
   }
 
   private JAXBContext context;
 
-  private Contact.Builder<? extends Contact> createBuilder()
+  private Contact.Builder createBuilder()
   {
-    Contact.Builder<? extends Contact> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.setTypes(ContactType.ALL);
     builder.address1(address1);
     builder.address2(address2);
     builder.city(city);
     builder.country(country);
-    builder.email(email);
+    builder.emailShop(emailShop);
+    builder.emailService(emailService);
     builder.fax(fax);
     builder.id(id);
     builder.memo(memo);
@@ -75,6 +85,7 @@ public class XContactTest
     builder.shopAddress(shop);
     builder.www(www);
     builder.zip(zip);
+    builder.lastModified(lastModified);
     return builder;
   }
 
@@ -92,7 +103,8 @@ public class XContactTest
     assertEquals(result.getAddress2(), contact.getAddress2());
     assertEquals(result.getCity(), contact.getCity());
     assertEquals(result.getCountry(), contact.getCountry());
-    assertEquals(result.getEmail(), contact.getEmail());
+    assertEquals(result.getEmailShop(), contact.getEmailShop());
+    assertEquals(result.getEmailService(), contact.getEmailService());
     assertEquals(result.getFax(), contact.getFax());
     assertEquals(result.getId(), contact.getId());
     assertEquals(result.getMemo(), contact.getMemo());
@@ -104,6 +116,8 @@ public class XContactTest
     assertEquals(result.getZip(), contact.getZip());
     assertEquals(result.getTypes().size(), contact.getTypes().size());
     assertTrue(contact.getTypes().containsAll(result.getTypes()));
+    InstantXmlAdapter adapter = new InstantXmlAdapter();
+    assertEquals(adapter.marshal(result.getLastModified()), adapter.marshal(contact.getLastModified()));
     assertNull(result.getLookup().lookup(Object.class));
   }
 

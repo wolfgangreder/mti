@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
@@ -21,7 +21,12 @@ import java.nio.file.Path;
 import java.util.Collection;
 import javax.imageio.ImageIO;
 import org.openide.util.Lookup;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -73,8 +78,8 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testCreateBuilder()
   {
-    Entity.Builder<?> expResult = factory.createBuilder();
-    Entity.Builder<?> result = factory.createBuilder();
+    Entity.Builder expResult = factory.createBuilder();
+    Entity.Builder result = factory.createBuilder();
     assertNotNull(result);
     assertNotNull(expResult);
     assertNotSame(result, expResult);
@@ -85,8 +90,8 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderImplementingClasses()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
-    Collection<? extends Class<? extends Entity>> ic = builder.getImplementingClasses();
+    Entity.Builder builder = factory.createBuilder();
+    Collection<? extends Class> ic = builder.getImplementingClasses();
     assertNotNull(ic);
     assertEquals(ic.size(), 1);
     assertSame(ic.iterator().next(), DefaultEntityBuilderFactory.DefaultEntity.class);
@@ -95,15 +100,15 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderXmlClass()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
-    Class<?> xc = builder.getXmlClass();
+    Entity.Builder builder = factory.createBuilder();
+    Class xc = builder.getXmlClass();
     assertSame(xc, XEntity.class);
   }
 
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderReturnsThis()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     assertSame(builder.copy(new DummyEntity()), builder);
     assertSame(builder.data(null), builder);
     assertSame(builder.data(dummyFile), builder);
@@ -120,7 +125,7 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderCopy()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     Entity e = new DummyEntity(cubaCarURI, "image/jpeg");
     builder.copy(e);
     Entity r = builder.build();
@@ -143,7 +148,7 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = {"testLookup", "testBuilderCopy"})
   public void testBuilderData()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.copy(new DummyEntity());
     builder.data(dummyFile);
     Entity e = builder.build();
@@ -160,7 +165,7 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderDescription()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.description(null);
     builder.description("description");
   }
@@ -168,7 +173,7 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderFilename()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.fileName(null);
     builder.fileName("description");
   }
@@ -176,42 +181,42 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderKind()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.kind(EntityKind.DECODER_DESCRIPTION);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testBuilderKindFail()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.kind(null);
   }
 
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderMimeType()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.mimeType("text/plain");
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testBuilderMimeTypeFail1()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.mimeType(" ");
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testBuilderMimeTypeFail2()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.mimeType(null);
   }
 
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderSize()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.size(0);
     builder.size(-1);
   }
@@ -219,28 +224,28 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testBuilderSizeFail()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.size(-2);
   }
 
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderURI()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.uri(cubaCarURI);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testBuilderURIFail()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.uri(null);
   }
 
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderBuild() throws IOException
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.uri(cubaCarURI);
     builder.mimeType("image/jpeg");
     builder.kind(EntityKind.IMAGE);
@@ -263,7 +268,7 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalStateException.class)
   public void testBuilderBuildFail1()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
 //    builder.uri(cubaCarURI);
     builder.mimeType("image/jpeg");
     builder.kind(EntityKind.IMAGE);
@@ -273,7 +278,7 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalStateException.class)
   public void testBuilderBuildFail2()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.uri(cubaCarURI);
 //    builder.mimeType("image/jpeg");
     builder.kind(EntityKind.IMAGE);
@@ -283,7 +288,7 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalStateException.class)
   public void testBuilderBuildFail3()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.uri(cubaCarURI);
     builder.mimeType("image/jpeg");
 //    builder.kind(EntityKind.IMAGE);
@@ -293,7 +298,7 @@ public class DefaultEntityBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalStateException.class)
   public void testBuilderBuildFail4()
   {
-    Entity.Builder<? extends Entity> builder = factory.createBuilder();
+    Entity.Builder builder = factory.createBuilder();
     builder.build();
   }
 

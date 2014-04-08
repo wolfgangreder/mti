@@ -1,14 +1,14 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel;
 
-import at.reder.mti.api.utils.Timestamp;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -21,41 +21,42 @@ import java.util.UUID;
 public interface ServiceEntry
 {
 
-  public static interface Builder<SE extends ServiceEntry> extends BaseBuilder<SE>
+  public static interface Builder extends BaseBuilder<ServiceEntry>
   {
 
-    public ServiceEntry.Builder<? extends ServiceEntry> copy(ServiceEntry se) throws NullPointerException;
+    public ServiceEntry.Builder copy(ServiceEntry se) throws NullPointerException;
 
-    public ServiceEntry.Builder<? extends ServiceEntry> id(UUID id) throws NullPointerException;
+    public ServiceEntry.Builder id(UUID id) throws NullPointerException;
 
-    public ServiceEntry.Builder<? extends ServiceEntry> description(String description);
+    public ServiceEntry.Builder description(String description);
 
-    public ServiceEntry.Builder<? extends ServiceEntry> date(Timestamp date) throws NullPointerException;
+    public ServiceEntry.Builder date(LocalDate date) throws NullPointerException;
 
-    public ServiceEntry.Builder<? extends ServiceEntry> addDefect(Defect def) throws NullPointerException;
+    public ServiceEntry.Builder addDefect(Defect def) throws NullPointerException;
 
-    public ServiceEntry.Builder<? extends ServiceEntry> removeDefect(Defect def);
+    public ServiceEntry.Builder removeDefect(Defect def);
 
-    public ServiceEntry.Builder<? extends ServiceEntry> clearDefects();
+    public ServiceEntry.Builder clearDefects();
 
-    public ServiceEntry.Builder<? extends ServiceEntry> addDefects(Collection<? extends Defect> defects) throws
+    public ServiceEntry.Builder addDefects(Collection<? extends Defect> defects) throws
             NullPointerException, IllegalArgumentException;
 
-    public ServiceEntry.Builder<? extends ServiceEntry> addSparePart(UsedSparePart sp) throws NullPointerException;
+    public ServiceEntry.Builder addSparePart(UsedSparePart sp) throws NullPointerException;
 
-    public ServiceEntry.Builder<? extends ServiceEntry> removeSparePart(UsedSparePart sp);
+    public ServiceEntry.Builder removeSparePart(UsedSparePart sp);
 
-    public ServiceEntry.Builder<? extends ServiceEntry> clearSpareParts();
+    public ServiceEntry.Builder clearSpareParts();
 
-    public ServiceEntry.Builder<? extends ServiceEntry> addSpareParts(Collection<UsedSparePart> sp) throws NullPointerException,
-                                                                                                           IllegalArgumentException;
+    public ServiceEntry.Builder addSpareParts(Collection<? extends UsedSparePart> sp) throws
+            NullPointerException,
+            IllegalArgumentException;
 
   }
 
   public static interface BuilderFactory
   {
 
-    public ServiceEntry.Builder<? extends ServiceEntry> createBuilder();
+    public ServiceEntry.Builder createBuilder();
 
   }
 
@@ -78,14 +79,14 @@ public interface ServiceEntry
    *
    * @return ein datum, niemals {@code null}
    */
-  public Timestamp getDate();
+  public LocalDate getDate();
 
   /**
    * Liste der Defekte die behoben wurden.
    *
    * @return Liste der Defekte, niemals {@code null}
    */
-  public List<? extends Defect> getDefectsResolved();
+  public List<Defect> getDefectsResolved();
 
   /**
    * Die Verwendeten Erstatzteile.

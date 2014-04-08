@@ -1,22 +1,26 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.xml;
 
+import at.reder.mti.api.datamodel.BaseBuilder;
 import at.reder.mti.api.datamodel.Contact;
 import at.reder.mti.api.datamodel.Entity;
 import at.reder.mti.api.datamodel.InventoryObject;
 import at.reder.mti.api.datamodel.ModelCondition;
 import at.reder.mti.api.utils.Money;
-import at.reder.mti.api.utils.Timestamp;
+import at.reder.mti.api.utils.xml.ISODateXmlAdapter;
+import at.reder.mti.api.utils.xml.InstantXmlAdapter;
 import at.reder.mti.api.utils.xml.MoneyXmlAdapter;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -29,16 +33,17 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 /**
  *
  * @author wolfi
+ * @param <B>
  */
-public abstract class AbstractXInventoryObject
+public abstract class AbstractXInventoryObject<B extends BaseBuilder<?>>
 {
 
-  protected final Set<Entity> entities = new HashSet<>();
+  protected final List<Entity> entities = new LinkedList<>();
   protected ModelCondition condition;
-  protected Timestamp dateOfPurchase;
+  protected LocalDate dateOfPurchase;
   protected String description;
   protected UUID id;
-  protected Timestamp lastModified;
+  protected Instant lastModified;
   protected Contact manufacturer;
   protected Entity masterImage;
   protected String name;
@@ -66,17 +71,11 @@ public abstract class AbstractXInventoryObject
     this.retailer = o.getRetailer();
   }
 
-  protected void initBuilder(InventoryObject.Builder<?> builder)
-  {
-    builder.addEntities(entities).condition(condition).dateOfPurchase(dateOfPurchase).description(description).id(id).
-            lastModified(lastModified).manufacturer(manufacturer).masterImage(masterImage).name(name).price(price).productNumber(
-            productNumber).retailer(retailer);
-  }
-
   @XmlElement(name = "entities", namespace = "mti")
+  @XmlJavaTypeAdapter(value = XEntity.Adapter.class)
   @XmlList
   @XmlIDREF
-  public Set<Entity> getEntities()
+  public List<Entity> getEntities()
   {
     return entities;
   }
@@ -88,8 +87,8 @@ public abstract class AbstractXInventoryObject
   }
 
   @XmlAttribute(name = "dateofpurchase", namespace = "mti")
-  @XmlJavaTypeAdapter(value = Timestamp.DateAdapter.class)
-  public Timestamp getDateOfPurchase()
+  @XmlJavaTypeAdapter(value = ISODateXmlAdapter.class)
+  public LocalDate getDateOfPurchase()
   {
     return dateOfPurchase;
   }
@@ -114,13 +113,14 @@ public abstract class AbstractXInventoryObject
   }
 
   @XmlAttribute(name = "lastmodified", namespace = "mti")
-  @XmlJavaTypeAdapter(Timestamp.ISO822TimestampAdapter.class)
-  public Timestamp getLastModified()
+  @XmlJavaTypeAdapter(InstantXmlAdapter.class)
+  public Instant getLastModified()
   {
     return lastModified;
   }
 
   @XmlAttribute(name = "manufacturer", namespace = "mti")
+  @XmlJavaTypeAdapter(value = XContact.Adapter.class)
   @XmlIDREF
   public Contact getManufacturer()
   {
@@ -128,6 +128,7 @@ public abstract class AbstractXInventoryObject
   }
 
   @XmlAttribute(name = "masterimage", namespace = "mti")
+  @XmlJavaTypeAdapter(value = XEntity.Adapter.class)
   @XmlIDREF
   public Entity getMasterImage()
   {
@@ -154,6 +155,7 @@ public abstract class AbstractXInventoryObject
   }
 
   @XmlAttribute(name = "retailer", namespace = "mti")
+  @XmlJavaTypeAdapter(value = XContact.Adapter.class)
   @XmlIDREF
   public Contact getRetailer()
   {
@@ -165,7 +167,7 @@ public abstract class AbstractXInventoryObject
     this.condition = condition;
   }
 
-  public void setDateOfPurchase(Timestamp dateOfPurchase)
+  public void setDateOfPurchase(LocalDate dateOfPurchase)
   {
     this.dateOfPurchase = dateOfPurchase;
   }
@@ -185,7 +187,7 @@ public abstract class AbstractXInventoryObject
     this.id = strId != null ? UUID.fromString(strId) : null;
   }
 
-  public void setLastModified(Timestamp lastModified)
+  public void setLastModified(Instant lastModified)
   {
     this.lastModified = lastModified;
   }

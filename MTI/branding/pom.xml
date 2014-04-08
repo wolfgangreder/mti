@@ -21,7 +21,8 @@
     <dependency>
       <groupId>org.netbeans.api</groupId>
       <artifactId>org-netbeans-api-annotations-common</artifactId>
-      <version>${netbeans.version}</version>
+      <version>RELEASE80</version>
+      <type>jar</type>
     </dependency>
   </dependencies>
 
@@ -39,6 +40,15 @@
                     <useDefaultManifestFile>true</useDefaultManifestFile>
                 </configuration>
             </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>2.3.2</version>
+            <configuration>
+               <source>1.8</source>
+               <target>1.8</target>
+            </configuration>
+         </plugin>
       </plugins>
   </build>
 </project>
