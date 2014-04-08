@@ -1,17 +1,20 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2014 Wolfgang Reder
+ *
  */package at.reder.mti.api.datamodel.impl.dummies;
 
 import at.reder.mti.api.datamodel.Contact;
 import at.reder.mti.api.datamodel.ContactType;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 /**
@@ -22,6 +25,7 @@ public class DummyContact implements Contact
 {
 
   private final UUID id = UUID.randomUUID();
+  private final Instant lastModified = Instant.now();
 
   @Override
   public UUID getId()
@@ -32,91 +36,123 @@ public class DummyContact implements Contact
   @Override
   public String getName()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return "name_" + id.toString();
   }
 
   @Override
   public String getAddress1()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return "address1_" + id.toString();
   }
 
   @Override
   public String getAddress2()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return "address2_" + id.toString();
   }
 
   @Override
   public String getZip()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return "zip_" + id.toString();
   }
 
   @Override
   public String getCity()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return "city_" + id.toString();
   }
 
   @Override
   public String getCountry()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return "country_" + id.toString();
   }
 
   @Override
-  public URI getEmail()
+  public URI getEmailService()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    try {
+      return new URI(id.toString() + ".service@nowhere.no");
+    } catch (URISyntaxException ex) {
+      Exceptions.printStackTrace(ex);
+    }
+    return null;
+  }
+
+  @Override
+  public URI getEmailShop()
+  {
+    try {
+      return new URI(id.toString() + ".shop@nowhere.no");
+    } catch (URISyntaxException ex) {
+      Exceptions.printStackTrace(ex);
+    }
+    return null;
   }
 
   @Override
   public URI getWWW()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    try {
+      return new URI("www.nowhere.no/" + id.toString());
+    } catch (URISyntaxException ex) {
+      Exceptions.printStackTrace(ex);
+    }
+    return null;
   }
 
   @Override
   public URI getShopAddress()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    try {
+      return new URI("shop.nowhere.no/" + id.toString());
+    } catch (URISyntaxException ex) {
+      Exceptions.printStackTrace(ex);
+    }
+    return null;
   }
 
   @Override
   public String getMemo()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return "memo_" + id.toString();
   }
 
   @Override
   public String getPhone1()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return "phone1_" + id.toString();
   }
 
   @Override
   public String getPhone2()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return "phone21_" + id.toString();
   }
 
   @Override
   public String getFax()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return "fax_" + id.toString();
   }
 
   @Override
   public Set<ContactType> getTypes()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return ContactType.ALL;
+  }
+
+  @Override
+  public Instant getLastModified()
+  {
+    return lastModified;
   }
 
   @Override
   public Lookup getLookup()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return Lookup.EMPTY;
   }
 
 }

@@ -1,15 +1,16 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.xml;
 
 import at.reder.mti.api.datamodel.Defect;
-import at.reder.mti.api.utils.Timestamp;
+import at.reder.mti.api.utils.xml.ISODateXmlAdapter;
+import java.time.LocalDate;
 import java.util.UUID;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -51,7 +52,7 @@ public final class XDefect
 
   }
   private UUID id;
-  private Timestamp date;
+  private LocalDate date;
   private String description;
 
   public XDefect()
@@ -95,13 +96,13 @@ public final class XDefect
   }
 
   @XmlAttribute(name = "date", namespace = "mti")
-  @XmlJavaTypeAdapter(value = Timestamp.DateAdapter.class)
-  public Timestamp getDate()
+  @XmlJavaTypeAdapter(value = ISODateXmlAdapter.class)
+  public LocalDate getDate()
   {
     return date;
   }
 
-  public void setDate(Timestamp date)
+  public void setDate(LocalDate date)
   {
     this.date = date;
   }

@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
@@ -18,16 +18,16 @@ import at.reder.mti.api.datamodel.Scale;
 import at.reder.mti.api.datamodel.ServiceEntry;
 import at.reder.mti.api.datamodel.xml.XLocomotive;
 import at.reder.mti.api.utils.Money;
-import at.reder.mti.api.utils.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 import org.openide.util.lookup.ServiceProvider;
 
-/**
- *
- * @author wolfi
- */
 @ServiceProvider(service = Locomotive.BuilderFactory.class)
 public final class DefaultLocomotiveBuilderFactory implements Locomotive.BuilderFactory
 {
@@ -46,9 +46,9 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     private DefaultLocomotive(UUID id,
                               String name,
                               ModelCondition condition,
-                              Timestamp dateOfPurchase,
+                              LocalDate dateOfPurchase,
                               String description,
-                              Timestamp lastModified,
+                              Instant lastModified,
                               Contact manufacturer,
                               Entity masterImage,
                               Money price,
@@ -119,12 +119,32 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
 
   }
 
-  public static final class DefaultBuilder extends AbstractVehicleBuilder<Locomotive>
-          implements Locomotive.Builder<Locomotive>
+  public static final class DefaultBuilder implements Locomotive.Builder
   {
 
     private static final Collection<? extends Class<? extends Locomotive>> implementingClasses = Collections.singleton(
             DefaultLocomotive.class);
+    private final Set<Entity> entities = new HashSet<>();
+    private ModelCondition condition;
+    private LocalDate dateOfPurchase;
+    private String description;
+    private UUID id;
+    private Instant lastModified;
+    private Contact manufacturer;
+    private Entity masterImage;
+    private String name;
+    private Money price;
+    private String productNumber;
+    private Contact retailer;
+    private Era era;
+    private double length;
+    private double width;
+    private double height;
+    private double weight;
+    private final Set<Decoder> decoder = new HashSet<>();
+    private Scale scale;
+    private final Set<ServiceEntry> serviceEntries = new HashSet<>();
+    private final Set<Object> lookupContent = new HashSet<>();
     private String number;
     private String arrangement;
     private String kind;
@@ -133,44 +153,464 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     private String country;
 
     @Override
-    public Locomotive.Builder<? extends Locomotive> locomotiveNumber(String number)
+    public Locomotive.Builder copy(Locomotive locomotive) throws NullPointerException
+    {
+      if (locomotive == null) {
+        throw new NullPointerException("locomotive==null");
+      }
+      this.entities.clear();
+      this.entities.addAll(locomotive.getEntities());
+      this.condition = locomotive.getCondition();
+      this.dateOfPurchase = locomotive.getDateOfPurchase();
+      this.description = locomotive.getDescription();
+      this.id = locomotive.getId();
+      this.lastModified = locomotive.getLastModified();
+      this.manufacturer = locomotive.getManufacturer();
+      this.masterImage = locomotive.getMasterImage();
+      this.name = locomotive.getName();
+      this.price = locomotive.getPrice();
+      this.productNumber = locomotive.getProductNumber();
+      this.retailer = locomotive.getRetailer();
+      this.era = locomotive.getEra();
+      this.length = locomotive.getLength();
+      this.height = locomotive.getHeight();
+      this.weight = locomotive.getWeight();
+      this.decoder.clear();
+      this.decoder.addAll(locomotive.getDecoder());
+      this.scale = locomotive.getScale();
+      serviceEntries.clear();
+      this.serviceEntries.addAll(locomotive.getServiceEntries());
+      lookupContent.clear();
+      this.number = locomotive.getLocomotiveNumber();
+      this.arrangement = locomotive.getWheelArrangement();
+      this.kind = locomotive.getKind();
+      this.clazz = locomotive.getLocomotiveClass();
+      this.company = locomotive.getCompany();
+      this.country = locomotive.getCountry();
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder copy(XLocomotive locomotive) throws NullPointerException
+    {
+      if (locomotive == null) {
+        throw new NullPointerException("locomotive==null");
+      }
+      this.entities.clear();
+      this.entities.addAll(locomotive.getEntities());
+      this.condition = locomotive.getCondition();
+      this.dateOfPurchase = locomotive.getDateOfPurchase();
+      this.description = locomotive.getDescription();
+      this.id = locomotive.getId();
+      this.lastModified = locomotive.getLastModified();
+      this.manufacturer = locomotive.getManufacturer();
+      this.masterImage = locomotive.getMasterImage();
+      this.name = locomotive.getName();
+      this.price = locomotive.getPrice();
+      this.productNumber = locomotive.getProductNumber();
+      this.retailer = locomotive.getRetailer();
+      this.era = locomotive.getEra();
+      this.length = locomotive.getLength();
+      this.height = locomotive.getHeight();
+      this.weight = locomotive.getWeight();
+      this.decoder.clear();
+      this.decoder.addAll(locomotive.getDecoder());
+      this.scale = locomotive.getScale();
+      serviceEntries.clear();
+      this.serviceEntries.addAll(locomotive.getServiceEntries());
+      lookupContent.clear();
+      this.number = locomotive.getNumber();
+      this.arrangement = locomotive.getArrangement();
+      this.kind = locomotive.getKind();
+      this.clazz = locomotive.getClazz();
+      this.company = locomotive.getCompany();
+      this.country = locomotive.getCountry();
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder locomotiveNumber(String number)
     {
       this.number = number;
       return this;
     }
 
     @Override
-    public Locomotive.Builder<? extends Locomotive> wheelArrangement(String arrangement)
+    public Locomotive.Builder wheelArrangement(String arrangement)
     {
       this.arrangement = arrangement;
       return this;
     }
 
     @Override
-    public Locomotive.Builder<? extends Locomotive> kind(String kind)
+    public Locomotive.Builder kind(String kind)
     {
       this.kind = kind;
       return this;
     }
 
     @Override
-    public Locomotive.Builder<? extends Locomotive> locomotiveClass(String clazz)
+    public Locomotive.Builder locomotiveClass(String clazz)
     {
       this.clazz = clazz;
       return this;
     }
 
     @Override
-    public Locomotive.Builder<? extends Locomotive> company(String company)
+    public Locomotive.Builder company(String company)
     {
       this.company = company;
       return this;
     }
 
     @Override
-    public Locomotive.Builder<? extends Locomotive> country(String country)
+    public Locomotive.Builder country(String country)
     {
       this.country = country;
+      return this;
+    }
+
+    private void checkState() throws IllegalStateException
+    {
+      if (id == null) {
+        throw new IllegalStateException("id==null");
+      }
+      if (name == null) {
+        throw new IllegalStateException("name==null");
+      }
+      if (name.trim().isEmpty()) {
+        throw new IllegalStateException("name is empty");
+      }
+      if (condition == null) {
+        throw new IllegalStateException("condition==null");
+      }
+      if (lastModified == null) {
+        throw new IllegalStateException("lastModified==null");
+      }
+      if (entities.contains(null)) {
+        throw new IllegalStateException("entities contains null");
+      }
+      if (decoder.contains(null)) {
+        throw new IllegalStateException("decoder contains null");
+      }
+      if (scale == null) {
+        throw new IllegalStateException("scale==null");
+      }
+      if (serviceEntries.contains(null)) {
+        throw new IllegalStateException("serviceEntries contains null");
+      }
+      if (lookupContent.contains(null)) {
+        throw new IllegalStateException("lookupContent contains null");
+      }
+
+    }
+
+    @Override
+    public Locomotive.Builder condition(ModelCondition cond) throws NullPointerException
+    {
+      if (cond == null) {
+        throw new NullPointerException("condition==null");
+      }
+      this.condition = cond;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder dateOfPurchase(LocalDate ts)
+    {
+      this.dateOfPurchase = ts;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder description(String descr)
+    {
+      if (descr == null) {
+        description = "";
+      } else {
+        description = descr;
+      }
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder addEntity(Entity e) throws NullPointerException
+    {
+      if (e == null) {
+        throw new NullPointerException("entity==null");
+      }
+      entities.add(e);
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder removeEntity(Entity e)
+    {
+      if (e != null) {
+        entities.remove(e);
+      }
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder addEntities(Collection<? extends Entity> e) throws
+            NullPointerException,
+            IllegalArgumentException
+    {
+      if (e == null) {
+        throw new NullPointerException("entities==null");
+      }
+      if (e.contains(null)) {
+        throw new IllegalArgumentException("entities contains null");
+      }
+      this.entities.addAll(e);
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder clearEntities()
+    {
+      this.entities.clear();
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder id(UUID id) throws NullPointerException
+    {
+      if (id == null) {
+        throw new NullPointerException("id==null");
+      }
+      this.id = id;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder lastModified(Instant ts) throws NullPointerException
+    {
+      if (ts == null) {
+        throw new NullPointerException("ts==null");
+      }
+      lastModified = ts;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder manufacturer(Contact contact)
+    {
+      this.manufacturer = contact;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder masterImage(Entity e)
+    {
+      this.masterImage = e;
+      if (e != null) {
+        addEntity(e);
+      }
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder name(String name) throws NullPointerException,
+                                                       IllegalArgumentException
+    {
+      if (name == null) {
+        throw new NullPointerException("name==null");
+      }
+      if (name.trim().isEmpty()) {
+        throw new IllegalArgumentException("name is empty");
+      }
+      this.name = name;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder price(Money price)
+    {
+      this.price = price;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder productNumber(String productNumber)
+    {
+      this.productNumber = productNumber;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder retailer(Contact contact)
+    {
+      this.retailer = contact;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder era(Era era)
+    {
+      this.era = era;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder length(double len)
+    {
+      this.length = len;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder width(double width)
+    {
+      this.width = width;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder height(double height)
+    {
+      this.height = height;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder weight(double weight)
+    {
+      this.weight = weight;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder addDecoder(Decoder d) throws NullPointerException
+    {
+      if (d == null) {
+        throw new NullPointerException("d==null");
+      }
+      decoder.add(d);
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder removeDecoder(Decoder d) throws NullPointerException
+    {
+      if (d != null) {
+        decoder.remove(d);
+      }
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder addDecoder(Collection<? extends Decoder> d) throws NullPointerException,
+                                                                                 IllegalArgumentException
+    {
+      if (d == null) {
+        throw new NullPointerException("d==null");
+      }
+      if (d.contains(null)) {
+        throw new IllegalArgumentException("d contains null");
+      }
+      decoder.addAll(d);
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder clearDecoder()
+    {
+      decoder.clear();
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder scale(Scale scale) throws NullPointerException
+    {
+      if (scale == null) {
+        throw new NullPointerException("scale==null");
+      }
+      this.scale = scale;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder addServiceEntry(ServiceEntry e) throws NullPointerException
+    {
+      if (e == null) {
+        throw new NullPointerException("e==null");
+      }
+      serviceEntries.add(e);
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder removeServiceEntry(ServiceEntry e)
+    {
+      if (e != null) {
+        serviceEntries.remove(e);
+      }
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder addServiceEntries(
+            Collection<? extends ServiceEntry> e) throws
+            NullPointerException,
+            IllegalArgumentException
+    {
+      if (e == null) {
+        throw new NullPointerException("e==null");
+      }
+      if (e.contains(null)) {
+        throw new IllegalArgumentException("e contains null");
+      }
+      serviceEntries.addAll(e);
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder clearServiceEntries()
+    {
+      serviceEntries.clear();
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder addLookupItem(Object item) throws NullPointerException
+    {
+      if (item == null) {
+        throw new NullPointerException("item==null");
+      }
+      lookupContent.add(item);
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder removeLookupItem(Object item)
+    {
+      if (item != null) {
+        lookupContent.remove(item);
+      }
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder removeInstancesOfFromLookup(Class<?> clazz) throws NullPointerException
+    {
+      if (clazz == null) {
+        throw new NullPointerException("clazz==null");
+      }
+      Iterator<Object> iter = lookupContent.iterator();
+      while (iter.hasNext()) {
+        if (clazz.isInstance(iter.next())) {
+          iter.remove();
+        }
+      }
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder clearLookup()
+    {
+      lookupContent.clear();
       return this;
     }
 
@@ -198,7 +638,7 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
   }
 
   @Override
-  public Locomotive.Builder<? extends Locomotive> createBuilder()
+  public Locomotive.Builder createBuilder()
   {
     return new DefaultBuilder();
   }

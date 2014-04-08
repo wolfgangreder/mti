@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
+ *
  * Copyright 2013 Wolfgang Reder
- * 
+ *
  */
 package at.reder.mti.api.datamodel;
 
@@ -13,7 +13,9 @@ import org.openide.util.Lookup;
 /**
  *
  * @author wolfi
+ * @param <L>
  */
+@Deprecated
 public interface LookupBuilder<L extends Lookup.Provider>
 {
 

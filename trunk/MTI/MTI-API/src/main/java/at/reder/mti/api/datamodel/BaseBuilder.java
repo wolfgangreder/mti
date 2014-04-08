@@ -14,6 +14,7 @@ import java.util.Collection;
  * Basisinterface für alle BaseBuilder.
  *
  * @author wolfi
+ * @param <E> Baseclass of instance to build.
  */
 public interface BaseBuilder<E>
 {

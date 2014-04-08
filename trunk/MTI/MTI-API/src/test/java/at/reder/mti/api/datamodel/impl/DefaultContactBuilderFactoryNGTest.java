@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
@@ -13,20 +13,24 @@ import at.reder.mti.api.datamodel.ContactType;
 import at.reder.mti.api.datamodel.xml.XContact;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import org.openide.util.Lookup;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
-import static org.testng.Assert.*;
 
-/**
- *
- * @author wolfi
- */
 public class DefaultContactBuilderFactoryNGTest
 {
 
@@ -48,9 +52,9 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testCreateBuilder()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     assertTrue(builder instanceof DefaultContactBuilderFactory.ContactBuilder);
-    Contact.Builder<?> builder2 = factory.createBuilder();
+    Contact.Builder builder2 = factory.createBuilder();
     assertNotSame(builder, builder2);
     assertNotNull(builder2);
   }
@@ -58,7 +62,7 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testImplementingClasses()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     Collection<? extends Class<?>> implClasses = builder.getImplementingClasses();
     assertNotNull(implClasses);
     assertEquals(implClasses.size(), 1);
@@ -68,15 +72,15 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testXmlClass()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     assertSame(builder.getXmlClass(), XContact.class);
   }
 
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderReturnThis() throws URISyntaxException
   {
-    Contact.Builder<? extends Contact> builder = factory.createBuilder();
-    Contact.Builder<? extends Contact> result = builder.id(UUID.randomUUID());
+    Contact.Builder builder = factory.createBuilder();
+    Contact.Builder result = builder.id(UUID.randomUUID());
     assertSame(result, builder);
     result = builder.addLookupItem(new Object());
     assertSame(result, builder);
@@ -98,9 +102,13 @@ public class DefaultContactBuilderFactoryNGTest
     assertSame(result, builder);
     result = builder.clearTypes();
     assertSame(result, builder);
-    result = builder.email(new URI("mailto:w.reder@mountain-sd.at"));
+    result = builder.emailShop(new URI("mailto:w.reder@mountain-sd.at"));
     assertSame(result, builder);
-    result = builder.email(null);
+    result = builder.emailShop(null);
+    assertSame(result, builder);
+    result = builder.emailService(new URI("mailto:w.reder@mountain-sd.at"));
+    assertSame(result, builder);
+    result = builder.emailService(null);
     assertSame(result, builder);
     result = builder.fax("46");
     assertSame(result, builder);
@@ -148,69 +156,85 @@ public class DefaultContactBuilderFactoryNGTest
     assertSame(result, builder);
     result = builder.zip(null);
     assertSame(result, builder);
+    result = builder.lastModified(Instant.now());
+    assertSame(result, builder);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testBuilderIdFail()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.id(null);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testBuilderNameFail1()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.name(null);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testBuilderNameFail2()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.name(" ");
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testBuilderNameFail3()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.name("");
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testAddToLookupFail()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.addLookupItem(null);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testAddTypeFail1()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.addType(null);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testCopyFail()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.copy(null);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testEmailFail1() throws URISyntaxException
   {
-    Contact.Builder<?> builder = factory.createBuilder();
-    builder.email(new URI("w.reder@mountain-sd.at"));
+    Contact.Builder builder = factory.createBuilder();
+    builder.emailShop(new URI("w.reder@mountain-sd.at"));
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testEmailFail2() throws URISyntaxException
   {
-    Contact.Builder<?> builder = factory.createBuilder();
-    builder.email(new URI("http://w.reder@mountain-sd.at"));
+    Contact.Builder builder = factory.createBuilder();
+    builder.emailShop(new URI("http://w.reder@mountain-sd.at"));
+  }
+
+  @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
+  public void testEmailFail3() throws URISyntaxException
+  {
+    Contact.Builder builder = factory.createBuilder();
+    builder.emailService(new URI("w.reder@mountain-sd.at"));
+  }
+
+  @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
+  public void testEmailFail4() throws URISyntaxException
+  {
+    Contact.Builder builder = factory.createBuilder();
+    builder.emailService(new URI("http://w.reder@mountain-sd.at"));
   }
 
   @Test(dependsOnMethods = "testLookup")
@@ -393,49 +417,49 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testIdFail()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.id(null);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testNameFail1()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.name(null);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testNameFail2()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.name("");
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testNameFail3()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.name(" ");
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testRemoveInstancesOfFromLookupFail()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.removeInstancesOfFromLookup(null);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testSetTypesFail1()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.setTypes(null);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testSetTypesFail2()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     List<ContactType> types = Arrays.asList(ContactType.RETAILER, null, ContactType.MANUFACTURER);
     builder.setTypes(types);
   }
@@ -443,7 +467,7 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testSetTypesFail3()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     List<ContactType> types = Arrays.asList(null, ContactType.MANUFACTURER);
     builder.setTypes(types);
   }
@@ -451,7 +475,7 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testSetTypesFail4()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     List<ContactType> types = Arrays.asList(ContactType.MANUFACTURER, null);
     builder.setTypes(types);
   }
@@ -459,7 +483,7 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
   public void testSetTypesFail5()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     Collection<ContactType> types = Collections.singletonList(null);
     builder.setTypes(types);
   }
@@ -467,21 +491,28 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testShopAddressFail1() throws URISyntaxException
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.shopAddress(new URI("gopher://www.mountain-sd.at"));
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testWWWFail1() throws URISyntaxException
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.www(new URI("gopher://www.mountain-sd.at"));
+  }
+
+  @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
+  public void testLastModifiedFail1() throws NullPointerException
+  {
+    Contact.Builder builder = factory.createBuilder();
+    builder.lastModified(null);
   }
 
   @Test(dependsOnMethods = "testLookup")
   public void testBuilder1()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     UUID id = UUID.randomUUID();
     builder.addType(ContactType.RETAILER);
     builder.id(id);
@@ -493,7 +524,8 @@ public class DefaultContactBuilderFactoryNGTest
     assertEquals(contact.getAddress2(), "");
     assertEquals(contact.getCity(), "");
     assertEquals(contact.getCountry(), "");
-    assertNull(contact.getEmail());
+    assertNull(contact.getEmailShop());
+    assertNull(contact.getEmailService());
     assertEquals(contact.getFax(), "");
     assertEquals(contact.getId(), id);
     assertEquals(contact.getMemo(), "");
@@ -506,16 +538,19 @@ public class DefaultContactBuilderFactoryNGTest
     assertTrue(contact.getTypes().contains(ContactType.RETAILER));
     assertNull(contact.getWWW());
     assertEquals(contact.getZip(), "");
+    assertNotNull(contact.getLastModified());
   }
 
   @Test(dependsOnMethods = "testLookup")
   public void testBuilder2() throws URISyntaxException
   {
-    Contact.Builder<? extends Contact> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     UUID id = UUID.randomUUID();
     URI email = new URI("mailto:w.reder@mountain-sd.at");
+    URI email2 = new URI("mailto:wolfgang.reder@aon.at");
     URI shop = new URI("http://www.roco.co.at");
     URI www = new URI("http://www.zimo.at");
+    Instant lastModified = Instant.now();
     builder.addLookupItem(new Integer(5));
     builder.addLookupItem("wolfi");
     builder.addLookupItem("reder");
@@ -526,7 +561,8 @@ public class DefaultContactBuilderFactoryNGTest
     builder.address2(" address 2");
     builder.city(" city ");
     builder.country(" country ");
-    builder.email(email);
+    builder.emailShop(email);
+    builder.emailService(email2);
     builder.fax("1");
     builder.id(id);
     builder.memo(" memo ");
@@ -536,13 +572,15 @@ public class DefaultContactBuilderFactoryNGTest
     builder.shopAddress(shop);
     builder.www(www);
     builder.zip("zip ");
+    builder.lastModified(lastModified);
     Contact contact = builder.build();
     assertNotNull(contact);
     assertEquals(contact.getAddress1(), "address 1");
     assertEquals(contact.getAddress2(), "address 2");
     assertEquals(contact.getCity(), "city");
     assertEquals(contact.getCountry(), "country");
-    assertEquals(contact.getEmail(), email);
+    assertEquals(contact.getEmailShop(), email);
+    assertEquals(contact.getEmailService(), email2);
     assertEquals(contact.getFax(), "1");
     assertEquals(contact.getId(), id);
     assertEquals(contact.getMemo(), " memo ");
@@ -552,21 +590,24 @@ public class DefaultContactBuilderFactoryNGTest
     assertEquals(contact.getShopAddress(), shop);
     assertEquals(contact.getWWW(), www);
     assertEquals(contact.getZip(), "zip");
-    assertEquals(contact.getTypes().size(), 1);
+    assertEquals(contact.getTypes().size(), 3);
     assertTrue(contact.getTypes().contains(ContactType.MANUFACTURER));
     Integer i = 5;
     assertEquals(contact.getLookup().lookup(Integer.class), i);
+    assertEquals(contact.getLastModified(), lastModified);
     assertNull(contact.getLookup().lookup(String.class));
   }
 
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderCopy() throws URISyntaxException
   {
-    Contact.Builder<? extends Contact> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     UUID id = UUID.randomUUID();
     URI email = new URI("mailto:w.reder@mountain-sd.at");
+    URI email2 = new URI("mailto:wolfgang.reder@mountain-sd.at");
     URI shop = new URI("http://www.roco.co.at");
     URI www = new URI("http://www.zimo.at");
+    Date lastModified = new Date();
     builder.addLookupItem(new Integer(5));
     builder.addLookupItem("wolfi");
     builder.addLookupItem("reder");
@@ -577,7 +618,8 @@ public class DefaultContactBuilderFactoryNGTest
     builder.address2(" address 2");
     builder.city(" city ");
     builder.country(" country ");
-    builder.email(email);
+    builder.emailShop(email);
+    builder.emailService(email2);
     builder.fax("1");
     builder.id(id);
     builder.memo(" memo ");
@@ -588,8 +630,8 @@ public class DefaultContactBuilderFactoryNGTest
     builder.www(www);
     builder.zip("zip ");
     Contact contact = builder.build();
-    Contact.Builder<? extends Contact> builder2 = factory.createBuilder();
-    Contact.Builder<? extends Contact> builder3 = builder2.copy(contact);
+    Contact.Builder builder2 = factory.createBuilder();
+    Contact.Builder builder3 = builder2.copy(contact);
     assertSame(builder3, builder2);
     Contact result = builder2.build();
     assertNotSame(result, contact);
@@ -597,7 +639,8 @@ public class DefaultContactBuilderFactoryNGTest
     assertEquals(result.getAddress2(), contact.getAddress2());
     assertEquals(result.getCity(), contact.getCity());
     assertEquals(result.getCountry(), contact.getCountry());
-    assertEquals(result.getEmail(), contact.getEmail());
+    assertEquals(result.getEmailShop(), contact.getEmailShop());
+    assertEquals(result.getEmailService(), contact.getEmailService());
     assertEquals(result.getFax(), contact.getFax());
     assertEquals(result.getId(), contact.getId());
     assertEquals(result.getMemo(), contact.getMemo());
@@ -610,12 +653,13 @@ public class DefaultContactBuilderFactoryNGTest
     assertEquals(result.getTypes().size(), contact.getTypes().size());
     assertTrue(contact.getTypes().containsAll(result.getTypes()));
     assertNull(result.getLookup().lookup(Object.class));
+    assertEquals(result.getLastModified(), contact.getLastModified());
   }
 
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderLookup1()
   {
-    Contact.Builder<? extends Contact> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.addType(ContactType.RETAILER);
     builder.id(UUID.randomUUID());
     builder.name("wolfi");
@@ -636,7 +680,7 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderLookup2()
   {
-    Contact.Builder<? extends Contact> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.addType(ContactType.RETAILER);
     builder.id(UUID.randomUUID());
     builder.name("wolfi");
@@ -657,7 +701,7 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalStateException.class)
   public void testBuilderContactTypeFail1()
   {
-    Contact.Builder<? extends Contact> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.addType(ContactType.RETAILER);
     builder.id(UUID.randomUUID());
     builder.name("wolfi");
@@ -668,7 +712,7 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderContactType1()
   {
-    Contact.Builder<? extends Contact> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.addType(ContactType.RETAILER);
     builder.id(UUID.randomUUID());
     builder.name("wolfi");
@@ -682,7 +726,7 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup")
   public void testBuilderContactType2()
   {
-    Contact.Builder<? extends Contact> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.setTypes(ContactType.ALL);
     builder.id(UUID.randomUUID());
     builder.name("wolfi");
@@ -694,7 +738,7 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = UnsupportedOperationException.class)
   public void testBuilderContactTypeFail2()
   {
-    Contact.Builder<? extends Contact> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.setTypes(ContactType.ALL);
     builder.id(UUID.randomUUID());
     builder.name("wolfi");
@@ -711,7 +755,7 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalStateException.class)
   public void testBuilderFail2()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
 //    builder.addType(ContactType.RETAILER);
     builder.id(UUID.randomUUID());
     builder.name("wolfi");
@@ -721,7 +765,7 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalStateException.class)
   public void testBuilderFail3()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.addType(ContactType.RETAILER);
 //    builder.id(UUID.randomUUID());
     builder.name("wolfi");
@@ -731,7 +775,7 @@ public class DefaultContactBuilderFactoryNGTest
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalStateException.class)
   public void testBuilderFail4()
   {
-    Contact.Builder<?> builder = factory.createBuilder();
+    Contact.Builder builder = factory.createBuilder();
     builder.addType(ContactType.RETAILER);
     builder.id(UUID.randomUUID());
 //    builder.name("wolfi");

@@ -1,17 +1,16 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
 import at.reder.mti.api.datamodel.Defect;
 import at.reder.mti.api.datamodel.xml.XDefect;
-import at.reder.mti.api.utils.MTIUtils;
-import at.reder.mti.api.utils.Timestamp;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -19,10 +18,6 @@ import java.util.UUID;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import org.openide.util.lookup.ServiceProvider;
 
-/**
- *
- * @author wolfi
- */
 @ServiceProvider(service = Defect.BuilderFactory.class)
 @XmlSeeAlso(value = XDefect.class)
 public final class DefaultDefectBuilderFactory implements Defect.BuilderFactory
@@ -34,15 +29,15 @@ public final class DefaultDefectBuilderFactory implements Defect.BuilderFactory
   {
 
     private final UUID id;
-    private final Timestamp date;
+    private final LocalDate date;
     private final String description;
 
     private DefectImpl(UUID id,
-                       Timestamp date,
+                       LocalDate date,
                        String description)
     {
       this.id = id;
-      this.date = new Timestamp(MTIUtils.getDayPart(date));
+      this.date = date;
       this.description = description;
     }
 
@@ -53,7 +48,7 @@ public final class DefaultDefectBuilderFactory implements Defect.BuilderFactory
     }
 
     @Override
-    public Timestamp getDate()
+    public LocalDate getDate()
     {
       return date;
     }
@@ -82,10 +77,7 @@ public final class DefaultDefectBuilderFactory implements Defect.BuilderFactory
         return false;
       }
       final DefectImpl other = (DefectImpl) obj;
-      if (!Objects.equals(this.id, other.id)) {
-        return false;
-      }
-      return true;
+      return Objects.equals(this.id, other.id);
     }
 
     @Override
@@ -96,15 +88,15 @@ public final class DefaultDefectBuilderFactory implements Defect.BuilderFactory
 
   }
 
-  public static final class DefectBuilder implements Defect.Builder<Defect>
+  public static final class DefectBuilder implements Defect.Builder
   {
 
     private UUID id;
-    private Timestamp date;
+    private LocalDate date;
     private String description;
 
     @Override
-    public Defect.Builder<? extends Defect> copy(Defect defect) throws NullPointerException
+    public Defect.Builder copy(Defect defect) throws NullPointerException
     {
       if (defect == null) {
         throw new NullPointerException("defect==null2");
@@ -116,7 +108,7 @@ public final class DefaultDefectBuilderFactory implements Defect.BuilderFactory
     }
 
     @Override
-    public Defect.Builder<? extends Defect> id(UUID id) throws NullPointerException
+    public Defect.Builder id(UUID id) throws NullPointerException
     {
       if (id == null) {
         throw new NullPointerException("id==null");
@@ -126,7 +118,7 @@ public final class DefaultDefectBuilderFactory implements Defect.BuilderFactory
     }
 
     @Override
-    public Defect.Builder<? extends Defect> date(Timestamp date) throws NullPointerException
+    public Defect.Builder date(LocalDate date) throws NullPointerException
     {
       if (date == null) {
         throw new NullPointerException("date==null");
@@ -136,7 +128,7 @@ public final class DefaultDefectBuilderFactory implements Defect.BuilderFactory
     }
 
     @Override
-    public Defect.Builder<? extends Defect> description(String descr) throws NullPointerException, IllegalArgumentException
+    public Defect.Builder description(String descr) throws NullPointerException, IllegalArgumentException
     {
       if (descr == null) {
         throw new NullPointerException("description==null");
@@ -181,7 +173,7 @@ public final class DefaultDefectBuilderFactory implements Defect.BuilderFactory
   }
 
   @Override
-  public Defect.Builder<? extends Defect> createBuilder()
+  public Defect.Builder createBuilder()
   {
     return new DefectBuilder();
   }

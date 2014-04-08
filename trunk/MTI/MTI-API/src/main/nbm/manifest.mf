@@ -1,2 +1,4 @@
 Manifest-Version: 1.0
+OpenIDE-Module-Install: at/reder/mti/api/datamodel/impl/Installer.class
+OpenIDE-Module-Layer: at/reder/mti/api/layer.xml
 OpenIDE-Module-Localizing-Bundle: at/reder/mti/api/Bundle.properties

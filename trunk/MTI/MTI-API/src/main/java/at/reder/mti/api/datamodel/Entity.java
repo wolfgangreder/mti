@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel;
 
@@ -24,7 +24,6 @@ import org.openide.util.Lookup;
  * Entity instance = builder.build();
  * </pre></code>
  *
- * @author wolfi
  */
 public interface Entity extends Lookup.Provider
 {
@@ -36,7 +35,7 @@ public interface Entity extends Lookup.Provider
 
   }
 
-  public static interface Builder<E extends Entity> extends BaseBuilder<E>
+  public static interface Builder extends BaseBuilder<Entity>
   {
 
     /**
@@ -46,7 +45,7 @@ public interface Entity extends Lookup.Provider
      * @return {@code this}
      * @throws NullPointerException wenn {@code e==null}.
      */
-    public Entity.Builder<? extends Entity> copy(Entity e) throws NullPointerException;
+    public Entity.Builder copy(Entity e) throws NullPointerException;
 
     /**
      * Setzt die Beschreibung
@@ -54,7 +53,7 @@ public interface Entity extends Lookup.Provider
      * @param descr
      * @return {@code this}
      */
-    public Entity.Builder<? extends Entity> description(String descr);
+    public Entity.Builder description(String descr);
 
     /**
      * Setzt den original Dateinamen
@@ -62,7 +61,7 @@ public interface Entity extends Lookup.Provider
      * @param fileName Der Dateiname oder {@code null} falls nicht bekannt.
      * @return {@code this}
      */
-    public Entity.Builder<? extends Entity> fileName(String fileName);
+    public Entity.Builder fileName(String fileName);
 
     /**
      * Setzt die Art der Entity
@@ -72,7 +71,7 @@ public interface Entity extends Lookup.Provider
      * @throws NullPointerException wenn {@code kind==null}
      * @see EntityKind
      */
-    public Entity.Builder<? extends Entity> kind(EntityKind kind) throws NullPointerException;
+    public Entity.Builder kind(EntityKind kind) throws NullPointerException;
 
     /**
      * Setzt den Mime-Typ
@@ -82,7 +81,7 @@ public interface Entity extends Lookup.Provider
      * @throws NullPointerException wenn {@code mimeType==null}
      * @throws IllegalArgumentException wenn {@code mimeType.trim().isEmpty()}.
      */
-    public Entity.Builder<? extends Entity> mimeType(String mimeType) throws NullPointerException, IllegalArgumentException;
+    public Entity.Builder mimeType(String mimeType) throws NullPointerException, IllegalArgumentException;
 
     /**
      * Grösse der Entität oder -1 falls nicht bekannt
@@ -91,7 +90,7 @@ public interface Entity extends Lookup.Provider
      * @return {@code this}
      * @throws IllegalArgumentException wenn {@code size<-1}
      */
-    public Entity.Builder<? extends Entity> size(int size);
+    public Entity.Builder size(int size);
 
     /**
      * Die URI mit der der Inhalt der Entität geladen werden kann.
@@ -100,7 +99,7 @@ public interface Entity extends Lookup.Provider
      * @return {@code this}
      * @throws NullPointerException wenn {@code uri==null}
      */
-    public Entity.Builder<? extends Entity> uri(URI uri) throws NullPointerException;
+    public Entity.Builder uri(URI uri) throws NullPointerException;
 
     /**
      * Setzt die Daten der Entity
@@ -108,14 +107,14 @@ public interface Entity extends Lookup.Provider
      * @param tmpFile
      * @return {@code this}
      */
-    public Entity.Builder<? extends Entity> data(Path tmpFile);
+    public Entity.Builder data(Path tmpFile);
 
   }
 
   public static interface BuilderFactory
   {
 
-    public Entity.Builder<? extends Entity> createBuilder();
+    public Entity.Builder createBuilder();
 
   }
 
@@ -172,6 +171,7 @@ public interface Entity extends Lookup.Provider
    * Liest die Daten
    *
    * @return
+   * @throws java.io.IOException
    */
   public InputStream getData() throws IOException;
 

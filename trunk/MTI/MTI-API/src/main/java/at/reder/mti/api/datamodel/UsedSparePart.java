@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
+ *
  * Copyright 2013 Wolfgang Reder
- * 
+ *
  */package at.reder.mti.api.datamodel;
 
 import at.reder.mti.api.datamodel.xml.XUsedSparePart;
@@ -35,7 +35,7 @@ public final class UsedSparePart
 
   /**
    *
-   * @param defects List mit Ids von Defekten denen dieser Erastzeil zugeordnet ist.
+   * @param defects List mit Ids von Defekten denen dieser Ersatzeil zugeordnet ist.
    * @param part Der Ersatzteil
    * @param amount Menge die Verbaut wurde
    * @param memo Notiz
@@ -60,7 +60,7 @@ public final class UsedSparePart
     if (part == null) {
       throw new NullPointerException("part is null");
     }
-    if (amount==null) {
+    if (amount == null) {
       throw new NullPointerException("amount==null");
     }
     if (amount.compareTo(BigDecimal.ZERO) <= 0) {

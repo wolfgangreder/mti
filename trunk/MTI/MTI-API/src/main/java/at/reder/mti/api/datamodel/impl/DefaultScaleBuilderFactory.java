@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
+ *
  * Copyright 2013 Wolfgang Reder
- * 
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
@@ -87,10 +87,7 @@ public final class DefaultScaleBuilderFactory implements Scale.BuilderFactory
         return false;
       }
       final Impl other = (Impl) obj;
-      if (!Objects.equals(this.id, other.id)) {
-        return false;
-      }
-      return true;
+      return Objects.equals(this.id, other.id);
     }
 
     @Override

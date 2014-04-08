@@ -1,12 +1,19 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel;
+
+import at.reder.mti.api.datamodel.xml.XWagon;
+import at.reder.mti.api.utils.Money;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.UUID;
 
 /**
  *
@@ -15,27 +22,236 @@ package at.reder.mti.api.datamodel;
 public interface Wagon extends Vehicle
 {
 
-  public static interface Builder<W extends Wagon> extends Vehicle.Builder<W>,BaseBuilder<W>
+  public static interface Builder extends BaseBuilder<Wagon>
   {
 
-    public Wagon.Builder<? extends Wagon> wagonNumber(String number);
+    public Wagon.Builder copy(Wagon wagon) throws NullPointerException;
 
-    public Wagon.Builder<? extends Wagon> wheelCount(int wheelCount);
+    public Wagon.Builder copy(XWagon wagon) throws NullPointerException;
 
-    public Wagon.Builder<? extends Wagon> kind(String kind);
+    /**
+     * Setzt den Zustand des Objekts
+     *
+     * @param cond
+     * @return {@code this}
+     * @throws NullPointerException wenn {@code cond==null}
+     */
+    public Wagon.Builder condition(ModelCondition cond) throws
+            NullPointerException;
 
-    public Wagon.Builder<? extends Wagon> wagonClass(String clazz);
+    /**
+     * Setzt das Kaufdatum.
+     *
+     * @param ts Das Kaufdatum oder {@code null} falls nicht bekannt.
+     * @return {@code this}
+     */
+    public Wagon.Builder dateOfPurchase(LocalDate ts);
 
-    public Wagon.Builder<? extends Wagon> company(String company);
+    /**
+     * Setzt die Beschreibung.
+     *
+     * @param descr
+     * @return {@code this}
+     */
+    public Wagon.Builder description(String descr);
 
-    public Wagon.Builder<? extends Wagon> country(String country);
+    /**
+     * Füngt eine Entität hinzu
+     *
+     * @param e
+     * @return {@code this}
+     * @throws NullPointerException wenn {@code e==null}
+     */
+    public Wagon.Builder addEntity(Entity e) throws NullPointerException;
+
+    /**
+     * Entfernt falls vorhanden die Entität.
+     *
+     * @param e
+     * @return {@code this}
+     */
+    public Wagon.Builder removeEntity(Entity e);
+
+    /**
+     * Fügt die in {@code e} übergebenen Entitäten hinzu.
+     *
+     * @param e Sammlung von Entitäten
+     * @return {@code this}
+     * @throws NullPointerException wenn {@code e==null}.
+     * @throws IllegalArgumentException wenn {@code e null} enthält.
+     */
+    public Wagon.Builder addEntities(Collection<? extends Entity> e) throws
+            NullPointerException, IllegalArgumentException;
+
+    /**
+     * Entfernt alle Entitäten
+     *
+     * @return {@code this}
+     */
+    public Wagon.Builder clearEntities();
+
+    /**
+     * Setzt die Id
+     *
+     * @param id
+     * @return {@code this}
+     * @throws NullPointerException wenn {@code id==null}.
+     */
+    public Wagon.Builder id(UUID id) throws NullPointerException;
+
+    /**
+     * Setzt den Zeitpunkt der letzten Änderung
+     *
+     * @param ts
+     * @return {@code this}
+     * @throws NullPointerException wenn {@code ts==null}
+     */
+    public Wagon.Builder lastModified(Instant ts) throws
+            NullPointerException;
+
+    /**
+     * Setzt den Hersteller.
+     *
+     * @param contact Der Hersteller oder {@code null} falls unbekannt.
+     * @return {@code this}
+     */
+    public Wagon.Builder manufacturer(Contact contact);
+
+    /**
+     * Setzt das Bild des Objekts. Wenn {@code e!=null} wird {
+     *
+     * @¢ode e} auch zur Liste der Entitäten hinzugefügt. Falls das Bild bereits gesetzt war, wird das alte Bild aber nicht aus
+     * der Liste entfernt.
+     * @param e Das Bild des Objekts oder {@code null} falls nicht vorhanden.
+     * @return {@code this}
+     */
+    public Wagon.Builder masterImage(Entity e);
+
+    /**
+     * Der Name des Objects
+     *
+     * @param name
+     * @return {@code this}
+     * @throws NullPointerException wenn {@code name==null}
+     * @throws IllegalArgumentException wenn {@code name.trim().isEmpty()}
+     */
+    public Wagon.Builder name(String name) throws NullPointerException,
+                                                  IllegalArgumentException;
+
+    /**
+     * Der Preis des Objekts.
+     *
+     * @param price Der Preis oder {@code null} wenn nicht bekannt.
+     * @return {@code this}
+     */
+    public Wagon.Builder price(Money price);
+
+    /**
+     * Artikelnummer des Herstellers
+     *
+     * @param productNumber Artikelnummer oder {@code null} falls nicht bekannt.
+     * @return {@code this}
+     */
+    public Wagon.Builder productNumber(String productNumber);
+
+    /**
+     * Der Händer bei dem das Objekt gekauft wurde.
+     *
+     * @param contact Der Händler, oder {@code null} falls nicht bekannt.
+     * @return {@code this}
+     */
+    public Wagon.Builder retailer(Contact contact);
+
+    /**
+     * Fügt ein Object zum Lookup hinzu
+     *
+     * @param item
+     * @return {@code this}
+     * @throws NullPointerException wenn {@code item==null}
+     */
+    public Wagon.Builder addLookupItem(Object item) throws NullPointerException;
+
+    /**
+     * Entfernt {@code item} vom Lookup
+     *
+     * @param item
+     * @return {@code this}
+     */
+    public Wagon.Builder removeLookupItem(Object item);
+
+    /**
+     * Entfernt alle Objekte für die gilt {@code clazz.isInstance(item)==true}
+     *
+     * @param clazz
+     * @return {@code this}
+     * @throws NullPointerException wenn {@code clazz==null}
+     * @see Class#isInstance(java.lang.Object)
+     */
+    public Wagon.Builder removeInstancesOfFromLookup(Class<?> clazz) throws NullPointerException;
+
+    /**
+     * Entfernt alle Objecte aus dem Lookup
+     *
+     * @return {@code this}
+     */
+    public Wagon.Builder clearLookup();
+
+    public Wagon.Builder addServiceEntry(ServiceEntry e) throws NullPointerException;
+
+    public Wagon.Builder removeServiceEntry(ServiceEntry e);
+
+    public Wagon.Builder addServiceEntries(Collection<? extends ServiceEntry> e) throws
+            NullPointerException,
+            IllegalArgumentException;
+
+    public Wagon.Builder clearServiceEntries();
+
+    /**
+     * Setzt den Masstab
+     *
+     * @param scale
+     * @return {@code this}
+     * @throws NullPointerException wenn {@code scale==null}
+     */
+    public Wagon.Builder scale(Scale scale) throws NullPointerException;
+
+    public Wagon.Builder era(Era era);
+
+    public Wagon.Builder length(double len);
+
+    public Wagon.Builder width(double width);
+
+    public Wagon.Builder height(double height);
+
+    public Wagon.Builder weight(double weight);
+
+    public Wagon.Builder addDecoder(Decoder d) throws NullPointerException;
+
+    public Wagon.Builder removeDecoder(Decoder d) throws NullPointerException;
+
+    public Wagon.Builder addDecoder(Collection<? extends Decoder> d) throws NullPointerException,
+                                                                            IllegalArgumentException;
+
+    public Wagon.Builder clearDecoder();
+
+    public Wagon.Builder wagonNumber(String number);
+
+    public Wagon.Builder wheelCount(int wheelCount);
+
+    public Wagon.Builder kind(String kind);
+
+    public Wagon.Builder wagonClass(String clazz);
+
+    public Wagon.Builder company(String company);
+
+    public Wagon.Builder country(String country);
 
   }
 
   public static interface BuilderFactory
   {
 
-    public Wagon.Builder<? extends Wagon> createBuilder();
+    public Wagon.Builder createBuilder();
 
   }
 

@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
@@ -17,7 +17,8 @@ import at.reder.mti.api.datamodel.Scale;
 import at.reder.mti.api.datamodel.ServiceEntry;
 import at.reder.mti.api.datamodel.Vehicle;
 import at.reder.mti.api.utils.Money;
-import at.reder.mti.api.utils.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,10 +27,6 @@ import java.util.UUID;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.Lookups;
 
-/**
- *
- * @author wolfi
- */
 public abstract class AbstractVehicle extends AbstractInventoryObject implements Vehicle
 {
 
@@ -38,17 +35,17 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
   private final double width;
   private final double height;
   private final double weight;
-  private final List<? extends Decoder> decoder;
+  private final List<Decoder> decoder;
   private final Scale scale;
-  private final List<? extends ServiceEntry> serviceEntries;
+  private final List<ServiceEntry> serviceEntries;
   private final Lookup lookup;
 
   protected AbstractVehicle(UUID id,
                             String name,
                             ModelCondition condition,
-                            Timestamp dateOfPurchase,
+                            LocalDate dateOfPurchase,
                             String description,
-                            Timestamp lastModified,
+                            Instant lastModified,
                             Contact manufacturer,
                             Entity masterImage,
                             Money price,
@@ -131,7 +128,7 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
   }
 
   @Override
-  public List<? extends Decoder> getDecoder()
+  public List<Decoder> getDecoder()
   {
     return decoder;
   }
@@ -143,7 +140,7 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
   }
 
   @Override
-  public List<? extends ServiceEntry> getServiceEntries()
+  public List<ServiceEntry> getServiceEntries()
   {
     return serviceEntries;
   }

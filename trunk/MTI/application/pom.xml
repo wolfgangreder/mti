@@ -15,16 +15,16 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <all.clusters>${project.build.directory}/${brandingToken}</all.clusters>
         <netbeans.run.params.ide/>
         <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
-        <all.clusters>${project.build.directory}/${brandingToken}</all.clusters>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.netbeans.cluster</groupId>
             <artifactId>platform</artifactId>
-            <version>${netbeans.version}</version>
+            <version>RELEASE74</version>
             <type>pom</type>
         </dependency>
         <dependency>
@@ -36,8 +36,9 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-nbjunit</artifactId>
-            <version>${netbeans.version}</version>
+            <version>RELEASE74</version>
             <scope>test</scope>
+            <type>jar</type>
         </dependency>
         <!-- To use Jelly Tools in your functional tests, add or replace with:
         <dependency>
@@ -64,6 +65,10 @@
                     <artifactId>javax.mail_1.4</artifactId>
                     <groupId>org.netbeans.external</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>jasperreport</artifactId>
+                    <groupId>at.reder</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -84,7 +89,8 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
-            <version>RELEASE73</version>
+            <version>RELEASE80</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
@@ -98,6 +104,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
+                <version>3.13</version>
             </plugin>
             <!-- Permits NbModuleSuite to be run in integration-test phase: -->
             <plugin>
@@ -116,8 +123,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <showDeprecation>true</showDeprecation>
                     <debug>true</debug>
                 </configuration>

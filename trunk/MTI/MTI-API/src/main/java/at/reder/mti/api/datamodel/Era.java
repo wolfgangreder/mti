@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel;
 
@@ -21,18 +21,15 @@ import java.util.UUID;
  * Era era = builder.build();
  * </pre></code>
  *
- * @author wolfi
  */
 public interface Era
 {
 
   /**
-   * BaseBuilder-Object zum erzeugen neuer
-   * <code>Era</code>-Instanzen.
+   * BaseBuilder-Object zum erzeugen neuer <code>Era</code>-Instanzen.
    *
-   * @param <E>
    */
-  public static interface Builder<E extends Era> extends BaseBuilder<Era>
+  public static interface Builder extends BaseBuilder<Era>
   {
 
     /**
@@ -42,7 +39,7 @@ public interface Era
      * @return {@code this}
      * @throws NullPointerException wenn {@code toCopy==null}.
      */
-    public Builder<? extends Era> copy(Era toCopy) throws NullPointerException;
+    public Builder copy(Era toCopy) throws NullPointerException;
 
     /**
      * Setzt die id der Era.
@@ -51,7 +48,7 @@ public interface Era
      * @return {@code this}
      * @throws NullPointerException wenn {@code id==null}
      */
-    public Builder<? extends Era> id(UUID id) throws NullPointerException;
+    public Builder id(UUID id) throws NullPointerException;
 
     /**
      * Setzt den namen der Era.
@@ -61,7 +58,7 @@ public interface Era
      * @throws NullPointerException wenn {@code name==null}
      * @throws IllegalArgumentException wenn {@code name.trim().isEmpty()}
      */
-    public Builder<? extends Era> name(String name) throws IllegalArgumentException, NullPointerException;
+    public Builder name(String name) throws IllegalArgumentException, NullPointerException;
 
     /**
      * Setzt das erste Jahr der Era.
@@ -69,7 +66,7 @@ public interface Era
      * @param yearFrom
      * @return {@code this}
      */
-    public Builder<? extends Era> yearFrom(int yearFrom);
+    public Builder yearFrom(int yearFrom);
 
     /**
      * Setzt das letze Jahr der Era.
@@ -77,7 +74,7 @@ public interface Era
      * @param yearTo letztes Jahr oder {@code null} falls die Era (noch) nicht abgeschlossen ist.
      * @return {@code this}
      */
-    public Builder<? extends Era> yearTo(Integer yearTo);
+    public Builder yearTo(Integer yearTo);
 
     /**
      * Fügt ein neues Land zur Liste der Länder hinzu für die die Era gültig ist.
@@ -87,7 +84,7 @@ public interface Era
      * @throws IllegalArgumentException wenn {@code country} nicht der Spezifikation entspricht.
      * @throws NullPointerException wenn {@code code==null}
      */
-    public Builder<? extends Era> addCountry(String country) throws IllegalArgumentException, NullPointerException;
+    public Builder addCountry(String country) throws IllegalArgumentException, NullPointerException;
 
     /**
      * Entfernt das Land {@code country} aus der Liste.
@@ -95,14 +92,14 @@ public interface Era
      * @param country Land das entfernt werden soll
      * @return {@code this}
      */
-    public Builder<? extends Era> removeCountry(String country);
+    public Builder removeCountry(String country);
 
     /**
      * Entfernt alle Länder aus der Liste.
      *
      * @return {@code this}
      */
-    public Builder<? extends Era> clearCountries();
+    public Builder clearCountries();
 
     /**
      * Fügt mehrere Länder zur Liste hinzu.
@@ -113,7 +110,7 @@ public interface Era
      * @throws NullPointerException siehe {@link Builder#addCountry(java.lang.String)}
      * @see Builder#addCountry(java.lang.String)
      */
-    public Builder<? extends Era> addCountries(Collection<String> countries) throws IllegalArgumentException, NullPointerException;
+    public Builder addCountries(Collection<String> countries) throws IllegalArgumentException, NullPointerException;
 
     /**
      * Setzt den Kommentar.
@@ -121,7 +118,7 @@ public interface Era
      * @param comment Neuer Kommentar
      * @return {@code this}
      */
-    public Builder<? extends Era> comment(String comment);
+    public Builder comment(String comment);
 
   }
 
@@ -137,7 +134,7 @@ public interface Era
      * @return eine neue Instanz von {@code Era.Builder<>}
      * @see Builder
      */
-    public Builder<? extends Era> createBuilder();
+    public Builder createBuilder();
 
   }
 

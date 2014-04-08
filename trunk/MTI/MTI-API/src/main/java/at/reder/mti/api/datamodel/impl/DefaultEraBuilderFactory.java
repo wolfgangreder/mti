@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
@@ -22,7 +22,6 @@ import org.openide.util.lookup.ServiceProvider;
 /**
  * Standardimplementation von {@code Era}
  *
- * @author wolfi
  * @see Era
  */
 @ServiceProvider(service = Era.BuilderFactory.class)
@@ -111,10 +110,7 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
         return false;
       }
       final Impl other = (Impl) obj;
-      if (!Objects.equals(this.id, other.id)) {
-        return false;
-      }
-      return true;
+      return Objects.equals(this.id, other.id);
     }
 
     @Override
@@ -125,7 +121,7 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
 
   }
 
-  public static final class EraBuilder implements Era.Builder<Era>
+  public static final class EraBuilder implements Era.Builder
   {
 
     private static final Pattern patternCountry = Pattern.compile("([A-Z]{2})|([0-9]{3})");
@@ -139,7 +135,7 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
     private Impl toCopy;
 
     @Override
-    public Era.Builder<? extends Era> copy(Era toCopy) throws NullPointerException
+    public Era.Builder copy(Era toCopy) throws NullPointerException
     {
       if (toCopy instanceof Impl) {
         this.toCopy = (Impl) toCopy;
@@ -159,7 +155,7 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
     }
 
     @Override
-    public Era.Builder<? extends Era> id(UUID id) throws NullPointerException
+    public Era.Builder id(UUID id) throws NullPointerException
     {
       if (id == null) {
         throw new NullPointerException("id==null");
@@ -170,7 +166,7 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
     }
 
     @Override
-    public Era.Builder<? extends Era> name(String name) throws IllegalArgumentException, NullPointerException
+    public Era.Builder name(String name) throws IllegalArgumentException, NullPointerException
     {
       if (name == null) {
         throw new NullPointerException("name==null");
@@ -184,7 +180,7 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
     }
 
     @Override
-    public Era.Builder<? extends Era> yearFrom(int yearFrom)
+    public Era.Builder yearFrom(int yearFrom)
     {
       toCopy = null;
       this.yearFrom = yearFrom;
@@ -192,7 +188,7 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
     }
 
     @Override
-    public Era.Builder<? extends Era> yearTo(Integer yearTo)
+    public Era.Builder yearTo(Integer yearTo)
     {
       toCopy = null;
       this.yearTo = yearTo;
@@ -212,7 +208,7 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
     }
 
     @Override
-    public Era.Builder<? extends Era> addCountry(String country) throws IllegalArgumentException, NullPointerException
+    public Era.Builder addCountry(String country) throws IllegalArgumentException, NullPointerException
     {
       checkCountry(country);
       toCopy = null;
@@ -221,7 +217,7 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
     }
 
     @Override
-    public Era.Builder<? extends Era> removeCountry(String country)
+    public Era.Builder removeCountry(String country)
     {
       if (country != null) {
         toCopy = null;
@@ -231,7 +227,7 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
     }
 
     @Override
-    public Era.Builder<? extends Era> clearCountries()
+    public Era.Builder clearCountries()
     {
       toCopy = null;
       countries.clear();
@@ -239,8 +235,8 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
     }
 
     @Override
-    public Era.Builder<? extends Era> addCountries(Collection<String> countries) throws IllegalArgumentException,
-                                                                                        NullPointerException
+    public Era.Builder addCountries(Collection<String> countries) throws IllegalArgumentException,
+                                                                         NullPointerException
     {
       if (countries == null) {
         throw new NullPointerException("countries==null");
@@ -253,7 +249,7 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
     }
 
     @Override
-    public Era.Builder<? extends Era> comment(String comment)
+    public Era.Builder comment(String comment)
     {
       if (comment == null) {
         this.comment = "";
@@ -303,7 +299,7 @@ public final class DefaultEraBuilderFactory implements Era.BuilderFactory
   }
 
   @Override
-  public Era.Builder<? extends Era> createBuilder()
+  public Era.Builder createBuilder()
   {
     return new EraBuilder();
   }

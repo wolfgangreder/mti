@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.impl;
 
@@ -13,9 +13,14 @@ import at.reder.mti.api.datamodel.Era.BuilderFactory;
 import at.reder.mti.api.datamodel.xml.XEra;
 import java.util.Collection;
 import java.util.UUID;
-import static org.testng.Assert.*;
-import org.testng.annotations.Test;
 import org.openide.util.Lookup;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 public class DefaultEraBuilderFactoryTest
 {
@@ -45,10 +50,10 @@ public class DefaultEraBuilderFactoryTest
     System.out.println("createBuilder");
 
     BuilderFactory instance = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> result = instance.createBuilder();
+    Era.Builder result = instance.createBuilder();
     assertNotNull(result);
     assertTrue(result instanceof DefaultEraBuilderFactory.EraBuilder);
-    Era.Builder<? extends Era> result2 = instance.createBuilder();
+    Era.Builder result2 = instance.createBuilder();
     assertNotSame(result, result2);
     assertSame(result.getClass(), result2.getClass());
   }
@@ -58,8 +63,8 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderImplementingClasses");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
-    Collection<? extends Class<? extends Era>> i = builder.getImplementingClasses();
+    Era.Builder builder = factory.createBuilder();
+    Collection<? extends Class> i = builder.getImplementingClasses();
     assertNotNull(i);
     assertEquals(1, i.size());
     assertSame(DefaultEraBuilderFactory.Impl.class, i.iterator().next());
@@ -70,7 +75,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderXmlClass");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     Class<?> xclass = builder.getXmlClass();
     assertNotNull(xclass);
     assertSame(XEra.class, xclass);
@@ -81,8 +86,8 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderIdValid");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
-    Era.Builder<? extends Era> result = builder.id(UUID.randomUUID());
+    Era.Builder builder = factory.createBuilder();
+    Era.Builder result = builder.id(UUID.randomUUID());
     assertSame(builder, result);
   }
 
@@ -91,7 +96,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderIdInvalid");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.id(null); // hier soll eine NullPointerException geworfen werden.
   }
 
@@ -100,8 +105,8 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderNameValid");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
-    Era.Builder<? extends Era> result = builder.name("wolfi");
+    Era.Builder builder = factory.createBuilder();
+    Era.Builder result = builder.name("wolfi");
     assertSame(builder, result);
   }
 
@@ -110,7 +115,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderNameInvalid1");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.name(null); // NullPointerException
   }
 
@@ -119,7 +124,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderNameInvalid2");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.name(""); // IllegalArgumentException
   }
 
@@ -128,7 +133,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderNameInvalid3");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.name(" "); // IllegalArgumentException
   }
 
@@ -137,8 +142,8 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderYearFrom");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
-    Era.Builder<? extends Era> result = builder.yearFrom(0);
+    Era.Builder builder = factory.createBuilder();
+    Era.Builder result = builder.yearFrom(0);
     assertSame(builder, result);
   }
 
@@ -147,8 +152,8 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderYearTo");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
-    Era.Builder<? extends Era> result = builder.yearTo(0);
+    Era.Builder builder = factory.createBuilder();
+    Era.Builder result = builder.yearTo(0);
     assertSame(builder, result);
     result = builder.yearTo(null);
     assertSame(builder, result);
@@ -159,8 +164,8 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderAddCountry");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
-    Era.Builder<? extends Era> result = builder.addCountry("AT");
+    Era.Builder builder = factory.createBuilder();
+    Era.Builder result = builder.addCountry("AT");
     assertSame(builder, result);
     result = builder.addCountry("027");
     assertSame(builder, result);
@@ -171,7 +176,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderAddCountryNull");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.addCountry(null);
   }
 
@@ -180,7 +185,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderAddCountryInvalid1");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.addCountry("at");
   }
 
@@ -189,7 +194,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderAddCountryInvalid2");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.addCountry("AUT");
   }
 
@@ -198,7 +203,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderAddCountryInvalid3");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.addCountry("27");
   }
 
@@ -207,7 +212,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderAddCountryInvalid4");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.addCountry("");
   }
 
@@ -216,7 +221,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderAddCountryInvalid5");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.addCountry("2700");
   }
 
@@ -225,7 +230,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderAddCountryInvalid6");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.addCountry("A");
   }
 
@@ -234,8 +239,8 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderComment");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
-    Era.Builder<? extends Era> result = builder.comment("wolfi");
+    Era.Builder builder = factory.createBuilder();
+    Era.Builder result = builder.comment("wolfi");
     assertSame(builder, result);
     builder.comment(null);
     builder.comment("");
@@ -246,11 +251,11 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderRemoveCountry");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.addCountry("AT");
     builder.addCountry("DE");
     builder.removeCountry(null);
-    Era.Builder<? extends Era> result = builder.removeCountry("DE");
+    Era.Builder result = builder.removeCountry("DE");
     assertSame(builder, result);
     builder.id(UUID.randomUUID());
     builder.name("wolfi");
@@ -265,10 +270,10 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderClearCountry");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.addCountry("AT");
     builder.addCountry("DE");
-    Era.Builder<? extends Era> result = builder.clearCountries();
+    Era.Builder result = builder.clearCountries();
     assertSame(builder, result);
     builder.id(UUID.randomUUID());
     builder.name("wolfi");
@@ -282,7 +287,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderBuild");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     UUID id = UUID.randomUUID();
     builder.id(id);
     builder.addCountry("AT");
@@ -343,7 +348,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderCopy");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     UUID id = UUID.randomUUID();
     builder.id(id);
     builder.addCountry("AT");
@@ -354,7 +359,7 @@ public class DefaultEraBuilderFactoryTest
     builder.yearTo(null);
     Era era = builder.build();
     builder = factory.createBuilder();
-    Era.Builder<? extends Era> result = builder.copy(era);
+    Era.Builder result = builder.copy(era);
     assertSame(builder, result);
     Era eraResult = builder.build();
     assertSame(era, eraResult);
@@ -410,7 +415,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderBuilderFailure1");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.build();
   }
 
@@ -419,7 +424,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderBuilderFailure2");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.id(UUID.randomUUID());
 //    builder.name("wolfi");
     builder.yearFrom(1900);
@@ -432,7 +437,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderBuilderFailure3");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
 //    builder.id(UUID.randomUUID());
     builder.name("wolfi");
     builder.yearFrom(1900);
@@ -445,7 +450,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderBuilderFailure4");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.id(UUID.randomUUID());
     builder.name("wolfi");
     builder.yearFrom(1699);
@@ -458,7 +463,7 @@ public class DefaultEraBuilderFactoryTest
   {
     System.out.println("builderBuilderFailure5");
     BuilderFactory factory = new DefaultEraBuilderFactory();
-    Era.Builder<? extends Era> builder = factory.createBuilder();
+    Era.Builder builder = factory.createBuilder();
     builder.id(UUID.randomUUID());
     builder.name("wolfi");
     builder.yearFrom(1900);

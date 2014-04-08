@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
+ *
  * Copyright 2013 Wolfgang Reder
- * 
+ *
  */
 package at.reder.mti.api.utils;
 
@@ -204,10 +204,7 @@ public final class Fract extends Number implements Comparable<Fract>
     if (this.numerator != other.numerator) {
       return false;
     }
-    if (this.denominator != other.denominator) {
-      return false;
-    }
-    return true;
+    return this.denominator == other.denominator;
   }
 
   @Override

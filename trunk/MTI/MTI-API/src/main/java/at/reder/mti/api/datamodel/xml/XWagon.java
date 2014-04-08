@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.xml;
 
@@ -69,8 +69,8 @@ public final class XWagon extends AbstractXVehicle
 
   public Wagon toWagon()
   {
-    Wagon.Builder<? extends Wagon> builder = Lookup.getDefault().lookup(Wagon.BuilderFactory.class).createBuilder();
-    initBuilder(builder);
+    Wagon.Builder builder = Lookup.getDefault().lookup(Wagon.BuilderFactory.class).createBuilder();
+    builder.copy(this);
     builder.company(company);
     builder.country(country);
     builder.kind(kind);

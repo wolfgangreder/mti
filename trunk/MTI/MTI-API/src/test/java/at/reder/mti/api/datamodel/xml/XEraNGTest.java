@@ -1,10 +1,10 @@
 /*
  * $Id$
- * 
+ *
  * Author Wolfgang Reder
- * 
- * Copyright 2013 Wolfgang Reder
- * 
+ *
+ * Copyright 2013-2014 Wolfgang Reder
+ *
  */
 package at.reder.mti.api.datamodel.xml;
 
@@ -26,7 +26,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.openide.util.Lookup;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 /**
@@ -47,7 +50,7 @@ public class XEraNGTest
   private static final Integer defaultYearTo = 1900;
   private static final Set<String> countries = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("DE", "AT")));
 
-  private Era.Builder<? extends Era> createEraBuilder()
+  private Era.Builder createEraBuilder()
   {
     return Lookup.getDefault().lookup(BuilderFactory.class).createBuilder().
             addCountries(countries).
@@ -62,7 +65,7 @@ public class XEraNGTest
   public void testToEra()
   {
     System.out.println("toEra");
-    Era.Builder<? extends Era> builder = createEraBuilder();
+    Era.Builder builder = createEraBuilder();
     Era expResult = builder.build();
     XEra instance = new XEra(expResult);
     Era result = instance.toEra();
