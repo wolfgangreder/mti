@@ -134,6 +134,24 @@
             <type>jar</type>
             <version>RELEASE80</version>
         </dependency>
+        <dependency>
+            <artifactId>org-openide-dialogs</artifactId>
+            <groupId>org.netbeans.api</groupId>
+            <type>jar</type>
+            <version>RELEASE80</version>
+        </dependency>
+        <dependency>
+            <artifactId>org-openide-filesystems</artifactId>
+            <groupId>org.netbeans.api</groupId>
+            <type>jar</type>
+            <version>RELEASE80</version>
+        </dependency>
+        <dependency>
+            <artifactId>org-openide-loaders</artifactId>
+            <groupId>org.netbeans.api</groupId>
+            <type>jar</type>
+            <version>RELEASE80</version>
+        </dependency>
     </dependencies>
 
     <build>

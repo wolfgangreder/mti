@@ -17,7 +17,6 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
@@ -120,7 +119,9 @@ public class DefaultContactBuilderFactoryNGTest
     assertSame(result, builder);
     result = builder.memo(null);
     assertSame(result, builder);
-    result = builder.name("wolfi");
+    result = builder.lastName("wolfi");
+    assertSame(result, builder);
+    result = builder.firstName("reder");
     assertSame(result, builder);
     result = builder.phone1("46");
     assertSame(result, builder);
@@ -171,21 +172,21 @@ public class DefaultContactBuilderFactoryNGTest
   public void testBuilderNameFail1()
   {
     Contact.Builder builder = factory.createBuilder();
-    builder.name(null);
+    builder.lastName(null);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testBuilderNameFail2()
   {
     Contact.Builder builder = factory.createBuilder();
-    builder.name(" ");
+    builder.lastName(" ");
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testBuilderNameFail3()
   {
     Contact.Builder builder = factory.createBuilder();
-    builder.name("");
+    builder.lastName("");
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
@@ -425,21 +426,21 @@ public class DefaultContactBuilderFactoryNGTest
   public void testNameFail1()
   {
     Contact.Builder builder = factory.createBuilder();
-    builder.name(null);
+    builder.lastName(null);
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testNameFail2()
   {
     Contact.Builder builder = factory.createBuilder();
-    builder.name("");
+    builder.lastName("");
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = IllegalArgumentException.class)
   public void testNameFail3()
   {
     Contact.Builder builder = factory.createBuilder();
-    builder.name(" ");
+    builder.lastName(" ");
   }
 
   @Test(dependsOnMethods = "testLookup", expectedExceptions = NullPointerException.class)
@@ -516,7 +517,8 @@ public class DefaultContactBuilderFactoryNGTest
     UUID id = UUID.randomUUID();
     builder.addType(ContactType.RETAILER);
     builder.id(id);
-    builder.name(" wolfi ");
+    builder.lastName(" wolfi ");
+    builder.firstName("reder ");
     Contact contact = builder.build();
     assertNotNull(contact);
     assertTrue(builder.getImplementingClasses().contains(contact.getClass()));
@@ -529,7 +531,8 @@ public class DefaultContactBuilderFactoryNGTest
     assertEquals(contact.getFax(), "");
     assertEquals(contact.getId(), id);
     assertEquals(contact.getMemo(), "");
-    assertEquals(contact.getName(), "wolfi");
+    assertEquals(contact.getLastName(), "wolfi");
+    assertEquals(contact.getFirstName(), "reder");
     assertEquals(contact.getPhone1(), "");
     assertEquals(contact.getPhone2(), "");
     assertNull(contact.getShopAddress());
@@ -551,7 +554,7 @@ public class DefaultContactBuilderFactoryNGTest
     URI shop = new URI("http://www.roco.co.at");
     URI www = new URI("http://www.zimo.at");
     Instant lastModified = Instant.now();
-    builder.addLookupItem(new Integer(5));
+    builder.addLookupItem(5);
     builder.addLookupItem("wolfi");
     builder.addLookupItem("reder");
     builder.removeInstancesOfFromLookup(String.class);
@@ -566,7 +569,8 @@ public class DefaultContactBuilderFactoryNGTest
     builder.fax("1");
     builder.id(id);
     builder.memo(" memo ");
-    builder.name("wolfi ");
+    builder.lastName("wolfi ");
+    builder.firstName("reder ");
     builder.phone1("2");
     builder.phone2("3");
     builder.shopAddress(shop);
@@ -584,7 +588,8 @@ public class DefaultContactBuilderFactoryNGTest
     assertEquals(contact.getFax(), "1");
     assertEquals(contact.getId(), id);
     assertEquals(contact.getMemo(), " memo ");
-    assertEquals(contact.getName(), "wolfi");
+    assertEquals(contact.getLastName(), "wolfi");
+    assertEquals(contact.getFirstName(), "reder");
     assertEquals(contact.getPhone1(), "2");
     assertEquals(contact.getPhone2(), "3");
     assertEquals(contact.getShopAddress(), shop);
@@ -607,8 +612,7 @@ public class DefaultContactBuilderFactoryNGTest
     URI email2 = new URI("mailto:wolfgang.reder@mountain-sd.at");
     URI shop = new URI("http://www.roco.co.at");
     URI www = new URI("http://www.zimo.at");
-    Date lastModified = new Date();
-    builder.addLookupItem(new Integer(5));
+    builder.addLookupItem(5);
     builder.addLookupItem("wolfi");
     builder.addLookupItem("reder");
     builder.removeInstancesOfFromLookup(String.class);
@@ -623,7 +627,8 @@ public class DefaultContactBuilderFactoryNGTest
     builder.fax("1");
     builder.id(id);
     builder.memo(" memo ");
-    builder.name("wolfi ");
+    builder.lastName("wolfi ");
+    builder.firstName(" reder");
     builder.phone1("2");
     builder.phone2("3");
     builder.shopAddress(shop);
@@ -644,7 +649,8 @@ public class DefaultContactBuilderFactoryNGTest
     assertEquals(result.getFax(), contact.getFax());
     assertEquals(result.getId(), contact.getId());
     assertEquals(result.getMemo(), contact.getMemo());
-    assertEquals(result.getName(), contact.getName());
+    assertEquals(result.getLastName(), contact.getLastName());
+    assertEquals(result.getFirstName(), contact.getFirstName());
     assertEquals(result.getPhone1(), contact.getPhone1());
     assertEquals(result.getPhone2(), contact.getPhone2());
     assertEquals(result.getShopAddress(), contact.getShopAddress());
@@ -662,7 +668,8 @@ public class DefaultContactBuilderFactoryNGTest
     Contact.Builder builder = factory.createBuilder();
     builder.addType(ContactType.RETAILER);
     builder.id(UUID.randomUUID());
-    builder.name("wolfi");
+    builder.lastName("wolfi");
+    builder.firstName("reder");
     builder.addLookupItem("wolfi");
     builder.addLookupItem(UUID.randomUUID());
     builder.addLookupItem("reder");
@@ -683,7 +690,8 @@ public class DefaultContactBuilderFactoryNGTest
     Contact.Builder builder = factory.createBuilder();
     builder.addType(ContactType.RETAILER);
     builder.id(UUID.randomUUID());
-    builder.name("wolfi");
+    builder.lastName("wolfi");
+    builder.firstName("reder");
     builder.addLookupItem("wolfi");
     builder.addLookupItem(UUID.randomUUID());
     builder.addLookupItem("reder");
@@ -704,7 +712,7 @@ public class DefaultContactBuilderFactoryNGTest
     Contact.Builder builder = factory.createBuilder();
     builder.addType(ContactType.RETAILER);
     builder.id(UUID.randomUUID());
-    builder.name("wolfi");
+    builder.lastName("wolfi");
     builder.clearTypes();
     builder.build();
   }
@@ -715,7 +723,7 @@ public class DefaultContactBuilderFactoryNGTest
     Contact.Builder builder = factory.createBuilder();
     builder.addType(ContactType.RETAILER);
     builder.id(UUID.randomUUID());
-    builder.name("wolfi");
+    builder.lastName("wolfi");
     builder.clearTypes();
     builder.addType(ContactType.MANUFACTURER);
     Contact contact = builder.build();
@@ -729,7 +737,7 @@ public class DefaultContactBuilderFactoryNGTest
     Contact.Builder builder = factory.createBuilder();
     builder.setTypes(ContactType.ALL);
     builder.id(UUID.randomUUID());
-    builder.name("wolfi");
+    builder.lastName("wolfi");
     Contact contact = builder.build();
     assertEquals(contact.getTypes().size(), ContactType.ALL.size());
     assertTrue(contact.getTypes().containsAll(ContactType.ALL));
@@ -741,7 +749,7 @@ public class DefaultContactBuilderFactoryNGTest
     Contact.Builder builder = factory.createBuilder();
     builder.setTypes(ContactType.ALL);
     builder.id(UUID.randomUUID());
-    builder.name("wolfi");
+    builder.lastName("wolfi");
     Contact contact = builder.build();
     contact.getTypes().remove(ContactType.MANUFACTURER);
   }
@@ -758,7 +766,7 @@ public class DefaultContactBuilderFactoryNGTest
     Contact.Builder builder = factory.createBuilder();
 //    builder.addType(ContactType.RETAILER);
     builder.id(UUID.randomUUID());
-    builder.name("wolfi");
+    builder.lastName("wolfi");
     builder.build();
   }
 
@@ -768,7 +776,7 @@ public class DefaultContactBuilderFactoryNGTest
     Contact.Builder builder = factory.createBuilder();
     builder.addType(ContactType.RETAILER);
 //    builder.id(UUID.randomUUID());
-    builder.name("wolfi");
+    builder.lastName("wolfi");
     builder.build();
   }
 

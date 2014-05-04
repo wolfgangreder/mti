@@ -50,7 +50,8 @@ public class XContactTest
   private final String country = "country";
   private final String fax = "1";
   private final String memo = "memo";
-  private final String name = "name";
+  private final String lastName = "reder";
+  private final String firstName = "wolfi";
   private final String phone1 = "2";
   private final String phone2 = "3";
   private final String zip = "zip";
@@ -79,7 +80,8 @@ public class XContactTest
     builder.fax(fax);
     builder.id(id);
     builder.memo(memo);
-    builder.name(name);
+    builder.lastName(lastName);
+    builder.firstName(firstName);
     builder.phone1(phone1);
     builder.phone2(phone2);
     builder.shopAddress(shop);
@@ -108,7 +110,8 @@ public class XContactTest
     assertEquals(result.getFax(), contact.getFax());
     assertEquals(result.getId(), contact.getId());
     assertEquals(result.getMemo(), contact.getMemo());
-    assertEquals(result.getName(), contact.getName());
+    assertEquals(result.getLastName(), contact.getLastName());
+    assertEquals(result.getFirstName(), contact.getFirstName());
     assertEquals(result.getPhone1(), contact.getPhone1());
     assertEquals(result.getPhone2(), contact.getPhone2());
     assertEquals(result.getShopAddress(), contact.getShopAddress());

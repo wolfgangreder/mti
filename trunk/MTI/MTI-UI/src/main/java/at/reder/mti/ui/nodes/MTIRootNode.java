@@ -6,7 +6,7 @@
  * Copyright 2014 Wolfgang Reder
  *
  */
-package at.reder.mti.api.datamodel.nb;
+package at.reder.mti.ui.nodes;
 
 import java.util.Arrays;
 import java.util.Collection;

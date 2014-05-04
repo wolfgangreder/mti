@@ -8,9 +8,11 @@
  */
 package at.reder.mti.api.datamodel.nb.helper;
 
+import at.reder.mti.api.datamodel.IdItem;
 import at.reder.mti.api.persistence.ProviderException;
 import java.io.IOException;
-import java.util.Objects;
+import java.util.UUID;
+import javax.swing.Action;
 import org.openide.cookies.SaveCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataLoader;
@@ -26,40 +28,32 @@ import org.openide.util.lookup.InstanceContent;
  *
  * @author Wolfgang Reder
  * @param <E>
+ * @param <DL>
  */
-public abstract class AbstractMTINode<E, DL extends DataLoader> extends AbstractNode
+public abstract class AbstractMTINode<E extends IdItem, DL extends DataLoader> extends AbstractNode
 {
 
   protected final InstanceContent content;
   private E current;
-  protected E saved;
-  private final SaveCookie saveCookie = () -> {
-    try {
-      saveCurrent();
-    } catch (ProviderException ex) {
-      if (ex.getCause() instanceof IOException) {
-        throw ((IOException) ex.getCause());
-      } else {
-        throw new IOException(ex);
-      }
-    }
-  };
   private final SaveCookieDataObject dob;
+  private SaveCookie sc;
+  private boolean floating;
 
-  protected AbstractMTINode(E e, DL loader)
+  protected AbstractMTINode(E e, DL loader, boolean floating)
   {
-    this(e, new InstanceContent(), loader, null);
+    this(e, new InstanceContent(), loader, null, floating);
   }
 
-  protected AbstractMTINode(E e, SaveCookieDataObject dob)
+  protected AbstractMTINode(E e, SaveCookieDataObject dob, boolean floating)
   {
-    this(e, new InstanceContent(), null, dob);
+    this(e, new InstanceContent(), null, dob, floating);
   }
 
-  private AbstractMTINode(E e, InstanceContent content, DL loader, SaveCookieDataObject dob)
+  private AbstractMTINode(E e, InstanceContent content, DL loader, SaveCookieDataObject dob, boolean floating)
   {
     super(Children.LEAF, new AbstractLookup(content));
     this.content = content;
+    this.floating = floating;
     DataObject tmp = null;
     if (loader != null) {
       try {
@@ -75,7 +69,7 @@ public abstract class AbstractMTINode<E, DL extends DataLoader> extends Abstract
     } else {
       this.dob = dob;
     }
-    setCurrent(e);
+    current = e;
   }
 
   protected abstract FileObject createFileObject(E element, DL loader, SaveCookieDataObject dob);
@@ -90,51 +84,68 @@ public abstract class AbstractMTINode<E, DL extends DataLoader> extends Abstract
     return current;
   }
 
-  public final boolean setCurrent(E e)
+  protected void setCurrent(E newCurrent)
   {
-    current = e;
-    return checkModified();
+    this.current = newCurrent;
+    setSaveCookie(null);
   }
 
-  public void reset()
+  public UUID getId()
   {
-    current = saved;
-    saved = createSaved();
-    checkModified();
+    E c = getCurrent();
+    return c != null ? c.getId() : null;
   }
 
-  protected abstract void saveCurrent() throws ProviderException;
-
-  protected abstract E createSaved();
-
-  protected boolean testModified(E current, E saved)
-  {
-    return !Objects.equals(current, saved);
-  }
-
-  protected final boolean checkModified()
+  public final boolean setSaveCookie(SaveCookie sc)
   {
     boolean wasModified = isModified();
-    boolean fire = false;
-    if (testModified(current, saved)) {
-      if (!wasModified) {
-        content.add(saveCookie);
-        if (dob != null) {
-          dob.setSaveCookie(saveCookie);
-        }
-        fire = true;
+    boolean fire = this.sc != sc;
+    if (this.sc != sc) {
+      if (this.sc != null) {
+        content.remove(this.sc);
       }
-    } else {
-      content.remove(saveCookie);
+      this.sc = sc;
+      if (this.sc != null) {
+        content.add(sc);
+      }
       if (dob != null) {
-        dob.setSaveCookie(null);
+        dob.setSaveCookie(sc);
       }
-      fire = true;
     }
     if (fire) {
       firePropertyChange("modified", wasModified, !wasModified);
     }
     return isModified();
+  }
+
+  public abstract E save(E newCurrent) throws ProviderException;
+
+  @Override
+  public Action getPreferredAction()
+  {
+    Action[] actions = getActions(true);
+    if (actions != null && actions.length > 0) {
+      return actions[0];
+    }
+    return null;
+  }
+
+  /**
+   *
+   * @return {@code true} wenn das object nur im flüchtigen speicher liegt,
+   */
+  public boolean isFloating()
+  {
+    synchronized (this) {
+      return floating;
+    }
+  }
+
+  public void resetFloating()
+  {
+    synchronized (this) {
+      floating = false;
+    }
   }
 
 }

@@ -3,7 +3,7 @@
  *
  * Author Wolfgang Reder
  *
- * Copyright 2013 Wolfgang Reder
+ * Copyright 2014 Wolfgang Reder
  *
  */
 package at.reder.mti.api.persistence.impl.fb;
@@ -60,12 +60,12 @@ public class FBProviderLookup implements ProviderLookup
     synchronized (this) {
       if (!started) {
         testDatabase(handle);
-        for (EntityProvider<?, ?> ep : providerLookup.lookupAll(EntityProvider.class)) {
-          ProviderStartup startup = ep.getLookup().lookup(ProviderStartup.class);
-          if (startup != null) {
-            startup.testDatabase(handle);
-          }
-        }
+        providerLookup.lookupAll(EntityProvider.class).stream().
+                map((ep) -> ep.getLookup().lookup(ProviderStartup.class)).
+                filter((startup) -> (startup != null)).
+                forEach((startup) -> {
+                  startup.testDatabase(handle);
+                });
         started = true;
       }
     }
@@ -85,8 +85,8 @@ public class FBProviderLookup implements ProviderLookup
             stmt.execute("create domain uuid char(16) character set OCTETS");
             stmt.execute("create domain boolean integer default 0 not null");
             stmt.execute("create table mti$stepping (provider uuid not null,\n"
-                         + "stepping integer default 0 not null,\n"
-                         + "constraint pk_mti$stepping primary key(provider))");
+                                 + "stepping integer default 0 not null,\n"
+                                 + "constraint pk_mti$stepping primary key(provider))");
           }
         }
       }

@@ -26,7 +26,7 @@ import org.openide.util.Lookup;
  *
  * @author wolfi
  */
-public interface Contact extends Lookup.Provider
+public interface Contact extends Lookup.Provider, IdItem
 {
 
   /**
@@ -62,7 +62,15 @@ public interface Contact extends Lookup.Provider
      * @throws NullPointerException wenn {@code name==null}
      * @throws IllegalArgumentException wenn {@code name.trim().isEmpty()}
      */
-    public Contact.Builder name(String name) throws NullPointerException, IllegalArgumentException;
+    public Contact.Builder lastName(String name) throws NullPointerException, IllegalArgumentException;
+
+    /**
+     * Setzt den Namen
+     *
+     * @param name neuer Name
+     * @return {@code this}
+     */
+    public Contact.Builder firstName(String name);
 
     /**
      * Setzt das Adressfeld 1
@@ -129,7 +137,7 @@ public interface Contact extends Lookup.Provider
     public Contact.Builder emailService(URI email) throws IllegalArgumentException;
 
     /**
-     * Setzt die Homepage. Es muss die URI zumindes die Form http://<host> oder https://<host> haben.
+     * Setzt die Homepage. Es muss die URI zumindest die Form http://&lt;host&gt; oder https://&lt;host&gt; haben.
      *
      * @param www
      * @return {@code this}
@@ -251,8 +259,7 @@ public interface Contact extends Lookup.Provider
      *
      * @param lm
      * @return
-     * @throws NullPointerException wenn {
-     * @ocde lm==null}.
+     * @throws NullPointerException wenn {@code lm==null}.
      */
     public Contact.Builder lastModified(Instant lm) throws NullPointerException;
 
@@ -275,14 +282,22 @@ public interface Contact extends Lookup.Provider
    *
    * @return niemals {@code null}.
    */
+  @Override
   public UUID getId();
+
+  /**
+   * Name des Kontakts.
+   *
+   * @return niemals {@code null}, und immer ohne führende oder abschließende Leerzeichen.
+   */
+  public String getFirstName();
 
   /**
    * Name des Kontakts.
    *
    * @return niemals {@code null} oder leer, und immer ohne führende oder abschließende Leerzeichen.
    */
-  public String getName();
+  public String getLastName();
 
   /**
    * Addressfeld 1

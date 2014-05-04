@@ -44,17 +44,19 @@ public interface EntityProvider<K, E> extends Lookup.Provider
    * Speichert das Entity {@code entity}.
    *
    * @param entity Das zu speichernde Enitity. Darf nicht null sein
+   * @return
    * @throws ProviderException
    */
-  public void store(E entity) throws ProviderException;
+  public E store(E entity) throws ProviderException;
 
   /**
    * Speichert die Entitites {@code entities}
    *
    * @param entities Collection mit den Entities. {@code null}-Einträge werden ignoriert.
+   * @return
    * @throws ProviderException
    */
-  public void store(Collection<? extends E> entities) throws ProviderException;
+  public List<E> store(Collection<? extends E> entities) throws ProviderException;
 
   /**
    * Löscht die Keys {@code keys} aus der Datenbank.
@@ -71,5 +73,7 @@ public interface EntityProvider<K, E> extends Lookup.Provider
    * @throws ProviderException
    */
   public void delete(K key) throws ProviderException;
+
+  public boolean isFloating(K key);
 
 }

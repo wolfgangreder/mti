@@ -34,9 +34,15 @@ public class DummyContact implements Contact
   }
 
   @Override
-  public String getName()
+  public String getLastName()
   {
-    return "name_" + id.toString();
+    return "lastname_" + id.toString();
+  }
+
+  @Override
+  public String getFirstName()
+  {
+    return "firstname_" + id.toString();
   }
 
   @Override
