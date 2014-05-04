@@ -8,12 +8,13 @@
  */
 package at.reder.mti.ui.explorer;
 
-import at.reder.mti.api.datamodel.nb.MTIRootNode;
+import at.reder.mti.ui.nodes.MTIRootNode;
 import java.awt.BorderLayout;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
+import org.openide.explorer.ExplorerUtils;
 import org.openide.explorer.view.BeanTreeView;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
@@ -54,6 +55,7 @@ public final class EntityExplorerTopComponent extends TopComponent implements Ex
     setLayout(new BorderLayout());
     add(btv, BorderLayout.CENTER);
     btv.setRootVisible(false);
+    associateLookup(ExplorerUtils.createLookup(explorerManager, getActionMap()));
     setName(Bundle.CTL_EntityExplorerTopComponent());
     //setToolTipText(Bundle.HINT_EntityExplorerTopComponent());
   }
@@ -71,18 +73,6 @@ public final class EntityExplorerTopComponent extends TopComponent implements Ex
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   // End of variables declaration//GEN-END:variables
-  @Override
-  public void componentOpened()
-  {
-    // TODO add custom code on component opening
-  }
-
-  @Override
-  public void componentClosed()
-  {
-    // TODO add custom code on component closing
-  }
-
   void writeProperties(java.util.Properties p)
   {
     // better to version settings since initial version as advocated at

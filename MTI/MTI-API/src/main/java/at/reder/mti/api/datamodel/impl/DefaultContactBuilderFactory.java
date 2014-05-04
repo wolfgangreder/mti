@@ -11,6 +11,7 @@ package at.reder.mti.api.datamodel.impl;
 import at.reder.mti.api.datamodel.Contact;
 import at.reder.mti.api.datamodel.ContactType;
 import at.reder.mti.api.datamodel.xml.XContact;
+import at.reder.mti.api.utils.MTIUtils;
 import java.net.URI;
 import java.time.Clock;
 import java.time.Instant;
@@ -53,7 +54,8 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     private final UUID id;
     private final Lookup lookup;
     private final String memo;
-    private final String name;
+    private final String lastName;
+    private final String firstName;
     private final String phone1;
     private final String phone2;
     private final URI shopAddress;
@@ -63,7 +65,8 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     private final Instant lastModified;
 
     private ContactImpl(UUID id,
-                        String name,
+                        String lastName,
+                        String firstName,
                         String address1,
                         String address2,
                         String city,
@@ -91,7 +94,8 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       this.id = id;
       this.lookup = lookup;
       this.memo = memo;
-      this.name = name;
+      this.lastName = lastName;
+      this.firstName = firstName;
       this.phone1 = phone1;
       this.phone2 = phone2;
       this.shopAddress = shopAddress;
@@ -108,9 +112,15 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public String getName()
+    public String getLastName()
     {
-      return name;
+      return lastName;
+    }
+
+    @Override
+    public String getFirstName()
+    {
+      return firstName;
     }
 
     @Override
@@ -222,7 +232,8 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       hash = 61 * hash + Objects.hashCode(this.fax);
       hash = 61 * hash + Objects.hashCode(this.id);
       hash = 61 * hash + Objects.hashCode(this.memo);
-      hash = 61 * hash + Objects.hashCode(this.name);
+      hash = 61 * hash + Objects.hashCode(this.lastName);
+      hash = 61 * hash + Objects.hashCode(this.firstName);
       hash = 61 * hash + Objects.hashCode(this.phone1);
       hash = 61 * hash + Objects.hashCode(this.phone2);
       hash = 61 * hash + Objects.hashCode(this.shopAddress);
@@ -269,7 +280,10 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       if (!Objects.equals(this.memo, other.memo)) {
         return false;
       }
-      if (!Objects.equals(this.name, other.name)) {
+      if (!Objects.equals(this.lastName, other.lastName)) {
+        return false;
+      }
+      if (!Objects.equals(this.firstName, other.firstName)) {
         return false;
       }
       if (!Objects.equals(this.phone1, other.phone1)) {
@@ -293,7 +307,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     @Override
     public String toString()
     {
-      return "ContactImpl{" + "id=" + id + ", name=" + name + '}';
+      return "ContactImpl{" + "id=" + id + ", name=" + lastName + '}';
     }
 
   }
@@ -311,7 +325,8 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     private String fax = "";
     private UUID id;
     private String memo = "";
-    private String name = "";
+    private String lastName = "";
+    private String firstName = "";
     private String phone1 = "";
     private String phone2 = "";
     private URI shopAddress;
@@ -336,7 +351,8 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       this.fax = contact.getFax();
       this.id = contact.getId();
       this.memo = contact.getMemo();
-      this.name = contact.getName();
+      this.lastName = contact.getLastName();
+      this.firstName = contact.getFirstName();
       this.phone1 = contact.getPhone1();
       this.phone2 = contact.getPhone2();
       this.shopAddress = contact.getShopAddress();
@@ -358,7 +374,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     }
 
     @Override
-    public Contact.Builder name(String name) throws NullPointerException, IllegalArgumentException
+    public Contact.Builder lastName(String name) throws NullPointerException, IllegalArgumentException
     {
       if (name == null) {
         throw new NullPointerException("name==null");
@@ -366,7 +382,18 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       if (name.trim().isEmpty()) {
         throw new IllegalArgumentException("name is empty");
       }
-      this.name = name.trim();
+      this.lastName = name.trim();
+      return this;
+    }
+
+    @Override
+    public Contact.Builder firstName(String name)
+    {
+      if (name == null) {
+        this.firstName = "";
+      } else {
+        this.firstName = name.trim();
+      }
       return this;
     }
 
@@ -462,23 +489,10 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       return this;
     }
 
-    private static String testWWW(URI www)
-    {
-      if (www != null) {
-        if (!"http".equals(www.getScheme()) && !"https".equals(www.getScheme())) {
-          return "illegal scheme";
-        }
-        if (www.getHost() == null || www.getHost().trim().isEmpty()) {
-          return "no host";
-        }
-      }
-      return null;
-    }
-
     @Override
     public Contact.Builder www(URI www) throws IllegalArgumentException
     {
-      String tmp = testWWW(www);
+      String tmp = MTIUtils.testWWW(www);
       if (tmp != null) {
         throw new IllegalArgumentException(tmp);
       }
@@ -489,7 +503,7 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
     @Override
     public Contact.Builder shopAddress(URI shopAddress) throws IllegalArgumentException
     {
-      String tmp = testWWW(shopAddress);
+      String tmp = MTIUtils.testWWW(shopAddress);
       if (tmp != null) {
         throw new IllegalArgumentException(tmp);
       }
@@ -645,8 +659,11 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       if (id == null) {
         throw new IllegalStateException("id=null");
       }
-      if (name == null || name.trim().isEmpty()) {
+      if (lastName == null || lastName.trim().isEmpty()) {
         throw new IllegalStateException("name is empty or null");
+      }
+      if (firstName == null) {
+        throw new IllegalStateException("firstName==null");
       }
       if (address1 == null) {
         throw new IllegalStateException("address1==null");
@@ -683,11 +700,11 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
       if (tmp != null) {
         throw new IllegalStateException(tmp);
       }
-      tmp = testWWW(www);
+      tmp = MTIUtils.testWWW(www);
       if (tmp != null) {
         throw new IllegalStateException(tmp);
       }
-      tmp = testWWW(shopAddress);
+      tmp = MTIUtils.testWWW(shopAddress);
       if (tmp != null) {
         throw new IllegalStateException(tmp);
       }
@@ -707,7 +724,8 @@ public class DefaultContactBuilderFactory implements Contact.BuilderFactory
         lookup = Lookups.fixed(lookupContent.toArray());
       }
       return new ContactImpl(id,
-                             name,
+                             lastName,
+                             firstName,
                              address1,
                              address2,
                              city,

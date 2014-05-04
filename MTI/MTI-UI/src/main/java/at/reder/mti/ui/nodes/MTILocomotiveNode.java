@@ -6,7 +6,7 @@
  * Copyright 2014 Wolfgang Reder
  *
  */
-package at.reder.mti.api.datamodel.nb;
+package at.reder.mti.ui.nodes;
 
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
@@ -17,18 +17,18 @@ import org.openide.util.NbBundle.Messages;
  *
  * @author Wolfgang Reder
  */
-@Messages({"MTIWagonNode_name=Waggons"})
-public final class MTIWagonNode extends AbstractNode
+@Messages({"MTILocomotiveNode_name=Lokomotiven"})
+public final class MTILocomotiveNode extends AbstractNode
 {
 
-  private static final MTIWagonNode INSTANCE = new MTIWagonNode();
+  private static final MTILocomotiveNode INSTANCE = new MTILocomotiveNode();
 
   public static Node getInstance()
   {
     return INSTANCE;
   }
 
-  private MTIWagonNode()
+  private MTILocomotiveNode()
   {
     super(Children.LEAF);
   }
@@ -36,7 +36,7 @@ public final class MTIWagonNode extends AbstractNode
   @Override
   public String getName()
   {
-    return Bundle.MTIWagonNode_name();
+    return Bundle.MTILocomotiveNode_name();
   }
 
 }

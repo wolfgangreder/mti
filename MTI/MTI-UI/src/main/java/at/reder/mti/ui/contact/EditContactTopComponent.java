@@ -10,14 +10,30 @@ package at.reder.mti.ui.contact;
 
 import at.reder.mti.api.datamodel.Contact;
 import at.reder.mti.api.datamodel.ContactType;
-import at.reder.mti.api.datamodel.nb.ContactNode;
-import at.reder.mti.ui.contact.controls.DefaultEnumCheckboxModel;
-import at.reder.mti.ui.contact.controls.EnumCheckbox;
-import at.reder.mti.ui.contact.controls.EnumCheckboxModel;
+import at.reder.mti.api.persistence.ProviderException;
+import at.reder.mti.ui.contact.model.ContactTypeCheckBoxModel;
+import at.reder.mti.ui.controls.CommitableAndErrorFlagableContainer;
+import at.reder.mti.ui.controls.NodeContainerSupport;
+import at.reder.mti.ui.nodes.ContactNode;
+import at.reder.mti.ui.nodes.MTIContactNode;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
-import javax.swing.DefaultListModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.SwingUtilities;
+import org.openide.nodes.NodeEvent;
+import org.openide.nodes.NodeListener;
+import org.openide.nodes.NodeMemberEvent;
+import org.openide.nodes.NodeReorderEvent;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.WeakListeners;
 import org.openide.windows.TopComponent;
 
 /**
@@ -25,48 +41,92 @@ import org.openide.windows.TopComponent;
  */
 @TopComponent.Description(
         preferredID = "EditContactTopComponent",
-        //iconBase="SET/PATH/TO/ICON/HERE",
+        iconBase = "at/reder/mti/ui/contact/vcard.png",
         persistenceType = TopComponent.PERSISTENCE_NEVER
 )
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
 @Messages({
   "CTL_EditContactAction=EditContact",
-  "CTL_EditContactTopComponent=EditContact Window",
-  "HINT_EditContactTopComponent=This is a EditContact window"
-})
+  "# {0} - lastName",
+  "# {1} - firstName",
+  "# {2} - fmtStart",
+  "# {3} - fmtEnd",
+  "# {4} - nameSuffix",
+  "CTL_EditContactTopComponent=<html>{2}{0} {1}{4}{3}",
+  "HINT_EditContactTopComponent=This is a EditContact window",})
 public final class EditContactTopComponent extends TopComponent
 {
 
   private final ContactNode node;
-  private final Contact.Builder builder;
-  private final EnumCheckboxModel<ContactType> ctModel = new DefaultEnumCheckboxModel<>(ContactType.class);
-  private EnumCheckbox<ContactType> ctPanel;
-  private final DefaultListModel<ContactType> listModel = new DefaultListModel<>();
-
-  public EditContactTopComponent(Contact saved)
+  private final ContactTypeCheckBoxModel ctModel = new ContactTypeCheckBoxModel();
+  private final NodeContainerSupport ncs = new NodeContainerSupport(this);
+  private final CommitableAndErrorFlagableContainer cec;
+  private static final Map<UUID, WeakReference<EditContactTopComponent>> instances = new HashMap<>();
+  private final NodeListener myNodeListener = new NodeListener()
   {
-    this.node = new ContactNode(saved);
-    builder = Lookup.getDefault().lookup(Contact.BuilderFactory.class).createBuilder();
-    if (saved != null) {
-      builder.copy(saved);
-    } else {
-      builder.id(UUID.randomUUID());
+
+    @Override
+    public void childrenAdded(NodeMemberEvent ev)
+    {
     }
-    ctModel.addEnumCheckboxModelListener(this::ctModelChanged);
-    ctModel.setOneRequired(true);
-    initComponents();
-    setName(Bundle.CTL_EditContactTopComponent());
-    setToolTipText(Bundle.HINT_EditContactTopComponent());
-    assignValues(saved);
+
+    @Override
+    public void childrenRemoved(NodeMemberEvent ev)
+    {
+    }
+
+    @Override
+    public void childrenReordered(NodeReorderEvent ev)
+    {
+    }
+
+    @Override
+    public void nodeDestroyed(NodeEvent ev)
+    {
+      SwingUtilities.invokeLater(EditContactTopComponent.this::close);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt)
+    {
+    }
+
+  };
+  private final NodeListener weakListener;
+  private final DefaultComboBoxModel<String> countryModel = new DefaultComboBoxModel<>(
+          new String[]{"Österreich", "Deutschland", "Schweiz"});
+
+  public static EditContactTopComponent getInstance(Contact.Builder c)
+  {
+    return getInstance(MTIContactNode.getInstance().createNode(c));
   }
 
-  private void ctModelChanged(EnumCheckboxModel<ContactType> model)
+  public static EditContactTopComponent getInstance(ContactNode node)
   {
-    listModel.clear();
-    model.getSelection().stream().
-            forEach((c) -> {
-              listModel.addElement(c);
-            });
+    assert SwingUtilities.isEventDispatchThread();
+    WeakReference<EditContactTopComponent> ref = instances.get(node.getId());
+    EditContactTopComponent comp = ref != null ? ref.get() : null;
+    if (comp == null) {
+      comp = new EditContactTopComponent(node);
+      instances.put(node.getId(), new WeakReference<>(comp));
+    }
+    return comp;
+  }
+
+  private EditContactTopComponent(ContactNode node)
+  {
+    assert node != null && node.getCurrent() != null;
+    this.node = node;
+    assert this.node != null;
+    ncs.addNodes(Collections.singleton(this.node));
+    cec = new CommitableAndErrorFlagableContainer(this);
+    initComponents();
+//    setToolTipText(Bundle.HINT_EditContactTopComponent());
+    assignValues(node.getCurrent());
+    cec.addPropertyChangeListener((PropertyChangeListener) this::checkData);
+    updateWindowCaption();
+    weakListener = WeakListeners.create(NodeListener.class, myNodeListener, node);
+    node.addNodeListener(weakListener);
   }
 
   /**
@@ -77,23 +137,50 @@ public final class EditContactTopComponent extends TopComponent
   private void initComponents()
   {
 
-    jLabel1 = new javax.swing.JLabel();
-    final javax.swing.JPanel ctp = ctPanel = new EnumCheckbox<>();
-    jScrollPane1 = new javax.swing.JScrollPane();
-    jList1 = new javax.swing.JList();
+    javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
+    final javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
+    javax.swing.JLabel jLabel3 = new javax.swing.JLabel();
+    javax.swing.JLabel jLabel5 = new javax.swing.JLabel();
+    javax.swing.JLabel jLabel4 = new javax.swing.JLabel();
+    javax.swing.JLabel jLabel6 = new javax.swing.JLabel();
+    javax.swing.JLabel jLabel7 = new javax.swing.JLabel();
 
     org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(EditContactTopComponent.class, "EditContactTopComponent.jLabel1.text")); // NOI18N
 
-    jTextField1.setText(org.openide.util.NbBundle.getMessage(EditContactTopComponent.class, "EditContactTopComponent.jTextField1.text")); // NOI18N
+    contactType.setMinimumSize(new java.awt.Dimension(10, 24));
+    contactType.setModel(ctModel);
+    contactType.setPreferredSize(new java.awt.Dimension(100, 24));
+    contactType.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
 
-    ctPanel.setModel(ctModel);
-    ctp.setAlignmentX(0.0F);
-    ctp.setMinimumSize(new java.awt.Dimension(200, 24));
-    ctp.setPreferredSize(new java.awt.Dimension(200, 24));
-    ctp.setLayout(null);
+    edLastName.setMinLength(1);
+    edLastName.setNullAllowed(false);
+    edLastName.setTrimText(true);
+    edLastName.addActionListener((ActionEvent evt)->updateWindowCaption());
 
-    jList1.setModel(listModel);
-    jScrollPane1.setViewportView(jList1);
+    org.openide.awt.Mnemonics.setLocalizedText(lbId, org.openide.util.NbBundle.getMessage(EditContactTopComponent.class, "EditContactTopComponent.lbId.text")); // NOI18N
+
+    org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(EditContactTopComponent.class, "EditContactTopComponent.jLabel2.text")); // NOI18N
+
+    jLabel3.setLabelFor(edAddress1);
+    jLabel3.setText(org.openide.util.NbBundle.getMessage(EditContactTopComponent.class, "EditContactTopComponent.jLabel3.text")); // NOI18N
+
+    jLabel5.setLabelFor(edZIP);
+    org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(EditContactTopComponent.class, "EditContactTopComponent.jLabel5.text")); // NOI18N
+
+    edZIP.setColumns(10);
+    edZIP.setMaxLength(10);
+
+    org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(EditContactTopComponent.class, "EditContactTopComponent.jLabel4.text")); // NOI18N
+
+    cbCountry.setEditable(true);
+    cbCountry.setModel(countryModel);
+
+    org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(EditContactTopComponent.class, "EditContactTopComponent.jLabel6.text")); // NOI18N
+
+    edFirstName.addActionListener((ActionEvent evt)->updateWindowCaption());
+
+    jLabel7.setLabelFor(edWWW);
+    org.openide.awt.Mnemonics.setLocalizedText(jLabel7, org.openide.util.NbBundle.getMessage(EditContactTopComponent.class, "EditContactTopComponent.jLabel7.text")); // NOI18N
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -101,54 +188,200 @@ public final class EditContactTopComponent extends TopComponent
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        .addComponent(jLabel1)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(56, 56, 56))
-      .addGroup(layout.createSequentialGroup()
-        .addContainerGap()
-        .addComponent(ctp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addComponent(lbId)
         .addContainerGap())
       .addGroup(layout.createSequentialGroup()
-        .addGap(24, 24, 24)
-        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addContainerGap()
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(jLabel6)
+          .addComponent(jLabel4)
+          .addComponent(jLabel5)
+          .addComponent(jLabel3)
+          .addComponent(jLabel1)
+          .addComponent(jLabel2)
+          .addComponent(jLabel7))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(edWWW, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(edZIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(edCity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+          .addComponent(edAddress2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addComponent(contactType, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addComponent(edLastName, javax.swing.GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE)
+          .addComponent(edAddress1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addComponent(cbCountry, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addComponent(edFirstName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addGap(137, 137, 137))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addComponent(ctp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+        .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(jLabel1))
-        .addGap(86, 86, 86))
+          .addComponent(jLabel6)
+          .addComponent(edFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel1)
+          .addComponent(edLastName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+          .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addComponent(contactType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel3)
+          .addComponent(edAddress1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(edAddress2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel5)
+          .addComponent(edZIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(edCity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel4)
+          .addComponent(cbCountry, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(edWWW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jLabel7))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 191, Short.MAX_VALUE)
+        .addComponent(lbId)
+        .addContainerGap())
     );
   }// </editor-fold>//GEN-END:initComponents
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JLabel jLabel1;
-  private javax.swing.JList jList1;
-  private javax.swing.JScrollPane jScrollPane1;
-  private final javax.swing.JTextField jTextField1 = new javax.swing.JTextField();
+  private final at.reder.mti.ui.controls.MTIComboBox<String> cbCountry = new at.reder.mti.ui.controls.MTIComboBox<>();
+  private final at.reder.mti.ui.controls.EnumCheckbox<ContactType> contactType = new at.reder.mti.ui.controls.EnumCheckbox<>();
+  private final at.reder.mti.ui.controls.MTITextField edAddress1 = new at.reder.mti.ui.controls.MTITextField();
+  private final at.reder.mti.ui.controls.MTITextField edAddress2 = new at.reder.mti.ui.controls.MTITextField();
+  private final at.reder.mti.ui.controls.MTITextField edCity = new at.reder.mti.ui.controls.MTITextField();
+  private final at.reder.mti.ui.controls.MTITextField edFirstName = new at.reder.mti.ui.controls.MTITextField();
+  private final at.reder.mti.ui.controls.MTITextField edLastName = new at.reder.mti.ui.controls.MTITextField();
+  private final at.reder.mti.ui.controls.MTIURITextField edWWW = new at.reder.mti.ui.controls.MTIURITextField();
+  private final at.reder.mti.ui.controls.MTITextField edZIP = new at.reder.mti.ui.controls.MTITextField();
+  private final javax.swing.JLabel lbId = new javax.swing.JLabel();
   // End of variables declaration//GEN-END:variables
-  @Override
-  public void componentOpened()
-  {
-    // TODO add custom code on component opening
-  }
 
   @Override
   public void componentClosed()
   {
-    // TODO add custom code on component closing
+    node.setSaveCookie(null);
+    node.removeNodeListener(weakListener);
+    ncs.removeNode(Collections.singleton(node));
+    instances.remove(node.getId());
+    if (node.isFloating()) {
+      MTIContactNode.getInstance().removeNode(node);
+    }
   }
 
   private void assignValues(Contact c)
   {
+    if (c != null) {
+      edLastName.setCommitedText(c.getLastName());
+      edFirstName.setCommitedText(c.getFirstName());
+      lbId.setText(c.getId().toString());
+      ctModel.setCommitedSelection(c.getTypes());
+      edAddress1.setCommitedText(c.getAddress1());
+      edAddress2.setCommitedText(c.getAddress2());
+      edCity.setCommitedText(c.getCity());
+      edZIP.setCommitedText(c.getZip());
+      cbCountry.setCommitedSelection(c.getCountry());
+      edWWW.setCommitedValue(c.getWWW());
+    } else {
+      edLastName.setCommitedText(null);
+      edFirstName.setCommitedText(null);
+      lbId.setText(null);
+      ctModel.setCommitedSelection(null);
+      edAddress1.setCommitedText(null);
+      edAddress2.setCommitedText(null);
+      edCity.setCommitedText(null);
+      edZIP.setCommitedText(null);
+      cbCountry.setCommitedSelection(null);
+      edWWW.setCommitedValue(null);
+    }
+    checkData(null);
+  }
 
+  private Contact getContact()
+  {
+    Object tmp;
+    final String strCountry;
+    tmp = cbCountry.getSelectedItem();
+    strCountry = tmp != null ? tmp.toString() : null;
+    return Lookup.getDefault().lookup(Contact.BuilderFactory.class).createBuilder().
+            id(node.getCurrent().getId()).
+            lastName(edLastName.getText()).
+            firstName(edFirstName.getText()).
+            setTypes(ctModel.getSelection()).
+            address1(edAddress1.getText()).
+            address2(edAddress2.getText()).
+            zip(edZIP.getText()).
+            city(edCity.getText()).
+            country(strCountry).
+            www(edWWW.getValue()).
+            build();
+  }
+
+  private void checkSaveCookie()
+  {
+    if (cec.isDataValid() && (node.isFloating() || cec.isDataChanged())) {
+      node.setSaveCookie(() -> {
+        try {
+          node.save(getContact());
+          cec.commit();
+//          isNew = false;
+        } catch (ProviderException ex) {
+          throw new IOException(ex);
+        } finally {
+          checkData(null);
+        }
+      });
+    } else {
+      node.setSaveCookie(null);
+    }
+  }
+
+  private void checkData(PropertyChangeEvent prop)
+  {
+    updateWindowCaption();
+    checkSaveCookie();
+  }
+
+  private void updateWindowCaption()
+  {
+    String lastName = edLastName.getText();
+    if (lastName == null || lastName.isEmpty()) {
+      lastName = "???";
+    }
+    String firstName = edFirstName.getText();
+    if (firstName == null) {
+      lastName = "";
+    }
+    String fmtStart = "";
+    String fmtEnd = "";
+    String nameSuffix = "";
+    if (node.isFloating() || cec.isDataChanged()) {
+      nameSuffix = " *";
+      if (cec.isDataValid()) {
+        fmtStart = "<b>";
+        fmtEnd = "</b>";
+      } else {
+        fmtStart = "<b><font color=\"#cc0000\">";
+        fmtEnd = "</font></b>";
+      }
+    } else { // !isDataChanged
+      if (!cec.isDataValid()) {
+        fmtStart = "<font color=\"#cc0000\">";
+        fmtEnd = "</font>";
+      }
+    }
+    setHtmlDisplayName(Bundle.CTL_EditContactTopComponent(lastName, firstName, fmtStart, fmtEnd, nameSuffix));
   }
 
 }

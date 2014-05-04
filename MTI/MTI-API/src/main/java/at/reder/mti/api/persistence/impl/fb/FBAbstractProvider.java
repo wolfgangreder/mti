@@ -78,11 +78,15 @@ public abstract class FBAbstractProvider<K, E> implements EntityProvider<K, E>
   }
 
   @Override
-  public void store(E entity) throws ProviderException
+  public E store(E entity) throws ProviderException
   {
     if (entity != null) {
-      store(Collections.singleton(entity));
+      List<E> tmp = store(Collections.singleton(entity));
+      if (!tmp.isEmpty()) {
+        return tmp.get(0);
+      }
     }
+    return null;
   }
 
   @Override

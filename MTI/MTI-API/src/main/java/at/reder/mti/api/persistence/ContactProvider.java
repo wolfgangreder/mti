@@ -24,4 +24,10 @@ public interface ContactProvider extends EntityProvider<UUID, Contact>
 
   public List<Contact> getByType(ContactType type) throws ProviderException;
 
+  public List<UUID> getAllIds() throws ProviderException;
+
+  public List<UUID> getAllIdsByType(ContactType type) throws ProviderException;
+
+  public Contact createContact(Contact.Builder builder);
+
 }

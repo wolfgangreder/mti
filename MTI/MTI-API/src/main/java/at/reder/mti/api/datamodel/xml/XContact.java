@@ -66,7 +66,8 @@ public final class XContact
   private String fax = "";
   private UUID id;
   private String memo = "";
-  private String name = "";
+  private String lastName = "";
+  private String firstName = "";
   private String phone1 = "";
   private String phone2 = "";
   private URI shopAddress;
@@ -90,7 +91,8 @@ public final class XContact
     this.fax = contact.getFax();
     this.id = contact.getId();
     this.memo = contact.getMemo();
-    this.name = contact.getName();
+    this.lastName = contact.getLastName();
+    this.firstName = contact.getFirstName();
     this.phone1 = contact.getPhone1();
     this.phone2 = contact.getPhone2();
     this.shopAddress = contact.getShopAddress();
@@ -102,10 +104,26 @@ public final class XContact
 
   public Contact toContact() throws NullPointerException, IllegalArgumentException, IllegalStateException
   {
-    return Lookup.getDefault().lookup(Contact.BuilderFactory.class).createBuilder().setTypes(types).address1(address1).address2(
-            address2).city(city).country(country).emailShop(emailShop).fax(fax).id(id).memo(memo).name(name).phone1(phone1).
-            phone2(phone2).shopAddress(shopAddress).www(www).zip(zip).emailService(emailService).lastModified(
-                    lastModified).build();
+    return Lookup.getDefault().lookup(Contact.BuilderFactory.class).createBuilder().
+            setTypes(types).
+            address1(address1).
+            address2(address2).
+            city(city).
+            country(country).
+            emailShop(emailShop).
+            fax(fax).
+            id(id).
+            memo(memo).
+            lastName(lastName).
+            firstName(firstName).
+            phone1(phone1).
+            phone2(phone2).
+            shopAddress(shopAddress).
+            www(www).
+            zip(zip).
+            emailService(emailService).
+            lastModified(lastModified).
+            build();
   }
 
   @XmlElement(name = "address1", namespace = "mti")
@@ -223,15 +241,26 @@ public final class XContact
     this.memo = memo;
   }
 
-  @XmlElement(name = "name", namespace = "mti", required = true)
-  public String getName()
+  @XmlElement(name = "lastname", namespace = "mti", required = true)
+  public String getLastName()
   {
-    return name;
+    return lastName;
   }
 
-  public void setName(String name)
+  public void setLastName(String name)
   {
-    this.name = name;
+    this.lastName = name;
+  }
+
+  @XmlElement(name = "firstname", namespace = "mti", required = false)
+  public String getFirstName()
+  {
+    return firstName;
+  }
+
+  public void setFirstName(String fn)
+  {
+    this.firstName = fn;
   }
 
   @XmlElement(name = "phone1", namespace = "mti")

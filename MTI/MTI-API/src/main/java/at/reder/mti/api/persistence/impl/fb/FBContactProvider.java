@@ -15,6 +15,7 @@ import at.reder.mti.api.persistence.EntityProvider;
 import at.reder.mti.api.persistence.ProviderException;
 import at.reder.mti.api.persistence.ProviderStartup;
 import at.reder.mti.api.utils.MTIUtils;
+import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -26,8 +27,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.netbeans.api.progress.ProgressHandle;
@@ -51,6 +54,7 @@ public final class FBContactProvider extends FBAbstractProvider<UUID, Contact> i
   private final UUID ID = UUID.fromString("6bdcbba0-70c1-476b-861e-f60ed8eb26e1");
   private final ProviderStartup startup = this::doTestDatabase;
   private final Lookup myLookup = Lookups.singleton(startup);
+  private static final Map<UUID, WeakReference<Contact>> floating = new HashMap<>();
 
   private void doTestDatabase(ProgressHandle handle)
   {
@@ -64,7 +68,8 @@ public final class FBContactProvider extends FBAbstractProvider<UUID, Contact> i
               try (Statement stmt = conn.createStatement()) {
                 stmt.execute("create table contact (\n"
                                      + "id uuid not null,\n"
-                                     + "name varchar(128) not null,\n"
+                                     + "lastname varchar(128) not null,\n"
+                                     + "firstname varchar(128) not null,\n"
                                      + "address1 varchar(128) default '' not null,\n"
                                      + "address2 varchar(128) default '' not null,\n"
                                      + "zip varchar(10) default '' not null,\n"
@@ -78,10 +83,11 @@ public final class FBContactProvider extends FBAbstractProvider<UUID, Contact> i
                                      + "fax varchar(128),\n"
                                      + "www_shop varchar(128),\n"
                                      + "www varchar(128),\n"
+                                     + "visible integer default 1 not null,\n"
                                      + "last_modified timestamp default 'now' not null,"
                                      + "constraint pk_contact primary key(id))");
                 stmt.execute("create index ndx$contact_lm on contact(last_modified)");
-                stmt.execute("create index ndx$contact_name on contact(name)");
+                stmt.execute("create index ndx$contact_name on contact(lastname,firstname)");
                 stmt.execute("create table contact2type (\n"
                                      + "contact uuid not null,\n"
                                      + "contacttype varchar(50) not null,"
@@ -107,6 +113,16 @@ public final class FBContactProvider extends FBAbstractProvider<UUID, Contact> i
     return null;
   }
 
+  Contact get(final Connection conn, UUID id) throws SQLException, ProviderException
+  {
+    List<Contact> result = get(conn, Collections.singleton(id));
+    if (result.isEmpty()) {
+      return null;
+    } else {
+      return result.get(0);
+    }
+  }
+
   List<Contact> get(final Connection conn, Collection<? extends UUID> keys) throws SQLException, ProviderException
   {
     List<Contact> result = new ArrayList<>(keys.size());
@@ -114,7 +130,7 @@ public final class FBContactProvider extends FBAbstractProvider<UUID, Contact> i
     if (builderFactory == null) {
       throw new ProviderException(Bundle.FBAbstractProvider_factory_null(Contact.class.getName()));
     }
-    try (PreparedStatement stmt = conn.prepareStatement("select name,address1,address2,zip,city,\n"
+    try (PreparedStatement stmt = conn.prepareStatement("select lastname,firstname,address1,address2,zip,city,\n"
                                                                 + "country,emailshop,emailservice,memo,\n"
                                                                 + "phone1,phone2,fax,last_modified,\n"
                                                                 + "www_shop,www\n"
@@ -127,6 +143,9 @@ public final class FBContactProvider extends FBAbstractProvider<UUID, Contact> i
           stmtType.setString(1, id.toString());
           try (ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
+              synchronized (floating) {
+                floating.remove(id);
+              }
               Contact.Builder builder = builderFactory.createBuilder();
               builder.address1(rs.getString("address1"));
               builder.address2(rs.getString("address2"));
@@ -138,7 +157,8 @@ public final class FBContactProvider extends FBAbstractProvider<UUID, Contact> i
               builder.id(id);
               builder.lastModified(sqlTimestamp2Timestamp(rs.getTimestamp("last_modified")));
               builder.memo(rs.getString("memo"));
-              builder.name(rs.getString("name"));
+              builder.lastName(rs.getString("lastname"));
+              builder.firstName(rs.getString("firstname"));
               builder.phone1(rs.getString("phone1"));
               builder.phone2(rs.getString("phone2"));
               builder.shopAddress(createURI(rs.getString("www_shop")));
@@ -146,10 +166,22 @@ public final class FBContactProvider extends FBAbstractProvider<UUID, Contact> i
               builder.zip(rs.getString("zip"));
               try (ResultSet rs1 = stmtType.executeQuery()) {
                 while (rs1.next()) {
-                  builder.addType(ContactType.valueOf(rs.getString("contacttype")));
+                  builder.addType(ContactType.valueOf(rs1.getString("contacttype")));
                 }
               }
               result.add(builder.build());
+            } else {
+              synchronized (floating) {
+                WeakReference<Contact> wr = floating.get(id);
+                if (wr != null) {
+                  Contact c = wr.get();
+                  if (c != null) {
+                    result.add(c);
+                  } else {
+                    floating.remove(id);
+                  }
+                }
+              }
             }
           }
         }
@@ -182,24 +214,26 @@ public final class FBContactProvider extends FBAbstractProvider<UUID, Contact> i
   }
 
   @Override
-  public void store(Collection<? extends Contact> entities) throws ProviderException
+  public List<Contact> store(Collection<? extends Contact> entities) throws ProviderException
   {
     if (entities == null) {
-      return;
+      return Collections.emptyList();
     }
     try (Connection conn = getConnection();
             PreparedStatement stmtExists = conn.prepareStatement("select id from contact where id=char_to_uuid(?)");
             PreparedStatement stmtDelete = conn.prepareStatement("delete from contact2type where contact=char_to_uuid(?)");
-            PreparedStatement stmtInsert = conn.prepareStatement("insert into contact (name,address1,address2,\n"
+            PreparedStatement stmtInsert = conn.prepareStatement("insert into contact (lastname,firstname,address1,address2,\n"
                                                                          + "zip,city,country,emailshop,emailservice,\n"
                                                                          + "memo,phone1,phone2,fax,last_modified,\n"
-                                                                         + "www_shop,www,id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,char_to_uuid(?))");
-            PreparedStatement stmtUpdate = conn.prepareStatement("update contact set name=?,address1=?,address2=?,\n"
-                                                                         + "zip=?,city=?,country=?,emailshop=?,emailservice=?,\n"
-                                                                         + "memo=?,phone1=?,phone2=?,fax=?,last_modified=?,\n"
-                                                                         + "www_shop=?,www=? where id=char_to_uuid(?)");
+                                                                         + "www_shop,www,id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,char_to_uuid(?))");
+            PreparedStatement stmtUpdate = conn.prepareStatement(
+                    "update contact set lastname=?,firstname=?,address1=?,address2=?,\n"
+                            + "zip=?,city=?,country=?,emailshop=?,emailservice=?,\n"
+                            + "memo=?,phone1=?,phone2=?,fax=?,last_modified=?,\n"
+                            + "www_shop=?,www=? where id=char_to_uuid(?)");
             PreparedStatement stmtInsertType = conn.prepareStatement("insert into contact2type (contact,contacttype)\n"
                                                                              + "values (char_to_uuid(?),?)")) {
+      List<Contact> result = new ArrayList<>(entities.size());
       for (Contact c : entities) {
         if (c != null) {
           stmtExists.setString(1, c.getId().toString());
@@ -215,30 +249,36 @@ public final class FBContactProvider extends FBAbstractProvider<UUID, Contact> i
           } else {
             stmt = stmtInsert;
           }
-          stmt.setString(1, MTIUtils.limitString2Len(c.getName(), MTIUtils.MAX_NAME_LENGTH));
-          stmt.setString(2, MTIUtils.limitString2Len(c.getAddress1(), MTIUtils.MAX_NAME_LENGTH));
-          stmt.setString(3, MTIUtils.limitString2Len(c.getAddress2(), MTIUtils.MAX_NAME_LENGTH));
-          stmt.setString(4, MTIUtils.limitString2Len(c.getZip(), 10));
-          stmt.setString(5, MTIUtils.limitString2Len(c.getCity(), MTIUtils.MAX_NAME_LENGTH));
-          stmt.setString(6, MTIUtils.limitString2Len(c.getCountry(), MTIUtils.MAX_NAME_LENGTH));
-          stmt.setString(7, uri2String(c.getEmailShop()));
-          stmt.setString(8, uri2String(c.getEmailService()));
-          stmt.setString(9, c.getMemo());
-          stmt.setString(10, MTIUtils.limitString2Len(c.getPhone1(), MTIUtils.MAX_NAME_LENGTH));
-          stmt.setString(11, MTIUtils.limitString2Len(c.getPhone2(), MTIUtils.MAX_NAME_LENGTH));
-          stmt.setString(12, MTIUtils.limitString2Len(c.getFax(), MTIUtils.MAX_NAME_LENGTH));
-          stmt.setTimestamp(13, date2SQLTimestamp(c.getLastModified()));
-          stmt.setString(14, uri2String(c.getShopAddress()));
-          stmt.setString(15, uri2String(c.getWWW()));
-          stmt.setString(16, c.getId().toString());
+          stmt.setString(1, MTIUtils.limitString2Len(c.getLastName(), MTIUtils.MAX_NAME_LENGTH));
+          stmt.setString(2, MTIUtils.limitString2Len(c.getFirstName(), MTIUtils.MAX_NAME_LENGTH));
+          stmt.setString(3, MTIUtils.limitString2Len(c.getAddress1(), MTIUtils.MAX_NAME_LENGTH));
+          stmt.setString(4, MTIUtils.limitString2Len(c.getAddress2(), MTIUtils.MAX_NAME_LENGTH));
+          stmt.setString(5, MTIUtils.limitString2Len(c.getZip(), 10));
+          stmt.setString(6, MTIUtils.limitString2Len(c.getCity(), MTIUtils.MAX_NAME_LENGTH));
+          stmt.setString(7, MTIUtils.limitString2Len(c.getCountry(), MTIUtils.MAX_NAME_LENGTH));
+          stmt.setString(8, uri2String(c.getEmailShop()));
+          stmt.setString(9, uri2String(c.getEmailService()));
+          stmt.setString(10, c.getMemo());
+          stmt.setString(11, MTIUtils.limitString2Len(c.getPhone1(), MTIUtils.MAX_NAME_LENGTH));
+          stmt.setString(12, MTIUtils.limitString2Len(c.getPhone2(), MTIUtils.MAX_NAME_LENGTH));
+          stmt.setString(13, MTIUtils.limitString2Len(c.getFax(), MTIUtils.MAX_NAME_LENGTH));
+          stmt.setTimestamp(14, date2SQLTimestamp(c.getLastModified()));
+          stmt.setString(15, uri2String(c.getShopAddress()));
+          stmt.setString(16, uri2String(c.getWWW()));
+          stmt.setString(17, c.getId().toString());
           stmt.executeUpdate();
           stmtInsertType.setString(1, c.getId().toString());
           for (ContactType ct : c.getTypes()) {
             stmtInsertType.setString(2, ct.name());
             stmtInsertType.executeUpdate();
           }
+          result.add(get(conn, c.getId()));
+          synchronized (floating) {
+            floating.remove(c.getId());
+          }
         }
       }
+      return result;
     } catch (SQLException ex) {
       throw new ProviderException(ex);
     }
@@ -261,19 +301,36 @@ public final class FBContactProvider extends FBAbstractProvider<UUID, Contact> i
     } catch (SQLException ex) {
       throw new ProviderException(ex);
     }
+    synchronized (floating) {
+      floating.keySet().removeAll(keys);
+    }
+  }
+
+  @Override
+  public List<UUID> getAllIds() throws ProviderException
+  {
+    try (Connection conn = getConnection()) {
+      return findAll(conn);
+    } catch (SQLException ex) {
+      throw new ProviderException(ex);
+    }
+  }
+
+  @Override
+  public List<UUID> getAllIdsByType(ContactType type) throws ProviderException
+  {
+    try (Connection conn = getConnection()) {
+      return findByType(conn, type);
+    } catch (SQLException ex) {
+      throw new ProviderException(ex);
+    }
   }
 
   @Override
   public List<Contact> getAll() throws ProviderException
   {
-    try (Connection conn = getConnection();
-            PreparedStatement stmt = conn.prepareStatement("select uuid_to_char(id) as id from contact");
-            ResultSet rs = stmt.executeQuery()) {
-      Set<UUID> ids = new HashSet<>();
-      while (rs.next()) {
-        ids.add(UUID.fromString(rs.getString("id")));
-      }
-      return get(conn, ids);
+    try (Connection conn = getConnection()) {
+      return get(conn, findAll(conn));
     } catch (SQLException ex) {
       throw new ProviderException(ex);
     }
@@ -282,22 +339,74 @@ public final class FBContactProvider extends FBAbstractProvider<UUID, Contact> i
   @Override
   public List<Contact> getByType(ContactType type) throws ProviderException
   {
+    try (Connection conn = getConnection()) {
+      return get(conn, findByType(conn, type));
+    } catch (SQLException ex) {
+      throw new ProviderException(ex);
+    }
+  }
+
+  private List<UUID> findAll(final Connection conn) throws SQLException
+  {
+    try (PreparedStatement stmt = conn.prepareStatement("select trim(uuid_to_char(id)) as id from contact");
+            ResultSet rs = stmt.executeQuery()) {
+      Set<UUID> ids = new HashSet<>();
+      while (rs.next()) {
+        ids.add(UUID.fromString(rs.getString("id")));
+      }
+      synchronized (floating) {
+        ids.addAll(floating.keySet());
+      }
+      return new ArrayList<>(ids);
+    }
+  }
+
+  private List<UUID> findByType(final Connection conn, ContactType type) throws SQLException
+  {
     if (type == null) {
       return Collections.emptyList();
     }
-    try (Connection conn = getConnection();
-            PreparedStatement stmt = conn.prepareStatement("select uuid_to_char(contact) as id \n"
-                                                                   + "from contact2type where contacttype=?")) {
+    try (PreparedStatement stmt = conn.prepareStatement("select trim(uuid_to_char(contact)) as id \n"
+                                                                + "from contact2type where contacttype=?")) {
       stmt.setString(1, type.name());
       Set<UUID> ids = new HashSet<>();
       try (ResultSet rs = stmt.executeQuery()) {
         while (rs.next()) {
-          ids.add(UUID.fromString("id"));
+          ids.add(UUID.fromString(rs.getString("id")));
         }
       }
-      return get(conn, ids);
-    } catch (SQLException ex) {
-      throw new ProviderException(ex);
+      synchronized (floating) {
+        floating.entrySet().stream().
+                forEach((e) -> {
+                  Contact c = e.getValue() != null ? e.getValue().get() : null;
+                  if (c != null && c.getTypes().contains(type)) {
+                    ids.add(e.getKey());
+                  }
+                });
+      }
+      return new ArrayList<>(ids);
+    }
+  }
+
+  @Override
+  public Contact createContact(Contact.Builder builder)
+  {
+    if (builder != null) {
+      UUID id = UUID.randomUUID();
+      Contact result = builder.id(id).build();
+      synchronized (floating) {
+        floating.put(id, new WeakReference<>(result));
+      }
+      return result;
+    }
+    return null;
+  }
+
+  @Override
+  public boolean isFloating(UUID key)
+  {
+    synchronized (floating) {
+      return floating.containsKey(key);
     }
   }
 
