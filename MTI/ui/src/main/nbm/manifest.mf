@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module-Layer: at/or/reder/mti/ui/layer.xml
+OpenIDE-Module-Localizing-Bundle: at/or/reder/mti/ui/Bundle.properties
+OpenIDE-Module-Requires: org.openide.windows.WindowManager
+

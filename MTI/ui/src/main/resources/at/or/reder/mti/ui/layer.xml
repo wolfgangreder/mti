@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+  <folder name="at">
+    <folder name="or">
+      <folder name="reder">
+        <folder name="mti">
+          <folder name="zimo">
+            <file name="FxIcon.zsx" url="../zimo/FxIcon.zsx"></file>
+            <file name="LocoImg.zsx" url="../zimo/LocoImg.zsx"></file>
+          </folder>
+        </folder>
+      </folder>
+    </folder>
+  </folder>
+</filesystem>
