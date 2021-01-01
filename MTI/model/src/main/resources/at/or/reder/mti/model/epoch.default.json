@@ -1,0 +1,92 @@
+{
+  "epoch": [{
+      "id": "4b4bc6cf-3464-4034-aedf-5fd43734b4ca",
+      "name": {
+        "entry": [{
+            "value": "Epoche I"
+          }]
+      },
+      "year-from": 1837,
+      "year-to": 1925,
+      "comment": {
+        "entry": [{
+            "value": "Bau der ersten Eisenbahnen, Entwicklung der Dampflokomotiven, viele Privatbahnen mit buntem Fahrzeugpark."
+          }]
+      }
+    }, 
+    {
+      "id": "7ba283c9-3ec5-4a4c-8b9c-cbc19cdd7c83",
+      "name": {
+        "entry": [{
+            "value": "Epoche II"
+          }]
+      },
+      "year-from": 1920,
+      "year-to": 1950,
+      "comment": {
+        "entry": [{
+            "value": "Weitgehende Vereinheitlichung der Bau- und Betriebsvorschriften, teilweise länderübergreifend (RIV, RIC), Einführung des elektrischen Zugbetriebes, vereinzelte Einführung von Lichtsignalen."
+          }]
+      }
+    },
+    {
+      "id": "cb347731-14ba-42bb-bc31-f2239e5fdb68",
+      "name": {
+        "entry": [{
+            "value": "Epoche III"
+          }]
+      },
+      "year-from": 1945,
+      "year-to": 1970,
+      "comment": {
+        "entry": [{
+            "value": "Wiederaufbau nach dem Krieg und Entwicklung eines modernen Fahrzeugparks, Traktionswechsel durch Ausbau des elektrischen Betriebes und der Dieselzugförderung."
+          }]
+      }
+    },
+    {
+      "id": "97d877d6-f2b8-4699-a623-3b95ca79c91d",
+      "name": {
+        "entry": [{
+            "value": "Epoche IV"
+          }]
+      },
+      "year-from": 1965,
+      "year-to": 1990,
+      "comment": {
+        "entry": [{
+            "value": "Weitgehender  Abschluss  der  Traktionsumstellung,  Einführung  eines  internationalen  Beschriftungsschemas des Wagenparks."
+          }]
+      }
+    },
+    {
+      "id": "606ce236-ef98-4aa4-8d0b-457a4cba4719",
+      "name": {
+        "entry": [{
+            "value": "Epoche V"
+          }]
+      },
+      "year-from": 1985,
+      "year-to": 2010,
+      "comment": {
+        "entry": [{
+            "value": "Entstehung von Schnellfahrnetzen, werbewirksame Farbgebung, Beginn des liberalisierten Zugangs zu den Bahnnetzen, Umwandlung der Staatsbahnen in Aktiengesellschaften mit Aufteilung in Infrastruktur-Unternehmen und in Verkehrs-Unternehmen, getrennt für Personen- und Güterverkehr, die auch außerhalb des angestammten Netzes tätig werden."
+          }]
+      }
+    },
+    {
+      "id": "d0b7cc9d-e415-4d4e-a55d-b88e1c07b842",
+      "name": {
+        "entry": [{
+            "value": "Epoche VI"
+          }]
+      },
+      "year-from": 2005,
+      "comment": {
+        "entry": [{
+            "value": "Neben den traditionellen Bahngesellschaften befahren zahlreiche Eisenbahnverkehrsunternehmen (EVU) ohne eigene Infrastruktur die bestehenden Eisenbahnnetze im Personen- und/oder im Güterverkehr national oder international mit eigenen Fahrzeugen. Entsprechende Anpassung des 12-stelligen UIC-Nummernschemas. Überleitung der bestehenden internationalen Übereinkommen (RIC, RIV, etc.) in neue EU-konforme Vorschriften (OTIF, TSI). Aufhebung der gemeinsamen Bewirtschaftung von Güterwagen (EUROP und OPW). Nationale Schnellfahrstrecken nur für Personenverkehr wachsen zu einem internationalen Netz zusammen. Massiver Abbau des Güterverkehrs in der Fläche mit Rückbau der Güterverkehrsanlagen und von Rangierbahnhöfen. Im Reisezugverkehr dominieren Trieb- oder Wendezüge, im Güterverkehr Ganzzüge."
+          }]
+      }
+    }
+  ]
+}

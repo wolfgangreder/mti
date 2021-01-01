@@ -15,13 +15,64 @@
  */
 package at.or.reder.mti.model.api;
 
+import at.or.reder.mti.model.Epoch;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import org.openide.util.Lookup;
 
 public final class Factories
 {
 
   private static Stores stores;
+
+  private static final class StreamerKey<C>
+  {
+
+    private final StreamFormat format;
+    private final Class<? super C> clazz;
+
+    public StreamerKey(StreamFormat format,
+                       Class<? super C> clazz)
+    {
+      this.format = format;
+      this.clazz = clazz;
+    }
+
+    @Override
+    public int hashCode()
+    {
+      int hash = 7;
+      hash = 97 * hash + Objects.hashCode(this.format);
+      hash = 97 * hash + Objects.hashCode(this.clazz);
+      return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
+      final StreamerKey other = (StreamerKey) obj;
+      if (this.format != other.format) {
+        return false;
+      }
+      return Objects.equals(this.clazz,
+                            other.clazz);
+    }
+
+  }
+  private static final Map<StreamerKey, Streamer<?>> streamerMap = new HashMap<>();
+  private static Lookup.Result<StreamSupport> streamSupport;
 
   public static synchronized Stores getStores() throws StoreException
   {
@@ -30,6 +81,33 @@ public final class Factories
       stores = provider.openStores(Collections.emptyMap());
     }
     return stores;
+  }
+
+  public static Epoch.BuilderFactory getEpochBuilderFactory()
+  {
+    return Lookup.getDefault().lookup(Epoch.BuilderFactory.class);
+  }
+
+  public static <C> Streamer<C> getStreamer(StreamFormat format,
+                                            Class<C> clazz)
+  {
+    if (streamSupport == null) {
+      streamSupport = Lookup.getDefault().lookupResult(StreamSupport.class);
+      streamSupport.addLookupListener((ev) -> {
+        synchronized (streamerMap) {
+          streamerMap.clear();
+        }
+      });
+    }
+    Collection<? extends StreamSupport> allFound = streamSupport.allInstances();
+    for (StreamSupport s : allFound) {
+      Streamer<?> streamer = s.getStreamer(format,
+                                           clazz);
+      if (streamer != null) {
+        return (Streamer<C>) streamer;
+      }
+    }
+    return null;
   }
 
   private Factories()

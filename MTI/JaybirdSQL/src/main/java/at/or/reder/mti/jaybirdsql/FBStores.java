@@ -16,6 +16,7 @@
 package at.or.reder.mti.jaybirdsql;
 
 import at.or.reder.mti.model.api.EpochStore;
+import at.or.reder.mti.model.api.StoreException;
 import at.or.reder.mti.model.api.Stores;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -26,15 +27,17 @@ final class FBStores implements Stores
 {
 
   private final DataSource ds;
+  private final FBEpochStore epochStore;
 
   public FBStores(DataSource ds)
   {
     this.ds = ds;
+    epochStore = new FBEpochStore(this);
   }
 
-  void startup()
+  void startup() throws SQLException, StoreException
   {
-
+    epochStore.startup();
   }
 
   public Connection getConnection() throws SQLException
@@ -45,12 +48,7 @@ final class FBStores implements Stores
   @Override
   public EpochStore getEpochStore()
   {
-    try (Connection conn = getConnection()) {
-
-    } catch (SQLException ex) {
-
-    }
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return epochStore;
   }
 
   @Override

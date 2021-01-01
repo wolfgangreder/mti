@@ -15,6 +15,7 @@
  */
 package at.or.reder.mti.model.utils;
 
+import java.awt.Color;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -146,6 +147,72 @@ public final class MTIUtils
       }
     }
     return null;
+  }
+
+  @SuppressWarnings("UseSpecificCatch")
+  public static Color stringToColor(String strCol)
+  {
+    if (strCol == null || strCol.isBlank()) {
+      return null;
+    }
+    int len = strCol.length();
+    if ((len == 9 && strCol.charAt(0) == '#') || (len == 8)) { // RGBA in html notation
+      try {
+        int i = Integer.parseInt(strCol.substring(len % 2),
+                                 16);
+        return new Color(i,
+                         true);
+      } catch (Throwable th) {
+      }
+    }
+    if ((strCol.length() == 7 && strCol.charAt(0) == '#') || (len == 6)) { // RGB in html notation
+      try {
+        int i = Integer.parseInt(strCol.substring(len % 2),
+                                 16);
+        return new Color(i,
+                         false);
+      } catch (Throwable th) {
+      }
+    }
+    try {
+      int i = Integer.parseInt(strCol);
+      return new Color(i,
+                       false);
+    } catch (Throwable th) {
+    }
+    return null;
+  }
+
+  public static String colorToHTMLString(Color col,
+                                         boolean withAlpha)
+  {
+    if (col == null) {
+      return null;
+    }
+    String red = Integer.toHexString(col.getRed());
+    String green = Integer.toHexString(col.getGreen());
+    String blue = Integer.toHexString(col.getBlue());
+    StringBuilder result = new StringBuilder("#");
+    if (withAlpha) {
+      String alpha = Integer.toHexString(col.getAlpha());
+      if (alpha.length() == 1) {
+        result.append('0');
+      }
+      result.append(alpha);
+    }
+    if (red.length() == 1) {
+      result.append('0');
+    }
+    result.append(red);
+    if (green.length() == 1) {
+      result.append('0');
+    }
+    result.append(green);
+    if (blue.length() == 1) {
+      result.append('0');
+    }
+    result.append(blue);
+    return result.toString();
   }
 
   private MTIUtils()

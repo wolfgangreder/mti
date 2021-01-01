@@ -23,9 +23,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 import org.apache.commons.dbcp2.ConnectionFactory;
 import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
 import org.apache.commons.dbcp2.PoolableConnectionFactory;
@@ -70,15 +76,26 @@ public class FBEmbStoreProvider implements StoreProvider
   public Stores openStores(Map<String, String> params) throws StoreException
   {
     try {
+      Properties props = new Properties();
+      if (params.get("username") != null) {
+        props.put("user",
+                  params.get("username"));
+      }
+      if (params.get("password") != null) {
+        props.put("password",
+                  params.get("password"));
+      }
+      props.put("charSet",
+                "UTF8");
       String dbq = createDatabase(params.get("fbstore.datadir"),
-                                  params.get("username"),
-                                  params.get("password"));
+                                  props);
       url = "jdbc:firebirdsql:embedded:" + dbq;
       ConnectionFactory connFactory = new DriverManagerConnectionFactory(url,
-                                                                         params.get("username"),
-                                                                         params.get("password"));
+                                                                         props);
       PooledObjectFactory factory = new PoolableConnectionFactory(connFactory,
-                                                                  null);
+                                                                  ObjectName.getInstance("at.or.reder.mti",
+                                                                                         "FBConnectionPool",
+                                                                                         dbq));
       GenericObjectPoolConfig cfg = new GenericObjectPoolConfig();
       ObjectPool pool = new GenericObjectPool(factory,
                                               cfg);
@@ -86,14 +103,13 @@ public class FBEmbStoreProvider implements StoreProvider
       FBStores result = new FBStores(ds);
       result.startup();
       return result;
-    } catch (SQLException ex) {
+    } catch (MalformedObjectNameException | SQLException ex) {
       throw new StoreException(ex);
     }
   }
 
   private String createDatabase(String dataDir,
-                                String uid,
-                                String pwd) throws SQLException, StoreException
+                                Properties props) throws SQLException, StoreException
   {
     Path dataPath = null;
     try {
@@ -126,14 +142,22 @@ public class FBEmbStoreProvider implements StoreProvider
                              "mti.firebird");
         fbManager.start();
         if (!fbManager.isDatabaseExists(dbq.toString(),
-                                        uid,
-                                        pwd)) {
+                                        props.getProperty("user"),
+                                        props.getProperty("password"))) {
           fbManager.setDialect(3);
           fbManager.setDefaultCharacterSet("UTF8");
           fbManager.setPageSize(16 * 1024);
           fbManager.createDatabase(dbq.toString(),
-                                   uid,
-                                   pwd);
+                                   props.getProperty("user"),
+                                   props.getProperty("password"));
+          try (Connection conn = DriverManager.getConnection("jdbc:firebirdsql:embedded:" + dbq,
+                                                             props);
+                  Statement stmt = conn.createStatement()) {
+            stmt.execute("create table config (\n"
+                         + "name varchar(255) not null,\n"
+                         + "val varchar(255),\n"
+                         + "constraint pk_config primary key(name))");
+          }
         }
         return dbq.toString();
       } finally {

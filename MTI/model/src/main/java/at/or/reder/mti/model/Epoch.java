@@ -15,9 +15,13 @@
  */
 package at.or.reder.mti.model;
 
+import at.or.reder.mti.model.utils.Localizable;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.netbeans.api.annotations.common.NonNull;
 
 /**
  * Diese Klasse beschreibt eine Modelepoche. Instanzen dieses Interfaces sollen nach folgendem Muster erzeugt werden:<br/>
@@ -60,12 +64,16 @@ public interface Epoch
     /**
      * Setzt den namen der Epoch.
      *
+     * @param lang sprache
      * @param name neuer name.
      * @return {@code this}
      * @throws NullPointerException wenn {@code name==null}
      * @throws IllegalArgumentException wenn {@code name.trim().isEmpty()}
      */
-    public Builder name(String name) throws IllegalArgumentException, NullPointerException;
+    public Builder name(String lang,
+                        String name) throws IllegalArgumentException, NullPointerException;
+
+    public Builder name(@NonNull Localizable names) throws NullPointerException;
 
     /**
      * Setzt das erste Jahr der Epoch.
@@ -122,10 +130,14 @@ public interface Epoch
     /**
      * Setzt den Kommentar.
      *
+     * @param lang Sprache
      * @param comment Neuer Kommentar
      * @return {@code this}
      */
-    public Builder comment(String comment);
+    public Builder comment(String lang,
+                           String comment);
+
+    public Builder comment(Localizable comments);
 
     public Epoch build();
 
@@ -145,6 +157,8 @@ public interface Epoch
      */
     public Epoch.Builder createEpochBuilder();
 
+    public List<Epoch> getDefaultValues() throws IOException;
+
   }
 
   /**
@@ -159,7 +173,7 @@ public interface Epoch
    *
    * @return Name der Epoche
    */
-  public String getName();
+  public Localizable getName();
 
   /**
    * Erstes Jahr der Epoche
@@ -187,6 +201,6 @@ public interface Epoch
    *
    * @return Kommentar zur Epoche. Niemals {@code null}.
    */
-  public String getComment();
+  public Localizable getComment();
 
 }
