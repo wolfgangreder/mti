@@ -124,6 +124,11 @@
       <version>6.8.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.netbeans.api</groupId>
+      <artifactId>org-netbeans-modules-keyring</artifactId>
+      <version>${netbeans.version}</version>
+    </dependency>
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

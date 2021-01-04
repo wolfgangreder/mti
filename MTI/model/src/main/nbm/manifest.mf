@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
+OpenIDE-Module-Layer: at/or/reder/mti/model/layer.xml
 OpenIDE-Module-Localizing-Bundle: at/or/reder/mti/model/Bundle.properties
 

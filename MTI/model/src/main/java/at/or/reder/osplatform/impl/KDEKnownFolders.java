@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wolfgang Reder.
+ * Copyright 2017-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -222,7 +222,7 @@ public final class KDEKnownFolders extends PlatformFolders
   }
 
   @Override
-  public Path getDokumentsFolder()
+  public Path getDocumentsFolder()
   {
     return documents.get();
   }
@@ -258,7 +258,7 @@ public final class KDEKnownFolders extends PlatformFolders
   }
 
   @Override
-  public Path getPublicDokumentsFolder()
+  public Path getPublicDocumentsFolder()
   {
     return publicShare.get();
   }
@@ -480,6 +480,48 @@ public final class KDEKnownFolders extends PlatformFolders
   public Path getThumbnailFolder()
   {
     return thumbnailDir.get();
+  }
+
+  @Override
+  public Path findCommand(String command)
+  {
+    String path = System.getenv("PATH");
+    if (path != null) {
+      String paths[] = path.split(File.pathSeparator);
+      for (String p : paths) {
+        Path result = Paths.get(p,
+                                command);
+        if (Files.isExecutable(result)) {
+          return result;
+        }
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public String getHostName()
+  {
+    String result;
+    result = System.getenv("HOSTNAME");
+    if (result == null || result.isEmpty() || result.trim().isEmpty()) {
+      try {
+        result = execReadToString("hostname");
+      } catch (IOException ex) {
+      }
+
+    }
+    if (result == null || result.isEmpty() || result.trim().isEmpty()) {
+      try {
+        result = execReadToString("cat /etc/hostname");
+      } catch (IOException ex) {
+      }
+    }
+    if (result == null || result.isEmpty() || result.trim().isEmpty()) {
+      return null;
+    } else {
+      return result;
+    }
   }
 
 }

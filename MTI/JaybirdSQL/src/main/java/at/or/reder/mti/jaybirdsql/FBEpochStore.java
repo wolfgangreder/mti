@@ -27,6 +27,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -73,6 +74,7 @@ public final class FBEpochStore extends AbstractStore implements EpochStore
                      "create table epoch_country(\n"
                      + "epoch char(36) not null,\n"
                      + "country char(3) not null,\n"
+                     + "dirty smallint default 0 not null,\n"
                      + "constraint pk_epoch_country primary key(epoch,country),\n"
                      + "constraint fk_epoch_country_epoch foreign key (epoch) references epoch(id) on update cascade on delete cascade)");
           if (created) {
@@ -89,7 +91,8 @@ public final class FBEpochStore extends AbstractStore implements EpochStore
   {
     List<Epoch> defaultValues = Factories.getEpochBuilderFactory().getDefaultValues();
     for (Epoch e : defaultValues) {
-      store(e);
+      store(conn,
+            e);
     }
   }
 
@@ -199,13 +202,78 @@ public final class FBEpochStore extends AbstractStore implements EpochStore
   @Override
   public void delete(Epoch epoch) throws StoreException
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    if (epoch == null) {
+      return;
+    }
+    try (Connection conn = store.getConnection();
+            PreparedStatement stmt = conn.prepareStatement("delete from epoch where id=?")) {
+      stmt.setString(1,
+                     epoch.getId().toString());
+      stmt.executeUpdate();
+    } catch (SQLException ex) {
+      throw new StoreException(ex);
+    }
+  }
+
+  boolean store(Connection conn,
+                Epoch epoch) throws SQLException
+  {
+    int modified = 0;
+    try (PreparedStatement stmt = conn.prepareStatement("update or insert into epoch\n"
+                                                        + "(id,name,yearfrom,yearto,comment)\n"
+                                                        + "values (?,?,?,?,?) matching(id)")) {
+      stmt.setString(1,
+                     epoch.getId().toString());
+      stmt.setString(2,
+                     epoch.getName().getValue(""));
+      stmt.setInt(3,
+                  epoch.getYearFrom());
+      if (epoch.getYearTo() != null) {
+        stmt.setInt(4,
+                    epoch.getYearTo());
+      } else {
+        stmt.setNull(4,
+                     Types.INTEGER);
+      }
+      stmt.setString(5,
+                     epoch.getComment().getValue(""));
+      modified = stmt.executeUpdate();
+    }
+    try (PreparedStatement stmt = conn.prepareStatement("update epoch_country set dirty = 1 where epoch=?")) {
+      stmt.setString(1,
+                     epoch.getId().toString());
+      stmt.executeUpdate();
+    }
+    try (PreparedStatement stmt = conn.prepareStatement("update or insert into epoch_country\n(epoch,country,dirty)\n"
+                                                        + "values(?,?,0)matching(epoch,country)")) {
+      stmt.setString(1,
+                     epoch.getId().toString());
+      for (String country : epoch.getCountries()) {
+        stmt.setString(2,
+                       country);
+        stmt.executeUpdate();
+      }
+    }
+    try (PreparedStatement stmt = conn.prepareStatement("delete from epoch_country where epoch=? and dirty!=0")) {
+      stmt.setString(1,
+                     epoch.getId().toString());
+      stmt.executeUpdate();
+    }
+    return modified == 1;
   }
 
   @Override
   public boolean store(Epoch epoch) throws StoreException
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    if (epoch == null) {
+      return false;
+    }
+    try (Connection conn = store.getConnection()) {
+      return store(conn,
+                   epoch);
+    } catch (SQLException ex) {
+      throw new StoreException(ex);
+    }
   }
 
 }

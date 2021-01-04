@@ -718,7 +718,7 @@ abstract class AbstractStore
   {
     try (ResultSet rs = meta.getTables(null,
                                        null,
-                                       tableName,
+                                       tableName.toUpperCase(),
                                        new String[]{"TABLE"})) {
       if (!rs.next()) {
         if (strStmt != null) {
@@ -738,8 +738,8 @@ abstract class AbstractStore
   {
     try (ResultSet rs = meta.getColumns(null,
                                         null,
-                                        tableName,
-                                        fieldName)) {
+                                        tableName.toUpperCase(),
+                                        fieldName.toUpperCase())) {
       if (!rs.next()) {
         if (strStmt != null) {
           stmt.execute(strStmt);
@@ -768,7 +768,7 @@ abstract class AbstractStore
     ForeignKey.Builder builder = null;
     try (ResultSet rs = meta.getImportedKeys(null,
                                              null,
-                                             key.getTableName())) {
+                                             key.getTableName().toUpperCase())) {
       while (rs.next()) {
         String pkTableName = rs.getString("PKTABLE_NAME");
         String pkColumnName = rs.getString("PKCOLUMN_NAME");
@@ -777,7 +777,7 @@ abstract class AbstractStore
         short updateRule = rs.getShort("UPDATE_RULE");
         short deleteRule = rs.getShort("DELETE_RULE");
         String fkName = rs.getString("FK_NAME");
-        if (key.getConstraintName().equals(fkName)) {
+        if (key.getConstraintName().equalsIgnoreCase(fkName)) {
           if (builder == null) {
             builder = new ForeignKey.Builder();
             builder.constraintName(key.getConstraintName());

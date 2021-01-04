@@ -52,8 +52,8 @@
     </dependency>
     <dependency>
       <groupId>org.firebirdsql.jdbc</groupId>
-      <artifactId>jaybird-java11</artifactId>
-      <version>4.0.0-beta-1</version>
+      <artifactId>jaybird</artifactId>
+      <version>4.0.1.java11</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

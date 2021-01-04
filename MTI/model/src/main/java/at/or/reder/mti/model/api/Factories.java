@@ -16,11 +16,18 @@
 package at.or.reder.mti.model.api;
 
 import at.or.reder.mti.model.Epoch;
+import at.or.reder.mti.model.MTIConfig;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+import org.netbeans.api.keyring.Keyring;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 public final class Factories
@@ -74,11 +81,54 @@ public final class Factories
   private static final Map<StreamerKey, Streamer<?>> streamerMap = new HashMap<>();
   private static Lookup.Result<StreamSupport> streamSupport;
 
+  private static boolean loadLogin(Map<String, String> config)
+  {
+    Properties props = new Properties();
+    try (FileInputStream fis = new FileInputStream("password.properties")) {
+      props.load(fis);
+      if (props.containsKey("password") && props.containsKey("user")) {
+        config.put("password",
+                   props.getProperty("password"));
+        config.put("user",
+                   props.getProperty("user"));
+        return true;
+      }
+    } catch (IOException ex) {
+      Exceptions.printStackTrace(ex);
+    }
+    return false;
+  }
+
   public static synchronized Stores getStores() throws StoreException
   {
     if (stores == null) {
-      StoreProvider provider = Lookup.getDefault().lookup(StoreProvider.class);
-      stores = provider.openStores(Collections.emptyMap());
+      MTIConfig cfg = Lookup.getDefault().lookup(MTIConfig.class);
+      AtomicReference<UUID> providerId = new AtomicReference<>(cfg.getStoreProvider());
+      Collection<? extends StoreProvider> providerList = Lookup.getDefault().lookupAll(StoreProvider.class);
+      StoreProvider provider = providerList.stream().filter((p) -> p.getId().equals(providerId.get())).findAny().orElse(null);
+      if (provider == null) {
+        providerId.set(cfg.getDefaultStoreProvider());
+        provider = providerList.stream().filter((p) -> p.getId().equals(providerId.get())).findAny().orElse(null);
+      }
+      Map<String, String> props = new HashMap<>();
+      if (!loadLogin(props)) {
+        char[] tmp = Keyring.read("mti.user");
+        if (tmp != null) {
+        } else {
+          props.put("user",
+                    new String(tmp));
+        }
+        tmp = Keyring.read("mti.password");
+        if (tmp != null) {
+          props.put("password",
+                    new String(tmp));
+        }
+      }
+      props.put("host",
+                "localhost");
+      props.put("datadir",
+                cfg.getDatadirectory());
+      stores = provider.openStores(props);
     }
     return stores;
   }

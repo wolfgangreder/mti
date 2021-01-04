@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wolfgang Reder.
+ * Copyright 2017-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,19 @@ import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.Guid.GUID;
+import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.Kernel32Util;
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Ole32;
 import com.sun.jna.platform.win32.Shell32;
 import com.sun.jna.platform.win32.ShellAPI;
+import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.platform.win32.WinNT;
+import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -139,13 +143,13 @@ public final class Win32KnownFolders extends PlatformFolders
   }
 
   @Override
-  public Path getPublicDokumentsFolder()
+  public Path getPublicDocumentsFolder()
   {
     return publicDocuments.get();
   }
 
   @Override
-  public Path getDokumentsFolder()
+  public Path getDocumentsFolder()
   {
     return documents.get();
   }
@@ -272,6 +276,55 @@ public final class Win32KnownFolders extends PlatformFolders
     return KDEThumbnailImplementation.findThumbnail(this,
                                                     file,
                                                     thumbSize);
+  }
+
+  @Override
+  public Path findCommand(String command)
+  {
+    String path = System.getenv("PATH");
+    if (path != null) {
+      String paths[] = path.split(File.pathSeparator);
+      for (String p : paths) {
+        Path result = Paths.get(p,
+                                command);
+        if (Files.isExecutable(result)) {
+          return result;
+        }
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public String getHostName()
+  {
+    IntByReference size = new IntByReference(0);
+    if (Kernel32.INSTANCE.GetComputerNameEx(WinBase.COMPUTER_NAME_FORMAT.ComputerNameDnsHostname,
+                                            null,
+                                            size)) {
+      if (size.getValue() < 1024) {
+        char[] buffer = new char[size.getValue()];
+        if (Kernel32.INSTANCE.GetComputerNameEx(WinBase.COMPUTER_NAME_FORMAT.ComputerNameDnsHostname,
+                                                buffer,
+                                                size)) {
+          return new String(buffer,
+                            0,
+                            size.getValue());
+        }
+      }
+    }
+    String result = System.getenv("COMPUTERNAME");
+    if (result == null || result.isEmpty() || result.trim().isEmpty()) {
+      try {
+        result = execReadToString("hostname");
+      } catch (IOException ex) {
+      }
+    }
+    if (result == null || result.isEmpty() || result.trim().isEmpty()) {
+      return null;
+    } else {
+      return result;
+    }
   }
 
 }

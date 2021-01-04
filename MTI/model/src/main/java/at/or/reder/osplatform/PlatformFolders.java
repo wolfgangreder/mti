@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wolfgang Reder.
+ * Copyright 2017-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Scanner;
 
 public abstract class PlatformFolders
 {
@@ -57,7 +58,7 @@ public abstract class PlatformFolders
 
   public abstract Path getDesktopFolder();
 
-  public abstract Path getDokumentsFolder();
+  public abstract Path getDocumentsFolder();
 
   public abstract Path getPicturesFolder();
 
@@ -69,7 +70,7 @@ public abstract class PlatformFolders
 
   public abstract Path getPublicDesktopFolder();
 
-  public abstract Path getPublicDokumentsFolder();
+  public abstract Path getPublicDocumentsFolder();
 
   public abstract Path getPublicPicturesFolder();
 
@@ -118,6 +119,17 @@ public abstract class PlatformFolders
                            ThumbnailGenerator generator) throws IOException
   {
     throw new UnsupportedOperationException();
+  }
+
+  public abstract Path findCommand(String command);
+
+  public abstract String getHostName();
+
+  public String execReadToString(String execCommand) throws IOException
+  {
+    try (Scanner s = new Scanner(Runtime.getRuntime().exec(execCommand).getInputStream()).useDelimiter("\\A")) {
+      return s.hasNext() ? s.next() : "";
+    }
   }
 
 }
