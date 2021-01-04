@@ -16,7 +16,14 @@
 package at.or.reder.mti.ui.zsx;
 
 import at.or.reder.dcc.util.Utils;
+import at.or.reder.mti.model.Epoch;
+import at.or.reder.mti.model.TractionSystem;
+import at.or.reder.mti.model.api.Factories;
+import at.or.reder.mti.model.api.StoreException;
+import at.or.reder.mti.model.api.StoreExceptionWrapper;
+import at.or.reder.mti.model.api.Stores;
 import at.or.reder.mti.ui.zsx.impl.DefaultImageItem;
+import at.or.reder.mti.ui.zsx.impl.DefaultLocoImageItem;
 import at.or.reder.mti.ui.zsx.impl.DefaultTachoImageItem;
 import at.or.reder.mti.ui.zsx.impl.ZSXHandler;
 import java.io.File;
@@ -25,6 +32,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
@@ -32,15 +41,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
@@ -56,14 +68,11 @@ import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 import org.xml.sax.SAXException;
 
-/**
- *
- * @author Wolfgang Reder
- */
-public class ZSXFile
+public final class ZSXFile
 {
 
   private static ZSXFile iconInstance;
+  private static ZSXFile locoInstance;
 
   public synchronized static ZSXFile getIconInstance()
   {
@@ -73,8 +82,15 @@ public class ZSXFile
     return iconInstance;
   }
 
+  public synchronized static ZSXFile getLocoInstance()
+  {
+    if (locoInstance == null) {
+      locoInstance = new ZSXFile("LocoImg.zsx");
+    }
+    return locoInstance;
+  }
+
   public static final String FOLDER = "/at/or/reder/mti/zimo/";
-  private final String imageFile;
   private final Future<File> cacheDir;
   private final List<ImageItem> imageItems = new CopyOnWriteArrayList<>();
   private volatile int num;
@@ -83,42 +99,112 @@ public class ZSXFile
   private volatile LocalDate date;
   private volatile String version;
 
-  private ZSXFile(String imageFile)
+  private ZSXFile(String rootFile)
   {
-    this.imageFile = imageFile;
-    FileObject obj = FileUtil.getConfigFile(FOLDER + imageFile);
-    File cache = Places.getCacheSubfile(FOLDER + imageFile);
-    byte[] fileDigest = getFileDigest(obj);
-    if (fileDigest != null) {
-      byte[] savedDigest = readCacheDigest(cache,
-                                           imageFile);
-      if (!Objects.deepEquals(fileDigest,
-                              savedDigest)) {
-        cacheDir = CompletableFuture.supplyAsync(() -> expose2Cache(obj,
-                                                                    cache),
-                                                 RequestProcessor.getDefault());
-      } else {
-        cacheDir = CompletableFuture.supplyAsync(() -> readFromCache(cache),
-                                                 RequestProcessor.getDefault());
+    FileObject obj = FileUtil.getConfigFile(FOLDER + rootFile);
+    File cache = Places.getCacheSubfile(FOLDER + rootFile);
+    File theFile = FileUtil.toFile(obj);
+    boolean update = true;
+    FileTime zsxTime = FileTime.from(Instant.now());
+    if (theFile != null) {
+      try {
+        zsxTime = Files.getLastModifiedTime(theFile.toPath());
+        FileTime cacheTime = readCacheTime(cache,
+                                           rootFile);
+        update = cacheTime == null || !zsxTime.toInstant().isBefore(cacheTime.toInstant());
+      } catch (IOException ex) {
+        Exceptions.printStackTrace(ex);
       }
-    } else {
-      throw new IllegalStateException();
     }
+    if (update) {
+      byte[] fileDigest = getFileDigest(obj);
+      byte[] savedDigest = readCacheDigest(cache,
+                                           rootFile);
+      update = !Objects.deepEquals(fileDigest,
+                                   savedDigest);
+    }
+    if (update) {
+      FileTime realTime = zsxTime;
+      cacheDir = CompletableFuture.supplyAsync(() -> expose2Cache(obj,
+                                                                  cache,
+                                                                  realTime),
+                                               RequestProcessor.getDefault());
+    } else {
+      cacheDir = CompletableFuture.supplyAsync(() -> readFromCache(cache),
+                                               RequestProcessor.getDefault());
+    }
+  }
+
+  private File writeDigestFile(File target,
+                               byte[] digest) throws IOException
+  {
+    File digestFile = new File(target,
+                               target.getName() + ".sha512");
+    String strDigest = Utils.byteArray2HexString(digest);
+    try (FileWriter writer = new FileWriter(digestFile,
+                                            StandardCharsets.UTF_8)) {
+      writer.write(strDigest);
+      writer.write("  ");
+      writer.write(target.getName());
+      writer.write("\n");
+    }
+    return digestFile;
   }
 
   @SuppressWarnings("empty-statement")
   private byte[] getFileDigest(FileObject obj)
   {
+    byte[] result = null;
     try {
-      MessageDigest digest = MessageDigest.getInstance("SHA-512");
-      try (DigestInputStream dis = new DigestInputStream(obj.getInputStream(),
-                                                         digest)) {
-        byte[] buffer = new byte[4096];
-        while (dis.read(buffer) > 0);
+      FileObject sha = obj.getParent().getFileObject(obj.getNameExt(),
+                                                     "sha512");
+      if (sha.canRead()) {
+        try (InputStreamReader reader = new InputStreamReader(sha.getInputStream())) {
+          result = readDigestFromReader(reader);
+        }
       }
-      return digest.digest();
-    } catch (IOException | NoSuchAlgorithmException ex) {
+      if (result == null) {
+        MessageDigest digest = MessageDigest.getInstance("SHA-512");
+        try (DigestInputStream dis = new DigestInputStream(obj.getInputStream(),
+                                                           digest)) {
+          byte[] buffer = new byte[4096];
+          while (dis.read(buffer) > 0);
+        }
+        result = digest.digest();
+        writeDigestFile(FileUtil.toFile(sha),
+                        result);
+      }
+    } catch (ParseException | IOException | NoSuchAlgorithmException ex) {
       Exceptions.printStackTrace(ex);
+    }
+
+    return result;
+  }
+
+  private FileTime readCacheTime(File cacheDir,
+                                 String imageFile)
+  {
+    File cache = new File(cacheDir,
+                          imageFile + ".sha512");
+    if (cache.isFile() && cache.canRead()) {
+      try {
+        return Files.getLastModifiedTime(cache.toPath());
+      } catch (IOException ex) {
+        Exceptions.printStackTrace(ex);
+      }
+    }
+    return null;
+  }
+
+  private byte[] readDigestFromReader(Reader reader) throws IOException, ParseException
+  {
+    char[] buffer = new char[128];
+    int read = reader.read(buffer);
+    if (read == buffer.length) {
+      ByteBuffer bb = Utils.hexString2ByteBuffer(new String(buffer),
+                                                 null,
+                                                 (char) 0);
+      return bb.array();
     }
     return null;
   }
@@ -130,14 +216,7 @@ public class ZSXFile
                           imageFile + ".sha512");
     if (cache.isFile() && cache.canRead()) {
       try (FileReader reader = new FileReader(cache)) {
-        char[] buffer = new char[128];
-        int read = reader.read(buffer);
-        if (read == buffer.length) {
-          ByteBuffer bb = Utils.hexString2ByteBuffer(new String(buffer),
-                                                     null,
-                                                     (char) 0);
-          return bb.array();
-        }
+        return readDigestFromReader(reader);
       } catch (ParseException | IOException ex) {
         Exceptions.printStackTrace(ex);
       }
@@ -189,7 +268,36 @@ public class ZSXFile
                                             author,
                                             type);
               case LOCO:
-                break;
+                UUID epochId = Epoch.EPOCH_UNKNOWN_ID;
+                try {
+                  epochId = UUID.fromString(props.getProperty("Epoch"));
+                } catch (Throwable th) {
+                }
+                Epoch epoch = null;
+                try {
+                  epoch = Factories.getStores().getEpochStore().getEpoch(epochId);
+                } catch (StoreException ex) {
+                  throw new StoreExceptionWrapper(ex);
+                }
+                TractionSystem tractionSystem = TractionSystem.OTHER;
+                try {
+                  tractionSystem = TractionSystem.valueOf(props.getProperty("Traction"));
+                } catch (Throwable th) {
+                }
+                String partNumber = props.getProperty("PartNum");
+                String smallFile = props.getProperty("FileSmall");
+                String largeFile = props.getProperty("FileLarge");
+                return new DefaultLocoImageItem(image.toFile(),
+                                                id,
+                                                0,
+                                                name,
+                                                smallFile,
+                                                largeFile,
+                                                author,
+                                                epoch,
+                                                tractionSystem,
+                                                partNumber,
+                                                type);
               case TACHO:
                 ndx = toInt(props.get("Idx"));
                 value = toInt(props.get("Val"));
@@ -220,9 +328,14 @@ public class ZSXFile
                                          2,
                                          (p, a) -> {
                                            return a.isRegularFile() && p.getFileName().toString().endsWith(".png");
-                                         }).map(this::readFile).filter((i) -> i != null).collect(Collectors.toList());
+                                         }).parallel().
+              map(this::readFile).
+              filter((i) -> i != null).
+              collect(Collectors.toList());
       imageItems.addAll(items);
       return target;
+    } catch (StoreExceptionWrapper sew) {
+      Exceptions.printStackTrace(sew.getCause());
     } catch (IOException ex) {
       Exceptions.printStackTrace(ex);
     }
@@ -230,7 +343,8 @@ public class ZSXFile
   }
 
   private File expose2Cache(FileObject source,
-                            File target)
+                            File target,
+                            FileTime zsxTime)
   {
     try {
       if (Files.exists(target.toPath())) {
@@ -250,7 +364,9 @@ public class ZSXFile
       Files.createDirectories(target.toPath());
       SAXParserFactory parserFactory = SAXParserFactory.newInstance();
       SAXParser parser = parserFactory.newSAXParser();
-      ZSXHandler handler = new ZSXHandler(target);
+      Stores stores = Factories.getStores();
+      ZSXHandler handler = new ZSXHandler(target,
+                                          stores);
       MessageDigest digest = MessageDigest.getInstance("SHA-512");
       parser.parse(new DigestInputStream(source.getInputStream(),
                                          digest),
@@ -261,18 +377,23 @@ public class ZSXFile
       name = handler.getName();
       date = handler.getDate();
       version = handler.getVersion();
-      File digestFile = new File(target,
-                                 target.getName() + ".sha512");
-      String strDigest = Utils.byteArray2HexString(digest.digest());
-      try (FileWriter writer = new FileWriter(digestFile,
-                                              StandardCharsets.UTF_8)) {
-        writer.write(strDigest);
-        writer.write("  ");
-        writer.write(source.getNameExt());
-        writer.write("\n");
-      }
+      writeDigestFile(target,
+                      digest.digest());
+      Files.walkFileTree(target.toPath(),
+                         new SimpleFileVisitor<>()
+                 {
+                   @Override
+                   public FileVisitResult visitFile(Path file,
+                                                    BasicFileAttributes attrs) throws IOException
+                   {
+                     Files.setLastModifiedTime(file,
+                                               zsxTime);
+                     return FileVisitResult.CONTINUE;
+                   }
+
+                 });
       return target;
-    } catch (IOException | ParserConfigurationException | SAXException | NoSuchAlgorithmException ex) {
+    } catch (StoreException | IOException | ParserConfigurationException | SAXException | NoSuchAlgorithmException ex) {
       Exceptions.printStackTrace(ex);
     }
     return null;

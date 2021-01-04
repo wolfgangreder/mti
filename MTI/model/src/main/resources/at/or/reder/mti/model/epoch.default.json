@@ -1,9 +1,32 @@
 {
   "epoch": [{
+      "id": "2988d848-3f7a-41fe-b125-feff67214033",
+      "name": {
+        "entry": [{
+            "value": "Unbekannt"
+          },{
+            "value":"Unknown",
+            "lang":"en"
+          },{
+            "value":"Inconnue",
+            "lang":"fr"
+          }]
+      },
+      "year-from": 1837
+    },
+    {
       "id": "4b4bc6cf-3464-4034-aedf-5fd43734b4ca",
       "name": {
         "entry": [{
             "value": "Epoche I"
+          },
+        {
+            "value": "Epoch I",
+            "lang":"en"
+          },
+        {
+            "value": "Epoque I",
+            "lang":"fr"
           }]
       },
       "year-from": 1837,
@@ -11,7 +34,9 @@
       "comment": {
         "entry": [{
             "value": "Bau der ersten Eisenbahnen, Entwicklung der Dampflokomotiven, viele Privatbahnen mit buntem Fahrzeugpark."
-          }]
+          },
+        {"value":"Construction of the first railways, development of steam locomotives, many private railways with a colorful fleet of vehicles.","lang":"en"},
+        {"value":"Construction des premiers chemins de fer, développement des locomotives à vapeur, nombre de compagnies privées.","lang":"fr"}]
       }
     }, 
     {
@@ -19,6 +44,14 @@
       "name": {
         "entry": [{
             "value": "Epoche II"
+          },
+        {
+            "value": "Epoch II",
+            "lang":"en"
+          },
+        {
+            "value": "Epoque II",
+            "lang":"fr"
           }]
       },
       "year-from": 1920,
@@ -26,7 +59,9 @@
       "comment": {
         "entry": [{
             "value": "Weitgehende Vereinheitlichung der Bau- und Betriebsvorschriften, teilweise länderübergreifend (RIV, RIC), Einführung des elektrischen Zugbetriebes, vereinzelte Einführung von Lichtsignalen."
-          }]
+          },
+        {"value":"Extensive standardization of building and operating regulations, partly across countries (RIV, RIC), introduction of electric train operation, occasional introduction of light signals.","lang":"en"},
+        {"value":"Unification intensive des constructions et règlements d'exploitations couvrant plusieurs pays (RIV, RIC), introduction de la traction électrique et des signaux lumineux.","lang":"fr"}]
       }
     },
     {
@@ -34,6 +69,14 @@
       "name": {
         "entry": [{
             "value": "Epoche III"
+          },
+        {
+            "value": "Epoch III",
+            "lang":"en"
+          },
+        {
+            "value": "Epoque III",
+            "lang":"fr"
           }]
       },
       "year-from": 1945,
@@ -41,7 +84,9 @@
       "comment": {
         "entry": [{
             "value": "Wiederaufbau nach dem Krieg und Entwicklung eines modernen Fahrzeugparks, Traktionswechsel durch Ausbau des elektrischen Betriebes und der Dieselzugförderung."
-          }]
+          },
+        {"value":"Reconstruction after the war and development of a modern vehicle fleet, traction change through expansion of the electrical operation and diesel train support.","lang":"en"},
+        {"value":" Reconstruction après la guerre et développement d'un parc moteur moderne, changement de traction suite au développement de l'électricité et du diesel.","lang":"fr"}]
       }
     },
     {
@@ -49,6 +94,14 @@
       "name": {
         "entry": [{
             "value": "Epoche IV"
+          },
+        {
+            "value": "Epoch IV",
+            "lang":"en"
+          },
+        {
+            "value": "Epoque IV",
+            "lang":"fr"
           }]
       },
       "year-from": 1965,
@@ -56,7 +109,9 @@
       "comment": {
         "entry": [{
             "value": "Weitgehender  Abschluss  der  Traktionsumstellung,  Einführung  eines  internationalen  Beschriftungsschemas des Wagenparks."
-          }]
+          },
+        {"value":"Extensive completion of the traction changeover, introduction of an international labeling scheme for the rolling stock.","lang":"en"},
+        {"value":"Achèvement du changement de système de traction, introduction d'un schéma de marquage international du parc de véhicules remorqués.","lang":"fr"}]
       }
     },
     {
@@ -64,6 +119,14 @@
       "name": {
         "entry": [{
             "value": "Epoche V"
+          },
+        {
+            "value": "Epoch V",
+            "lang":"en"
+          },
+        {
+            "value": "Epoque V",
+            "lang":"fr"
           }]
       },
       "year-from": 1985,
@@ -71,7 +134,9 @@
       "comment": {
         "entry": [{
             "value": "Entstehung von Schnellfahrnetzen, werbewirksame Farbgebung, Beginn des liberalisierten Zugangs zu den Bahnnetzen, Umwandlung der Staatsbahnen in Aktiengesellschaften mit Aufteilung in Infrastruktur-Unternehmen und in Verkehrs-Unternehmen, getrennt für Personen- und Güterverkehr, die auch außerhalb des angestammten Netzes tätig werden."
-          }]
+          },
+        {"value":"Emergence of high-speed networks, effective advertising coloring, beginning of liberalized access to the railway networks, transformation of the state railways into stock corporations with division into infrastructure companies and transport companies, separated for passenger and freight traffic that also operate outside the traditional network","lang":"en"},
+        {"value":" Construction de lignes à grande vitesse, livrées plus marquantes du matériel afin d'améliorer l'image de marque, libéralisation des réseaux, transformation des chemins de fer d'état en sociétés à actionnariat. Séparation des infrastructures et de la traction ainsi que du trafic voyageurs et marchandises, même en dehors des réseaux principaux.","lang":"fr"}]
       }
     },
     {
@@ -79,13 +144,23 @@
       "name": {
         "entry": [{
             "value": "Epoche VI"
+          },
+        {
+            "value": "Epoch VI",
+            "lang":"en"
+          },
+        {
+            "value": "Epoque VI",
+            "lang":"fr"
           }]
       },
       "year-from": 2005,
       "comment": {
         "entry": [{
             "value": "Neben den traditionellen Bahngesellschaften befahren zahlreiche Eisenbahnverkehrsunternehmen (EVU) ohne eigene Infrastruktur die bestehenden Eisenbahnnetze im Personen- und/oder im Güterverkehr national oder international mit eigenen Fahrzeugen. Entsprechende Anpassung des 12-stelligen UIC-Nummernschemas. Überleitung der bestehenden internationalen Übereinkommen (RIC, RIV, etc.) in neue EU-konforme Vorschriften (OTIF, TSI). Aufhebung der gemeinsamen Bewirtschaftung von Güterwagen (EUROP und OPW). Nationale Schnellfahrstrecken nur für Personenverkehr wachsen zu einem internationalen Netz zusammen. Massiver Abbau des Güterverkehrs in der Fläche mit Rückbau der Güterverkehrsanlagen und von Rangierbahnhöfen. Im Reisezugverkehr dominieren Trieb- oder Wendezüge, im Güterverkehr Ganzzüge."
-          }]
+          },
+        {"value":"In addition to the traditional railway companies, numerous railway companies (EVU) without their own infrastructure use the existing railway networks for passenger and / or freight transport nationally or internationally with their own vehicles. Corresponding adaptation of the 12-digit UIC numbering scheme. Transition of the existing international agreements (RIC, RIV, etc.) into new EU-compliant regulations (OTIF, TSI). The joint management of freight wagons (EUROP and OPW) is abolished. National high-speed routes for passenger traffic only are growing together to form an international network. Massive reduction in freight traffic in the area with dismantling of the freight transport facilities and shunting yards. In passenger train traffic, multiple units or push-pull trains dominate, in freight traffic block trains.","lang":"en"},
+        {"value":"A côté des \"anciens\" chemins de fer, de nouvelles entreprises de transport ferroviaires sans infrastructure propre s'établissent avec leur matériel de traction et leurs livrées personnelles en service voyageurs et en service marchandises, national et international. Amélioration du schéma de numérotation UIC avec 12 chiffres. Passage des accords internationaux existants (RIC, RIV, etc..) vers les nouvelles directives conformes aux prescriptions européennes (OTIF, TSI). Abandon du management commun des wagons marchandises (EUROP et OPW). Les lignes à grande vitesse nationales réservées au seul trafic voyageur se développent en un réseau international. Les services marchandises dans les petites gares et leurs installations sont abandonnées ainsi que des gares de triage. En service \"voyageurs\" des rames fixes et réversibles prédominent, le service \"marchandises\" est surtout composé de trains complets.","lang":"fr"}]
       }
     }
   ]

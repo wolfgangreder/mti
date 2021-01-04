@@ -17,6 +17,8 @@ package at.or.reder.mti.ui.zsx.impl;
 
 import at.or.reder.mti.model.Epoch;
 import at.or.reder.mti.model.TractionSystem;
+import at.or.reder.mti.model.api.StoreException;
+import at.or.reder.mti.model.api.Stores;
 import at.or.reder.mti.ui.zsx.ImageItem;
 import at.or.reder.mti.ui.zsx.ImageType;
 import java.awt.image.BufferedImage;
@@ -24,13 +26,18 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
@@ -65,15 +72,18 @@ public class ZSXHandler extends DefaultHandler
   private String _author;
   private File _cacheFile;
   private String _smallFile;
-  private File _smallCacheFile;
   private String _partNumber;
   private Epoch _epoch;
   private TractionSystem _tractionSystem;
   private String _largeFile;
   private final ImageWriter pngWriter;
+  private final Stores stores;
+  private final Map<Integer, Epoch> epochMap = new HashMap<>();
 
-  public ZSXHandler(File cacheRoot)
+  public ZSXHandler(File cacheRoot,
+                    Stores stores)
   {
+    this.stores = stores;
     this.cacheRoot = cacheRoot;
     Iterator<ImageWriter> witer = ImageIO.getImageWritersByMIMEType("image/png");
     if (witer.hasNext()) {
@@ -81,6 +91,62 @@ public class ZSXHandler extends DefaultHandler
     } else {
       throw new IllegalStateException("Cannot find writer for MIME \"image/png\"");
     }
+  }
+
+  private Epoch getEpoch(String strZimoEpoch) throws StoreException
+  {
+    int i = Math.max(0,
+                     toInt(strZimoEpoch));
+    Epoch result = epochMap.get(i);
+    if (result == null) {
+      UUID id = Epoch.EPOCH_UNKNOWN_ID;
+      switch (i) {
+        case 1:
+          id = Epoch.EPOCH_1_ID;
+          break;
+        case 2:
+          id = Epoch.EPOCH_2_ID;
+          break;
+        case 3:
+          id = Epoch.EPOCH_3_ID;
+          break;
+        case 4:
+          id = Epoch.EPOCH_4_ID;
+          break;
+        case 5:
+          id = Epoch.EPOCH_5_ID;
+          break;
+        case 6:
+          id = Epoch.EPOCH_6_ID;
+          break;
+      }
+      result = stores.getEpochStore().getEpoch(id);
+      epochMap.put(i,
+                   result);
+    }
+    return result;
+  }
+
+  private TractionSystem getTraction(String strTraction)
+  {
+    if (strTraction == null) {
+      return TractionSystem.OTHER;
+    }
+    switch (strTraction) {
+      case "S":
+        return TractionSystem.STEAM;
+      case "E":
+        return TractionSystem.ELECTRIC;
+      case "D":
+        return TractionSystem.DIESEL;
+      case "P":
+        return TractionSystem.HORSE;
+      case "H":
+        return TractionSystem.HYDROGEN;
+      case "B":
+        return TractionSystem.HYBRID;
+    }
+    return TractionSystem.OTHER;
   }
 
   public int getNum()
@@ -132,7 +198,6 @@ public class ZSXHandler extends DefaultHandler
                                           _name,
                                           _author,
                                           _type));
-          exposeMetadata();
           break;
         case TACHO:
           images.add(new DefaultTachoImageItem(_cacheFile,
@@ -143,8 +208,22 @@ public class ZSXHandler extends DefaultHandler
                                                _type,
                                                _value,
                                                _unit));
-          exposeMetadata();
+          break;
+        case LOCO:
+          images.add(new DefaultLocoImageItem(_cacheFile,
+                                              _id,
+                                              _index,
+                                              _name,
+                                              _smallFile,
+                                              _largeFile,
+                                              _author,
+                                              _epoch,
+                                              _tractionSystem,
+                                              _partNumber,
+                                              _type));
+          break;
       }
+      exposeMetadata();
       _cacheFile = null;
       _id = 0;
       _type = null;
@@ -163,25 +242,29 @@ public class ZSXHandler extends DefaultHandler
                            Attributes attributes) throws SAXException
   {
     assertNotFinished();
-    switch (qName) {
-      case "FileInfo":
-        processFileInfo(attributes);
-        break;
-      case "Tacho":
-        processImage(ImageType.TACHO,
-                     attributes);
-        break;
-      case "Image":
-        processImageData(attributes);
-        break;
-      case "FxIcon":
-        processImage(ImageType.FXICON,
-                     attributes);
-        break;
-      case "LocoImg":
-        processImage(ImageType.LOCO,
-                     attributes);
-        break;
+    try {
+      switch (qName) {
+        case "FileInfo":
+          processFileInfo(attributes);
+          break;
+        case "Tacho":
+          processImage(ImageType.TACHO,
+                       attributes);
+          break;
+        case "Image":
+          processImageData(attributes);
+          break;
+        case "FxIcon":
+          processImage(ImageType.FXICON,
+                       attributes);
+          break;
+        case "LocoImg":
+          processImage(ImageType.LOCO,
+                       attributes);
+          break;
+      }
+    } catch (StoreException ex) {
+      throw new SAXException(ex);
     }
   }
 
@@ -228,7 +311,8 @@ public class ZSXHandler extends DefaultHandler
       fileName = fileName.substring(0,
                                     dotPos);
     }
-    return fileName;
+    return URLEncoder.encode(fileName,
+                             StandardCharsets.UTF_8);
   }
 
   private String extractUnit(String baseName)
@@ -240,24 +324,36 @@ public class ZSXHandler extends DefaultHandler
   }
 
   private void processImage(ImageType type,
-                            Attributes attributes)
+                            Attributes attributes) throws StoreException
   {
     _type = null;
     _id = toInt(attributes.getValue("Num"));
-    _author = attributes.getValue("Author");
-    _name = attributes.getValue("File");
     switch (type) {
       case FXICON:
+        _name = attributes.getValue("File");
+        _author = attributes.getValue("Author");
         _index = toInt(attributes.getValue("Idx"));
         _type = type;
         break;
       case TACHO:
+        _name = attributes.getValue("File");
+        _author = attributes.getValue("Author");
         _index = toInt(attributes.getValue("Idx"));
         _value = toInt(attributes.getValue("Val"));
         _unit = extractUnit(extractBaseName(_name));
         _type = type;
         break;
       case LOCO:
+        _name = attributes.getValue("Name");
+        _epoch = getEpoch(attributes.getValue("Epoch"));
+        _tractionSystem = getTraction(attributes.getValue("Engine"));
+        _partNumber = attributes.getValue("PartNum");
+        _smallFile = attributes.getValue("File150x50");
+        _largeFile = attributes.getValue("File279x92");
+        _author = null;
+        _index = 0;
+        _type = type;
+        break;
     }
   }
 
@@ -266,24 +362,38 @@ public class ZSXHandler extends DefaultHandler
     Properties props = new Properties();
     props.put("Num",
               Integer.toString(_id));
-    props.put("Author",
-              _author);
     props.put("File",
               _name);
     props.put("Type",
               _type.name());
     switch (_type) {
       case FXICON:
+        props.put("Author",
+                  _author);
         props.put("Idx",
                   Integer.toString(_index));
         break;
       case TACHO:
+        props.put("Author",
+                  _author);
         props.put("Idx",
                   Integer.toString(_index));
         props.put("Val",
                   Integer.toString(_value));
         props.put("Unit",
                   _unit);
+        break;
+      case LOCO:
+        props.put("Epoch",
+                  _epoch.getId().toString());
+        props.put("Traction",
+                  _tractionSystem.name());
+        props.put("PartNum",
+                  _partNumber);
+        props.put("FileSmall",
+                  _smallFile);
+        props.put("FileLarge",
+                  _largeFile);
         break;
     }
     try (FileOutputStream out = new FileOutputStream(new File(cacheRoot,

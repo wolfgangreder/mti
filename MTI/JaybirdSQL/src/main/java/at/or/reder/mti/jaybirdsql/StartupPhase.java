@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Wolfgang Reder.
+ * Copyright 2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.mti.ui.zsx;
-
-import at.or.reder.mti.model.Epoch;
-import at.or.reder.mti.model.TractionSystem;
+package at.or.reder.mti.jaybirdsql;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface LocoImageItem extends ImageItem
+public enum StartupPhase
 {
-
-  public String getFileNameLarge();
-
-  public String getFileNameSmall();
-
-//  public String getOriginalFilename();
-  public Epoch getEpoch();
-
-  public TractionSystem getTractionSystem();
-
-  public String getProductNumber();
-
+  CREATE,
+  LINK,
+  FILL,
+  ACTIVATE;
 }

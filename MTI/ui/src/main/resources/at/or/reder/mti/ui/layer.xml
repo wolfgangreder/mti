@@ -7,7 +7,9 @@
         <folder name="mti">
           <folder name="zimo">
             <file name="FxIcon.zsx" url="../zimo/FxIcon.zsx"></file>
+            <file name="FxIcon.zsx.sha512" url="../zimo/FxIcon.zsx.sha512"></file>
             <file name="LocoImg.zsx" url="../zimo/LocoImg.zsx"></file>
+            <file name="LocoImg.zsx.sha512" url="../zimo/LocoImg.zsx.sha512"></file>
           </folder>
         </folder>
       </folder>

@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import org.netbeans.api.annotations.common.NonNull;
@@ -45,45 +46,119 @@ public final class FBEpochStore extends AbstractStore implements EpochStore
 {
 
   private final FBStores store;
+  private final LocalizableStore localizations;
+  private final Map<UUID, Epoch> epochCache = new ConcurrentHashMap<>();
 
-  public FBEpochStore(FBStores store)
+  public FBEpochStore(FBStores store,
+                      LocalizableStore loc)
   {
     this.store = store;
+    this.localizations = loc;
   }
 
-  void startup() throws SQLException, StoreException
+  private void startupCreate(Connection conn) throws SQLException, StoreException
   {
-    try (Connection conn = store.getConnection()) {
-      int stepping = getStepping(conn);
-      if (stepping < 1) {
-        DatabaseMetaData meta = conn.getMetaData();
-        try (Statement stmt = conn.createStatement()) {
-          boolean created = checkTable(meta,
-                                       stmt,
-                                       "epoch",
-                                       "create table epoch(\n"
-                                       + "id char(36) not null,\n"
-                                       + "name varchar(" + MTIUtils.MAX_NAME_LENGTH + ") not null,\n"
-                                       + "yearfrom int not null,\n"
-                                       + "yearto int ,\n"
-                                       + "comment blob sub_type text,\n"
-                                       + "constraint pk_epoch primary key(id))");
-          checkTable(meta,
-                     stmt,
-                     "epoch_country",
-                     "create table epoch_country(\n"
-                     + "epoch char(36) not null,\n"
-                     + "country char(3) not null,\n"
-                     + "dirty smallint default 0 not null,\n"
-                     + "constraint pk_epoch_country primary key(epoch,country),\n"
-                     + "constraint fk_epoch_country_epoch foreign key (epoch) references epoch(id) on update cascade on delete cascade)");
-          if (created) {
-            createDefaultValues(conn);
-          }
+    int stepping = getStepping(conn);
+    if (stepping < 1) {
+      DatabaseMetaData meta = conn.getMetaData();
+      try (Statement stmt = conn.createStatement()) {
+        checkTable(meta,
+                   stmt,
+                   "epoch",
+                   "create table epoch(\n"
+                   + "id char(36) not null,\n"
+                   + "name varchar(" + MTIUtils.MAX_NAME_LENGTH + ") not null,\n"
+                   + "yearfrom int not null,\n"
+                   + "yearto int ,\n"
+                   + "comment blob sub_type text,\n"
+                   + "constraint pk_epoch primary key(id))");
+        checkTable(meta,
+                   stmt,
+                   "epoch_country",
+                   "create table epoch_country(\n"
+                   + "epoch char(36) not null,\n"
+                   + "country char(3) not null,\n"
+                   + "dirty smallint default 0 not null,\n"
+                   + "constraint pk_epoch_country primary key(epoch,country))");
+      }
+    }
+  }
+
+  private void startupLink(Connection conn) throws SQLException, StoreException
+  {
+    int stepping = getStepping(conn);
+    if (stepping < 1) {
+      DatabaseMetaData meta = conn.getMetaData();
+      try (Statement stmt = conn.createStatement()) {
+        checkForeignKey(meta,
+                        stmt,
+                        ForeignKey.builder().addFieldNames(0,
+                                                           "epoch",
+                                                           "id").
+                                constraintName("fk_epoch_country_epoch").
+                                rules(ForeignKey.CascadeRule.CASCADE).
+                                pkTableName("epoch").
+                                tableName("epoch_country").build());
+        String source = getTriggerSource(conn,
+                                         "epoch",
+                                         "trg_epoch_loc_u");
+        if (source == null) {
+          stmt.execute("create trigger trg_epoch_loc_u\n"
+                       + "after update on epoch\n"
+                       + "as\n"
+                       + "begin\n"
+                       + "  update localisations set id=new.id where id=old.id;\n"
+                       + "end");
+        }
+        source = getTriggerSource(conn,
+                                  "epoch",
+                                  "trg_epoch_loc_d");
+        if (source == null) {
+          stmt.execute("create trigger trg_epoch_loc_d\n"
+                       + "after update on epoch\n"
+                       + "as\n"
+                       + "begin\n"
+                       + "  delete from localisations where id=old.id;\n"
+                       + "end");
         }
       }
-    } catch (IOException ex) {
-      throw new StoreException(ex);
+    }
+  }
+
+  private void startupFill(Connection conn) throws SQLException, StoreException
+  {
+    int stepping = getStepping(conn);
+    if (stepping < 1) {
+      try {
+        createDefaultValues(conn);
+      } catch (IOException ex) {
+        throw new StoreException(ex);
+      }
+    }
+  }
+
+  private void startupActivate(Connection conn) throws SQLException, StoreException
+  {
+    setStepping(conn,
+                1);
+  }
+
+  void startup(Connection conn,
+               StartupPhase phase) throws SQLException, StoreException
+  {
+    switch (phase) {
+      case CREATE:
+        startupCreate(conn);
+        break;
+      case LINK:
+        startupLink(conn);
+        break;
+      case FILL:
+        startupFill(conn);
+        break;
+      case ACTIVATE:
+        startupActivate(conn);
+        break;
     }
   }
 
@@ -98,7 +173,7 @@ public final class FBEpochStore extends AbstractStore implements EpochStore
 
   private int get(@NonNull Connection conn,
                   Collection<UUID> ids,
-                  Consumer<Epoch> consumer) throws SQLException
+                  Consumer<Epoch> consumer) throws SQLException, StoreException
   {
     if (ids == null || ids.isEmpty()) {
       return 0;
@@ -108,9 +183,17 @@ public final class FBEpochStore extends AbstractStore implements EpochStore
     if (builderFactory == null) {
       throw new IllegalStateException("Cannot find Epoch.BuilderFactory");
     }
+    int result = 0;
     try (PreparedStatement stmt = conn.prepareStatement("select name,yearfrom,yearto,comment from epoch where id=?")) {
       for (UUID id : ids) {
         if (id != null) {
+          Epoch tmpEpoch = epochCache.get(ids);
+          if (tmpEpoch != null) {
+            if (consumer != null) {
+              consumer.accept(tmpEpoch);
+            }
+            ++result;
+          }
           stmt.setString(1,
                          id.toString());
           try (ResultSet rs = stmt.executeQuery()) {
@@ -135,7 +218,6 @@ public final class FBEpochStore extends AbstractStore implements EpochStore
         }
       }
     }
-    int result = 0;
     if (!builderMap.isEmpty()) {
       try (PreparedStatement stmt = conn.prepareStatement("select country from epoch_country where epoch=?")) {
         for (Map.Entry<UUID, Epoch.Builder> e : builderMap.entrySet()) {
@@ -150,10 +232,24 @@ public final class FBEpochStore extends AbstractStore implements EpochStore
               }
             }
           }
-          if (consumer != null) {
-            consumer.accept(builder.build());
-            ++result;
-          }
+        }
+      }
+      for (Map.Entry<UUID, Epoch.Builder> e : builderMap.entrySet()) {
+        Epoch.Builder builder = e.getValue();
+        localizations.loadLocalizable(conn,
+                                      "name",
+                                      e.getKey(),
+                                      e.getValue()::name);
+        localizations.loadLocalizable(conn,
+                                      "comment",
+                                      e.getKey(),
+                                      e.getValue()::name);
+        Epoch epoch = builder.build();
+        ++result;
+        epochCache.put(e.getKey(),
+                       epoch);
+        if (consumer != null) {
+          consumer.accept(epoch);
         }
       }
     }
@@ -212,11 +308,13 @@ public final class FBEpochStore extends AbstractStore implements EpochStore
       stmt.executeUpdate();
     } catch (SQLException ex) {
       throw new StoreException(ex);
+    } finally {
+      epochCache.remove(epoch.getId());
     }
   }
 
   boolean store(Connection conn,
-                Epoch epoch) throws SQLException
+                Epoch epoch) throws SQLException, StoreException
   {
     int modified = 0;
     try (PreparedStatement stmt = conn.prepareStatement("update or insert into epoch\n"
@@ -239,7 +337,7 @@ public final class FBEpochStore extends AbstractStore implements EpochStore
                      epoch.getComment().getValue(""));
       modified = stmt.executeUpdate();
     }
-    try (PreparedStatement stmt = conn.prepareStatement("update epoch_country set dirty = 1 where epoch=?")) {
+    try (PreparedStatement stmt = conn.prepareStatement("update epoch_country set dirty=1 where epoch=?")) {
       stmt.setString(1,
                      epoch.getId().toString());
       stmt.executeUpdate();
@@ -259,6 +357,15 @@ public final class FBEpochStore extends AbstractStore implements EpochStore
                      epoch.getId().toString());
       stmt.executeUpdate();
     }
+    localizations.storeLocalizables(conn,
+                                    "name",
+                                    Collections.singletonMap(epoch.getId(),
+                                                             epoch.getName()));
+    localizations.storeLocalizables(conn,
+                                    "comment",
+                                    Collections.singletonMap(epoch.getId(),
+                                                             epoch.getComment()));
+    epochCache.remove(epoch.getId());
     return modified == 1;
   }
 

@@ -28,16 +28,26 @@ final class FBStores implements Stores
 
   private final DataSource ds;
   private final FBEpochStore epochStore;
+  private final LocalizableStore locStore;
 
   public FBStores(DataSource ds)
   {
     this.ds = ds;
-    epochStore = new FBEpochStore(this);
+    locStore = new LocalizableStore(this);
+    epochStore = new FBEpochStore(this,
+                                  locStore);
   }
 
   void startup() throws SQLException, StoreException
   {
-    epochStore.startup();
+    try (Connection conn = getConnection()) {
+      for (StartupPhase phase : StartupPhase.values()) {
+        epochStore.startup(conn,
+                           phase);
+        locStore.startup(conn,
+                         phase);
+      }
+    }
   }
 
   public Connection getConnection() throws SQLException

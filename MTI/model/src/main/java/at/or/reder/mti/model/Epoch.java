@@ -36,6 +36,14 @@ import org.netbeans.api.annotations.common.NonNull;
 public interface Epoch
 {
 
+  public static final UUID EPOCH_UNKNOWN_ID = UUID.fromString("2988d848-3f7a-41fe-b125-feff67214033");
+  public static final UUID EPOCH_1_ID = UUID.fromString("4b4bc6cf-3464-4034-aedf-5fd43734b4ca");
+  public static final UUID EPOCH_2_ID = UUID.fromString("7ba283c9-3ec5-4a4c-8b9c-cbc19cdd7c83");
+  public static final UUID EPOCH_3_ID = UUID.fromString("cb347731-14ba-42bb-bc31-f2239e5fdb68");
+  public static final UUID EPOCH_4_ID = UUID.fromString("97d877d6-f2b8-4699-a623-3b95ca79c91d");
+  public static final UUID EPOCH_5_ID = UUID.fromString("606ce236-ef98-4aa4-8d0b-457a4cba4719");
+  public static final UUID EPOCH_6_ID = UUID.fromString("d0b7cc9d-e415-4d4e-a55d-b88e1c07b842");
+
   /**
    * BaseBuilder-Object zum erzeugen neuer <code>Epoch</code>-Instanzen.
    *

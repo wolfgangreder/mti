@@ -21,7 +21,10 @@ public enum TractionSystem
   HORSE,
   STEAM,
   DIESEL,
+  BATTERY,
   ELECTRIC,
-  HYDROGEN;
+  HYBRID,
+  HYDROGEN,
+  OTHER;
 
 }

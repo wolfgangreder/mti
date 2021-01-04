@@ -15,10 +15,8 @@
  */
 package at.or.reder.mti.ui;
 
-import at.or.reder.mti.model.api.EpochStore;
 import at.or.reder.mti.model.api.Factories;
 import at.or.reder.mti.model.api.StoreException;
-import at.or.reder.mti.model.api.Stores;
 import at.or.reder.mti.ui.zsx.ImageItem;
 import at.or.reder.mti.ui.zsx.ImageType;
 import at.or.reder.mti.ui.zsx.ZSXFile;
@@ -130,22 +128,24 @@ public final class ControlTesterTopComponent extends TopComponent
     initComponents();
     setName(Bundle.CTL_ControlTesterTopComponent());
     setToolTipText(Bundle.HINT_ControlTesterTopComponent());
+    try {
+      Factories.getStores();
+    } catch (StoreException ex) {
+    }
   }
 
   private void readFiles()
   {
-    try {
-      ZSXFile zsx = ZSXFile.getIconInstance();
-      DefaultListModel<ImageItem> itemModel = new DefaultListModel<>();
-      for (ImageItem i : zsx.getImageItems()) {
-        itemModel.addElement(new ListImageItem(i));
-      }
-      jList1.setModel(itemModel);
-      Stores stores = Factories.getStores();
-      EpochStore epochStore = stores.getEpochStore();
-    } catch (StoreException ex) {
-      Exceptions.printStackTrace(ex);
+    ZSXFile zsx = ZSXFile.getLocoInstance();
+    ZSXFile loco = ZSXFile.getIconInstance();
+    DefaultListModel<ImageItem> itemModel = new DefaultListModel<>();
+    for (ImageItem i : zsx.getImageItems()) {
+      itemModel.addElement(new ListImageItem(i));
     }
+    for (ImageItem i : loco.getImageItems()) {
+      itemModel.addElement(new ListImageItem(i));
+    }
+    jList1.setModel(itemModel);
   }
 
   private void showSelected()

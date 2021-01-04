@@ -365,14 +365,14 @@ abstract class AbstractStore
     DefaultIndexInfo.Builder indexBuilder = null;
     try (ResultSet rs = meta.getIndexInfo(null,
                                           null,
-                                          tableName,
+                                          tableName.toUpperCase(),
                                           false,
                                           true)) {
       while (rs.next()) {
         String ndx = rs.getString("INDEX_NAME");
         short type = rs.getShort("TYPE");
         if (type != DatabaseMetaData.tableIndexStatistic) {
-          if (indexName.equals(ndx)) {
+          if (indexName.equalsIgnoreCase(ndx)) {
             if (indexBuilder == null) {
               indexBuilder = new DefaultIndexInfo.Builder();
               indexBuilder.name(ndx);

@@ -19,11 +19,8 @@ import at.or.reder.mti.model.Epoch;
 import at.or.reder.mti.model.TractionSystem;
 import at.or.reder.mti.ui.zsx.ImageType;
 import at.or.reder.mti.ui.zsx.LocoImageItem;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.Objects;
-import javax.imageio.ImageIO;
 
 /**
  *
@@ -32,31 +29,25 @@ import javax.imageio.ImageIO;
 public class DefaultLocoImageItem extends DefaultImageItem implements LocoImageItem
 {
 
-  private final File smallCacheFile;
-  private final File originalCacheFile;
   private final String fileNameLarge;
   private final String fileNameSmall;
-  private final String originalFilename;
   private final Epoch epoch;
   private final TractionSystem tractionSystem;
   private final String productNumber;
 
   public DefaultLocoImageItem(File cacheFile,
-                              File largeCacheFile,
-                              File originalCacheFile,
                               int id,
                               int index,
                               String name,
                               String smallFile,
                               String largeFile,
-                              String originalFile,
                               String author,
                               Epoch epoch,
                               TractionSystem tractionSystem,
                               String productNumber,
                               ImageType imageType)
   {
-    super(largeCacheFile,
+    super(cacheFile,
           id,
           index,
           name,
@@ -64,12 +55,9 @@ public class DefaultLocoImageItem extends DefaultImageItem implements LocoImageI
           imageType);
     fileNameLarge = largeFile;
     fileNameSmall = smallFile;
-    originalFilename = originalFile;
     this.epoch = epoch;
     this.tractionSystem = tractionSystem;
     this.productNumber = productNumber;
-    this.smallCacheFile = cacheFile;
-    this.originalCacheFile = originalCacheFile;
   }
 
   @Override
@@ -84,12 +72,11 @@ public class DefaultLocoImageItem extends DefaultImageItem implements LocoImageI
     return fileNameSmall;
   }
 
-  @Override
-  public String getOriginalFilename()
-  {
-    return originalFilename;
-  }
-
+//  @Override
+//  public String getOriginalFilename()
+//  {
+//    return originalFilename;
+//  }
   @Override
   public Epoch getEpoch()
   {
@@ -109,19 +96,13 @@ public class DefaultLocoImageItem extends DefaultImageItem implements LocoImageI
   }
 
   @Override
-  public BufferedImage getSmallImage() throws IOException
-  {
-    return ImageIO.read(smallCacheFile);
-  }
-
-  @Override
   public int hashCode()
   {
     int hash = 7;
     hash = 29 * hash + super.hashCode();
     hash = 29 * hash + Objects.hashCode(this.fileNameLarge);
     hash = 29 * hash + Objects.hashCode(this.fileNameSmall);
-    hash = 29 * hash + Objects.hashCode(this.originalFilename);
+    /* hash = 29 * hash + Objects.hashCode(this.originalFilename); */
     hash = 29 * hash + Objects.hashCode(this.epoch);
     hash = 29 * hash + Objects.hashCode(this.tractionSystem);
     hash = 29 * hash + Objects.hashCode(this.productNumber);
@@ -150,10 +131,10 @@ public class DefaultLocoImageItem extends DefaultImageItem implements LocoImageI
                         other.getFileNameSmall())) {
       return false;
     }
-    if (!Objects.equals(this.originalFilename,
-                        other.getOriginalFilename())) {
-      return false;
-    }
+    /* if (!Objects.equals(this.originalFilename,
+     * other.getOriginalFilename())) {
+     * return false;
+     * } */
     if (!Objects.equals(this.productNumber,
                         other.getProductNumber())) {
       return false;
