@@ -15,27 +15,28 @@
  */
 package at.or.reder.mti.model;
 
-import at.or.reder.mti.model.utils.Fract;
+import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 /**
  * Dieses Interface beschreibt eine Modellspurweite.<br/>
  * Instanzen dieses Interfaces sollen nach folgendem Muster erzeugt werden:<br/>
  * <code><pre>
- * Scale.BuilderFactory factory = Lookup.getDefault().lookup(Scale.BuilderFactory.class);
- * Scale.Builder<? extends Era> builder = factory.createBuilder(;
+ * Gauge.BuilderFactory factory = Lookup.getDefault().lookup(Gauge.BuilderFactory.class);
+ * Gauge.Builder<? extends Era> builder = factory.createBuilder(;
  * // werte setzen
- * Scale scale = builder.build();
+ * Gauge scale = builder.build();
  * </pre></code>
  *
  * @author wolfi
  */
-public interface Scale
+public interface Gauge
 {
 
   /**
    * Builder-Object zum erzeugen neuer
-   * <code>Scale</code>-Instanzen.
+   * <code>Gauge</code>-Instanzen.
    *
    * @param <S>
    */
@@ -45,11 +46,11 @@ public interface Scale
     /**
      * Initialisiert alle Attribute mit den Werten von {@code scale}.
      *
-     * @param scale Scale der kopiert werden soll.
+     * @param scale Gauge der kopiert werden soll.
      * @return {@code this}
      * @throws NullPointerException wenn {@code scale==null}
      */
-    public Scale.Builder copy(Scale scale) throws NullPointerException;
+    public Gauge.Builder copy(Gauge scale) throws NullPointerException;
 
     /**
      * Setzt die id.
@@ -58,7 +59,7 @@ public interface Scale
      * @return {@code this}
      * @throws NullPointerException wenn {@code id==null}
      */
-    public Scale.Builder id(UUID id) throws NullPointerException;
+    public Gauge.Builder id(UUID id) throws NullPointerException;
 
     /**
      * Setzt den Namen.
@@ -68,17 +69,16 @@ public interface Scale
      * @throws NullPointerException wenn {@code name==null}
      * @throws IllegalArgumentException wenn {@code name.trim().isEmpty()}
      */
-    public Scale.Builder name(String name) throws NullPointerException, IllegalArgumentException;
+    public Gauge.Builder name(String name) throws NullPointerException, IllegalArgumentException;
 
     /**
      * Setzt den Maßstab
      *
      * @param scale neuer Maßstab
      * @return {@code this}
-     * @throws NullPointerException wenn {@code scale==null}
      * @throws IllegalArgumentException wenn {@code scale.doubleValue()<=0}
      */
-    public Scale.Builder scale(Fract scale) throws NullPointerException, IllegalArgumentException;
+    public Gauge.Builder scale(double scale) throws IllegalArgumentException;
 
     /**
      * Setzt die Spurweite
@@ -87,14 +87,14 @@ public interface Scale
      * @return {@code this}
      * @throws IllegalArgumentException wenn {@code trackWidth()<=0}
      */
-    public Scale.Builder trackWidth(double trackWidth) throws IllegalArgumentException;
+    public Gauge.Builder trackWidth(double trackWidth) throws IllegalArgumentException;
 
-    public Scale build();
+    public Gauge build();
 
   }
 
   /**
-   * Lookupobject zum erzeugen eines {@code Scale.Builder<>} Objekts.
+   * Lookupobject zum erzeugen eines {@code Gauge.Builder<>} Objekts.
    */
   public static interface BuilderFactory
   {
@@ -102,10 +102,12 @@ public interface Scale
     /**
      * Erzeugt einen neuen Builder.
      *
-     * @return eine neue Instanz von {@code Scale.Builder<>}
+     * @return eine neue Instanz von {@code Gauge.Builder<>}
      * @see Builder
      */
-    public Scale.Builder createScaleBuilder();
+    public Gauge.Builder createGaugeBuilder();
+
+    public List<Gauge> getDefaultGauges() throws IOException;
 
   }
 
@@ -128,7 +130,7 @@ public interface Scale
    *
    * @return Maßstab (niemals {@code null})
    */
-  public Fract getScale();
+  public double getScale();
 
   /**
    * Spurweite der der Modellspurweite in mm.

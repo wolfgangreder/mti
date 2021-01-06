@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2021 Wolfgang Reder.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+
+<gauge-container>
+  <gauge id="ea12f8a8-131d-44b9-ac59-5feff8e0c06e" track-width="6.5" name="Z" scale="220"/>
+  <gauge id="402266f7-1589-4da7-bd1d-5622852f3117" track-width="4.5" name="Zm" scale="220"/>
+  <gauge id="99ba9151-3091-4774-9b42-ae4f2fee7969" track-width="9" name="N" scale="160"/>  
+  <gauge id="9e2dc08e-af93-415e-b4b2-6c805a9d1e64" track-width="6.5" name="Nm" scale="160"/>
+  <gauge id="a67a3de7-996d-40c3-9f5d-9311bf57f607" track-width="4.5" name="Ne" scale="160"/>
+  <gauge id="787900cf-f1ec-4789-b0d3-32ac1188f57c" track-width="12" name="TT" scale="120"/>
+  <gauge id="98d0d89b-2b68-458f-8157-9742280a2720" track-width="9" name="TTm" scale="120"/>
+  <gauge id="294cc0a3-dae1-419a-8a59-236f2b444366" track-width="6.5" name="TTe" scale="120"/>
+  <gauge id="b9e8d4ce-878c-4282-a57d-b35846b49a4d" track-width="4.5" name="TTi" scale="120"/>
+  <gauge id="ae9688f9-be88-41b8-8886-f65965d15e65" track-width="16.5" name="HO" scale="87"/>
+  <gauge id="43060005-dd4c-4704-a30c-66efe378872b" track-width="12" name="HOm" scale="87"/>
+  <gauge id="24ef6689-6477-48c6-916f-42c2ed832651" track-width="9" name="HOe" scale="87"/>
+  <gauge id="b27b74e4-8a24-4d54-869f-b58290cea35b" track-width="6.5" name="HOi" scale="87"/>
+  <gauge id="dd12b934-d207-48d5-8aa5-e779fac61b72" track-width="4.5" name="HOp" scale="87"/>
+  <gauge id="c795b7ee-16d0-4fc3-a56f-12f651068461" track-width="22.5" name="S" scale="64"/>
+  <gauge id="e3c1deeb-1730-4749-9042-577082895788" track-width="16.5" name="Sm" scale="64"/>
+  <gauge id="034ebb11-6b76-49cb-a5eb-cc26be130cf7" track-width="12" name="Se" scale="64"/>
+  <gauge id="0147fac7-3726-4b9d-95c4-9a7adf75acc2" track-width="9" name="Si" scale="64"/>
+  <gauge id="3b63a460-ca23-4447-8863-079fde63dd7b" track-width="6.5" name="Sp" scale="64"/>
+  <gauge id="4ec05d98-cf4d-4230-b336-f07101afd753" track-width="32" name="O" scale="45"/>
+  <gauge id="f55b0dbc-49cf-4ea7-ae79-48f495d814b8" track-width="22.5" name="Om" scale="45"/>
+  <gauge id="20fdfd31-e41b-4c63-b958-2fe653effa29" track-width="16.5" name="Oe" scale="45"/>
+  <gauge id="235561d9-476e-4d60-a4ad-0b6e6bacb69f" track-width="12" name="Oi" scale="45"/>
+  <gauge id="5af369a2-bf40-4ef4-82d4-836da535cefa" track-width="9" name="Op" scale="45"/>
+  <gauge id="c33df560-ec61-4bed-93c6-cb604a8e2d4e" track-width="45" name="I" scale="32"/>
+  <gauge id="e12222ee-fec3-4b34-b2dd-797d2f7bb7ac" track-width="32" name="Im" scale="32"/>
+  <gauge id="bfbe2c7f-568b-41e1-b088-ff68b1f1b751" track-width="22.5" name="Ie" scale="32"/>
+  <gauge id="e19c625f-7084-4bf3-a3ad-69ab7c54843d" track-width="16.5" name="Ii" scale="32"/>
+  <gauge id="03506760-7336-4592-a63d-3e3f992c9337" track-width="12" name="Ip" scale="32"/>
+  <gauge id="8d62a295-3eaf-4f3f-bbf5-9d0b9169781f" track-width="64" name="II" scale="22.5"/>
+  <gauge id="b0b3f7b8-c3fe-4cbd-aae0-559b7ea048a2" track-width="32" name="IIm" scale="22.5"/>
+  <gauge id="7b46c411-aa6c-4de9-9e2b-9a447ab87484" track-width="22.5" name="IIe" scale="22.5"/>
+  <gauge id="275bc427-de37-44f5-94b0-87f5b5a05a97" track-width="16.5" name="IIi" scale="22.5"/>
+  <gauge id="73ea923b-e965-4b8d-afe3-eb3a5d4c4474" track-width="12" name="IIp" scale="22.5"/>
+  <gauge id="680c2d01-8ff3-45f6-9a49-d1e877cc92ac" track-width="89" name="III" scale="16"/>
+  <gauge id="0e7ac3d2-5905-4b24-afa5-88ca8d1d0c51" track-width="64" name="IIIm" scale="16"/>
+  <gauge id="f6cf69f4-d192-4762-beb6-cabf82ab3dcd" track-width="45" name="IIIe" scale="16"/>
+  <gauge id="4088084f-863b-4872-9553-bc2f8d90136d" track-width="32" name="IIIi" scale="16"/>
+  <gauge id="6a2b0396-a440-4abb-96b2-24e32cea25c1" track-width="22.5" name="IIIp" scale="16"/>
+  <gauge id="1f1742e3-cacf-4b95-8dfd-db4d6eb75145" track-width="127" name="V" scale="11"/>
+  <gauge id="23329bac-1e0f-4c0b-b9c9-ce1137936062" track-width="89" name="Vm" scale="11"/>
+  <gauge id="b1f66cfe-23de-44fa-9546-ea1581ed090b" track-width="64" name="Ve" scale="11"/>
+  <gauge id="e84fabf9-2d2f-42ac-a4c5-ae99fbcd6081" track-width="45" name="Vi" scale="11"/>
+  <gauge id="0e79d3af-7a70-4980-95c5-f8bc4e457c5b" track-width="32" name="Vp" scale="11"/>
+  <gauge id="089aebf1-bfc3-44d1-8efb-33f29e0b19fc" track-width="184" name="VII" scale="8"/>
+  <gauge id="d2bd6c66-2872-443c-a587-ae2bb17dee0d" track-width="127" name="VIIm" scale="8"/>
+  <gauge id="6198214c-a5c8-4ee4-bdad-16fa55e4fe8e" track-width="89" name="VIIe" scale="8"/>
+  <gauge id="0617736a-bef6-4d51-bf33-b932859ddcf6" track-width="64" name="VIIi" scale="8"/>
+  <gauge id="b2df24e5-d158-4549-bf8f-8dc3db11ff44" track-width="45" name="VIIp" scale="8"/>
+  <gauge id="0c4ad445-fc9c-4ea4-a284-fc2aa1e595cb" track-width="260" name="X" scale="5.5"/>
+  <gauge id="f13f230f-b37f-449e-8bb1-f002e146ea29" track-width="184" name="Xm" scale="5.5"/>
+  <gauge id="adfb3072-996b-43dc-b88d-20f69e622d2e" track-width="127" name="Xe" scale="5.5"/>
+  <gauge id="fc0d05d7-b719-40db-a3d1-4f3b5f02e931" track-width="89" name="Xi" scale="5.5"/>
+  <gauge id="fc97b9c3-6bfe-4f2d-8391-310a5ca8dec7" track-width="64" name="Xp" scale="5.5"/>
+</gauge-container>

@@ -22,7 +22,7 @@ import java.util.ArrayList;
  *
  * @author Wolfgang Reder
  */
-public class EpochContainer extends ArrayList<Epoch>
+public final class EpochContainer extends ArrayList<Epoch>
 {
 
 }

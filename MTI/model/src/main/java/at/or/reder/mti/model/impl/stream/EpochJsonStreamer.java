@@ -16,13 +16,7 @@
 package at.or.reder.mti.model.impl.stream;
 
 import at.or.reder.mti.model.Epoch;
-import at.or.reder.mti.model.api.StreamFormat;
 import at.or.reder.mti.model.api.Streamer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -30,64 +24,19 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Wolfgang Reder
  */
 @ServiceProvider(service = Streamer.class, path = "mti/streamer")
-public final class EpochJsonStreamer implements Streamer<Epoch>
+public final class EpochJsonStreamer extends AbstractJsonStreamer<Epoch, XmlEpoch> implements Streamer<Epoch>
 {
 
-  private ObjectMapper _mapper;
-
-  @Override
-  public StreamFormat getFormat()
+  public EpochJsonStreamer()
   {
-    return StreamFormat.JSON;
+    super(XmlEpoch::new,
+          XmlEpoch.class);
   }
 
   @Override
   public Class<Epoch> getStreamableClass()
   {
     return Epoch.class;
-  }
-
-  @Override
-  public boolean isMarshalSupported()
-  {
-    return true;
-  }
-
-  @Override
-  public boolean isUnmarshalSupported()
-  {
-    return true;
-  }
-
-  private synchronized ObjectMapper getContext() throws IOException
-  {
-    if (_mapper == null) {
-      JaxbAnnotationModule module = new JaxbAnnotationModule();
-      _mapper.registerModule(module);
-    }
-    return _mapper;
-  }
-
-  @Override
-  public Epoch unmarshal(InputStream is) throws IOException
-  {
-    ObjectMapper ctx = getContext();
-    XmlEpoch e = ctx.readValue(is,
-                               XmlEpoch.class);
-    if (e != null) {
-      return e.toEpoch();
-    }
-    return null;
-  }
-
-  @Override
-  public void marshal(Epoch value,
-                      OutputStream out) throws IOException
-  {
-    ObjectMapper ctx = getContext();
-    XmlEpoch x = new XmlEpoch(value);
-    ctx.writeValue(out,
-                   x);
   }
 
 }

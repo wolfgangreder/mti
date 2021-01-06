@@ -15,37 +15,41 @@
  */
 package at.or.reder.mti.model.impl.stream;
 
-import at.or.reder.mti.model.Epoch;
-import at.or.reder.mti.model.api.EpochContainer;
+import at.or.reder.mti.model.Gauge;
+import at.or.reder.mti.model.api.GaugeContainer;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "epoch-container")
-public final class XmlEpochContainer implements XmlObject<EpochContainer>
+/**
+ *
+ * @author Wolfgang Reder
+ */
+@XmlRootElement(name = "gauge-container")
+public class XmlGaugeContainer implements XmlObject<GaugeContainer>
 {
 
-  @XmlElement(name = "epoch")
-  private List<XmlEpoch> data;
+  @XmlElement(name = "gauge")
+  private List<XmlGauge> gauges;
 
-  public XmlEpochContainer()
+  public XmlGaugeContainer()
   {
   }
 
-  public XmlEpochContainer(Collection<? extends Epoch> e)
+  public XmlGaugeContainer(Collection<? extends Gauge> scales)
   {
-    data = e.stream().map(XmlEpoch::new).collect(Collectors.toList());
+    this.gauges = scales.stream().map(XmlGauge::new).collect(Collectors.toList());
   }
 
   @Override
-  public EpochContainer toModel()
+  public GaugeContainer toModel()
   {
-    if (data != null && !data.isEmpty()) {
-      return data.stream().map(XmlEpoch::toModel).collect(Collectors.toCollection(EpochContainer::new));
+    if (gauges != null) {
+      return gauges.stream().filter((f) -> f != null).map(XmlGauge::toModel).collect(Collectors.toCollection(GaugeContainer::new));
     }
-    return new EpochContainer();
+    return new GaugeContainer();
   }
 
 }

@@ -15,7 +15,7 @@
  */
 package at.or.reder.mti.model.impl.stream;
 
-import at.or.reder.mti.model.api.EpochContainer;
+import at.or.reder.mti.model.api.GaugeContainer;
 import at.or.reder.mti.model.api.Streamer;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -24,20 +24,20 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Wolfgang Reder
  */
 @ServiceProvider(service = Streamer.class, path = "mti/streamer")
-public final class EpochContainerJsonStreamer extends AbstractJsonStreamer<EpochContainer, XmlEpochContainer> implements
-        Streamer<EpochContainer>
+public final class GaugeContainerJsonStreamer extends AbstractJsonStreamer<GaugeContainer, XmlGaugeContainer>
+        implements Streamer<GaugeContainer>
 {
 
-  public EpochContainerJsonStreamer()
+  public GaugeContainerJsonStreamer()
   {
-    super(XmlEpochContainer::new,
-          XmlEpochContainer.class);
+    super(XmlGaugeContainer::new,
+          XmlGaugeContainer.class);
   }
 
   @Override
-  public Class<EpochContainer> getStreamableClass()
+  public Class<GaugeContainer> getStreamableClass()
   {
-    return EpochContainer.class;
+    return GaugeContainer.class;
   }
 
 }

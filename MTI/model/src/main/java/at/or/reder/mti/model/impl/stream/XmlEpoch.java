@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Wolfgang Reder
  */
 @XmlRootElement(name = "epoch")
-public class XmlEpoch
+public class XmlEpoch implements XmlObject<Epoch>
 {
 
   @XmlID
@@ -69,7 +69,8 @@ public class XmlEpoch
     comment = new XmlLocalizable(epoch.getComment());
   }
 
-  public Epoch toEpoch()
+  @Override
+  public Epoch toModel()
   {
     Epoch.Builder builder = Factories.getEpochBuilderFactory().createEpochBuilder();
     if (countries != null) {

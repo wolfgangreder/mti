@@ -217,7 +217,7 @@ public interface Wagon extends Vehicle
      * @return {@code this}
      * @throws NullPointerException wenn {@code scale==null}
      */
-    public Wagon.Builder scale(Scale scale) throws NullPointerException;
+    public Wagon.Builder scale(Gauge scale) throws NullPointerException;
 
     public Wagon.Builder era(Epoch era);
 

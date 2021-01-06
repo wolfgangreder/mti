@@ -16,15 +16,7 @@
 package at.or.reder.mti.model.impl.stream;
 
 import at.or.reder.mti.model.Epoch;
-import at.or.reder.mti.model.api.StreamFormat;
 import at.or.reder.mti.model.api.Streamer;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -32,76 +24,18 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Wolfgang Reder
  */
 @ServiceProvider(service = Streamer.class, path = "mti/streamer")
-public final class EpochXmlStreamer implements Streamer<Epoch>
+public final class EpochXmlStreamer extends AbstractXmlStreamer<Epoch, XmlEpoch> implements Streamer<Epoch>
 {
 
-  private JAXBContext _context;
-
-  @Override
-  public StreamFormat getFormat()
+  public EpochXmlStreamer()
   {
-    return StreamFormat.XML;
+    super(XmlEpoch::new);
   }
 
   @Override
   public Class<Epoch> getStreamableClass()
   {
     return Epoch.class;
-  }
-
-  @Override
-  public boolean isMarshalSupported()
-  {
-    return true;
-  }
-
-  @Override
-  public boolean isUnmarshalSupported()
-  {
-    return true;
-  }
-
-  private synchronized JAXBContext getContext() throws IOException
-  {
-    if (_context == null) {
-      try {
-        _context = JAXBContext.newInstance("at.or.reder.mti.model.impl.stream");
-      } catch (JAXBException ex) {
-        throw new IOException(ex);
-      }
-    }
-    return _context;
-  }
-
-  @Override
-  public Epoch unmarshal(InputStream is) throws IOException
-  {
-    JAXBContext ctx = getContext();
-    try {
-      Unmarshaller um = ctx.createUnmarshaller();
-      Object o = um.unmarshal(is);
-      if (o instanceof XmlEpoch) {
-        return ((XmlEpoch) o).toEpoch();
-      }
-    } catch (JAXBException ex) {
-      throw new IOException(ex);
-    }
-    return null;
-  }
-
-  @Override
-  public void marshal(Epoch value,
-                      OutputStream out) throws IOException
-  {
-    JAXBContext ctx = getContext();
-    try {
-      Marshaller um = ctx.createMarshaller();
-      XmlEpoch x = new XmlEpoch(value);
-      um.marshal(x,
-                 out);
-    } catch (JAXBException ex) {
-      throw new IOException(ex);
-    }
   }
 
 }

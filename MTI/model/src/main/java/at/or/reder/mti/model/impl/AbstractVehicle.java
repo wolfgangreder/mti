@@ -19,7 +19,6 @@ import at.or.reder.mti.model.Contact;
 import at.or.reder.mti.model.Decoder;
 import at.or.reder.mti.model.Entity;
 import at.or.reder.mti.model.ModelCondition;
-import at.or.reder.mti.model.Scale;
 import at.or.reder.mti.model.ServiceEntry;
 import at.or.reder.mti.model.Vehicle;
 import at.or.reder.mti.model.utils.Money;
@@ -33,6 +32,7 @@ import java.util.UUID;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.Lookups;
 import at.or.reder.mti.model.Epoch;
+import at.or.reder.mti.model.Gauge;
 
 public abstract class AbstractVehicle extends AbstractInventoryObject implements Vehicle
 {
@@ -43,7 +43,7 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
   private final double height;
   private final double weight;
   private final List<Decoder> decoder;
-  private final Scale scale;
+  private final Gauge scale;
   private final List<ServiceEntry> serviceEntries;
   private final Lookup lookup;
 
@@ -66,7 +66,7 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
                             double weight,
                             Collection<? extends ServiceEntry> serviceEntries,
                             Collection<? extends Decoder> decoder,
-                            Scale scale,
+                            Gauge scale,
                             Collection<? extends Object> lookupContent)
   {
     super(id,
@@ -141,7 +141,7 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
   }
 
   @Override
-  public Scale getScale()
+  public Gauge getScale()
   {
     return scale;
   }

@@ -13,31 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.mti.model.impl.stream;
+package at.or.reder.mti.model.api;
 
-import at.or.reder.mti.model.api.EpochContainer;
-import at.or.reder.mti.model.api.Streamer;
-import org.openide.util.lookup.ServiceProvider;
+import java.util.ArrayList;
+import at.or.reder.mti.model.Gauge;
 
 /**
  *
  * @author Wolfgang Reder
  */
-@ServiceProvider(service = Streamer.class, path = "mti/streamer")
-public final class EpochContainerJsonStreamer extends AbstractJsonStreamer<EpochContainer, XmlEpochContainer> implements
-        Streamer<EpochContainer>
+public final class GaugeContainer extends ArrayList<Gauge>
 {
-
-  public EpochContainerJsonStreamer()
-  {
-    super(XmlEpochContainer::new,
-          XmlEpochContainer.class);
-  }
-
-  @Override
-  public Class<EpochContainer> getStreamableClass()
-  {
-    return EpochContainer.class;
-  }
 
 }

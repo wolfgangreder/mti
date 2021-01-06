@@ -17,6 +17,7 @@ package at.or.reder.mti.model.api;
 
 import at.or.reder.mti.model.Entity;
 import at.or.reder.mti.model.Epoch;
+import at.or.reder.mti.model.Gauge;
 import at.or.reder.mti.model.MTIConfig;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -142,6 +143,11 @@ public final class Factories
   public static Entity.BuilderFactory getEntityBuilderFactory()
   {
     return Lookup.getDefault().lookup(Entity.BuilderFactory.class);
+  }
+
+  public static Gauge.BuilderFactory getGaugeBuilderFactory()
+  {
+    return Lookup.getDefault().lookup(Gauge.BuilderFactory.class);
   }
 
   public static <C> Streamer<C> getStreamer(StreamFormat format,

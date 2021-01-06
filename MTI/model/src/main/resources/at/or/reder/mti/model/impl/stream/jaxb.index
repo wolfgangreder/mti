@@ -1,3 +1,5 @@
 XmlLocalizable
 XmlEpoch
 XmlEpochContainer
+XmlGauge
+XmlGaugeContainer

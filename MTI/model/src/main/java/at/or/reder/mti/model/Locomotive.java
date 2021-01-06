@@ -213,7 +213,7 @@ public interface Locomotive extends Vehicle
      * @return {@code this}
      * @throws NullPointerException wenn {@code scale==null}
      */
-    public Locomotive.Builder scale(Scale scale) throws NullPointerException;
+    public Locomotive.Builder scale(Gauge scale) throws NullPointerException;
 
     public Locomotive.Builder era(Epoch era);
 

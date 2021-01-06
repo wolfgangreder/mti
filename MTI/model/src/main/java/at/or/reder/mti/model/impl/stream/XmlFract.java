@@ -15,29 +15,36 @@
  */
 package at.or.reder.mti.model.impl.stream;
 
-import at.or.reder.mti.model.api.EpochContainer;
-import at.or.reder.mti.model.api.Streamer;
-import org.openide.util.lookup.ServiceProvider;
+import at.or.reder.mti.model.utils.Fract;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /**
  *
  * @author Wolfgang Reder
  */
-@ServiceProvider(service = Streamer.class, path = "mti/streamer")
-public final class EpochContainerJsonStreamer extends AbstractJsonStreamer<EpochContainer, XmlEpochContainer> implements
-        Streamer<EpochContainer>
+public class XmlFract
 {
 
-  public EpochContainerJsonStreamer()
+  @XmlAttribute(name = "numerator")
+  private long numerator;
+  @XmlAttribute(name = "denominator")
+  private long denominator;
+
+  public XmlFract()
   {
-    super(XmlEpochContainer::new,
-          XmlEpochContainer.class);
   }
 
-  @Override
-  public Class<EpochContainer> getStreamableClass()
+  public XmlFract(Fract fract)
   {
-    return EpochContainer.class;
+    numerator = fract.getNumerator();
+    denominator = fract.getDenominator();
+  }
+
+  public Fract toFract()
+  {
+    return Fract.valueOf(numerator,
+                         denominator,
+                         false);
   }
 
 }

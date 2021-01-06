@@ -28,6 +28,6 @@ public interface ScaledObject
    *
    * @return niemals {@code null}
    */
-  public Scale getScale();
+  public Gauge getScale();
 
 }

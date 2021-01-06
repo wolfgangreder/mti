@@ -28,4 +28,6 @@ public interface Stores extends Lookup.Provider
 
   public EntityStore getEntityStore();
 
+  public GaugeStore getGaugeStore();
+
 }

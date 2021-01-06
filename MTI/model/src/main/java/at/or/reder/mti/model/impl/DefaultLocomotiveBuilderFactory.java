@@ -20,7 +20,6 @@ import at.or.reder.mti.model.Decoder;
 import at.or.reder.mti.model.Entity;
 import at.or.reder.mti.model.Locomotive;
 import at.or.reder.mti.model.ModelCondition;
-import at.or.reder.mti.model.Scale;
 import at.or.reder.mti.model.ServiceEntry;
 import at.or.reder.mti.model.utils.Money;
 import java.time.Instant;
@@ -32,6 +31,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.openide.util.lookup.ServiceProvider;
 import at.or.reder.mti.model.Epoch;
+import at.or.reder.mti.model.Gauge;
 
 @ServiceProvider(service = Locomotive.BuilderFactory.class)
 public final class DefaultLocomotiveBuilderFactory implements Locomotive.BuilderFactory
@@ -67,7 +67,7 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
                               double weight,
                               Collection<? extends ServiceEntry> serviceEntries,
                               Collection<? extends Decoder> decoder,
-                              Scale scale,
+                              Gauge scale,
                               Collection<? extends Object> lookupContent,
                               String number,
                               String arrangement,
@@ -164,7 +164,7 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     private double height;
     private double weight;
     private final Set<Decoder> decoder = new HashSet<>();
-    private Scale scale;
+    private Gauge scale;
     private final Set<ServiceEntry> serviceEntries = new HashSet<>();
     private final Set<Object> lookupContent = new HashSet<>();
     private String number;
@@ -506,7 +506,7 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     }
 
     @Override
-    public Locomotive.Builder scale(Scale scale) throws NullPointerException
+    public Locomotive.Builder scale(Gauge scale) throws NullPointerException
     {
       if (scale == null) {
         throw new NullPointerException("scale==null");
