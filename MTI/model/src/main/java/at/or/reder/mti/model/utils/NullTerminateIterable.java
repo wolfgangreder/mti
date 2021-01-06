@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Wolfgang Reder.
+ * Copyright 2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.mti.model.api;
+package at.or.reder.mti.model.utils;
 
-import org.openide.util.Lookup;
+import java.util.Iterator;
+import java.util.Objects;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface Stores extends Lookup.Provider
+public final class NullTerminateIterable<C> implements Iterable<C>
 {
 
-  public EpochStore getEpochStore();
+  private final Iterable<C> wrapped;
 
-  public EntityStore getEntityStore();
+  public NullTerminateIterable(Iterable<C> wrapped)
+  {
+    this.wrapped = Objects.requireNonNull(wrapped);
+  }
+
+  @Override
+  public Iterator<C> iterator()
+  {
+    return new NullTerminateIterator<>(wrapped.iterator());
+  }
 
 }

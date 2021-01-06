@@ -16,6 +16,8 @@
 package at.or.reder.mti.jaybirdsql;
 
 import at.or.reder.mti.model.utils.Money;
+import at.or.reder.mti.model.utils.NullTerminateIterable;
+import at.or.reder.mti.model.utils.OneShotSupplier;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -34,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -855,6 +858,16 @@ abstract class AbstractStore
                      Integer.toString(stepping));
       stmt.executeUpdate();
     }
+  }
+
+  public <C> Supplier<C> wrapIterable(Iterable<? extends C> iterable)
+  {
+    return new NullTerminateIterable<>(iterable).iterator()::next;
+  }
+
+  public <C> Supplier<C> wrapSingleton(C value)
+  {
+    return new OneShotSupplier<>(value);
   }
 
 }

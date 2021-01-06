@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Wolfgang Reder.
+ * Copyright 2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,23 @@
  */
 package at.or.reder.mti.model.api;
 
-import org.openide.util.Lookup;
+import at.or.reder.mti.model.Entity;
+import java.util.List;
+import java.util.UUID;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface Stores extends Lookup.Provider
+public interface EntityStore
 {
 
-  public EpochStore getEpochStore();
+  public Entity getEntity(UUID entity) throws StoreException;
 
-  public EntityStore getEntityStore();
+  public List<Entity> getEntities() throws StoreException;
+
+  public void storeEntity(Entity e) throws StoreException;
+
+  public void deleteEntity(Entity e) throws StoreException;
 
 }

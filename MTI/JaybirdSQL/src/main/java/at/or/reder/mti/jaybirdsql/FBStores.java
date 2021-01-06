@@ -15,6 +15,7 @@
  */
 package at.or.reder.mti.jaybirdsql;
 
+import at.or.reder.mti.model.api.EntityStore;
 import at.or.reder.mti.model.api.EpochStore;
 import at.or.reder.mti.model.api.StoreException;
 import at.or.reder.mti.model.api.Stores;
@@ -29,6 +30,7 @@ final class FBStores implements Stores
   private final DataSource ds;
   private final FBEpochStore epochStore;
   private final LocalizableStore locStore;
+  private final FBEntityStore entityStore;
 
   public FBStores(DataSource ds)
   {
@@ -36,6 +38,8 @@ final class FBStores implements Stores
     locStore = new LocalizableStore(this);
     epochStore = new FBEpochStore(this,
                                   locStore);
+    entityStore = new FBEntityStore(this,
+                                    locStore);
   }
 
   void startup() throws SQLException, StoreException
@@ -46,6 +50,8 @@ final class FBStores implements Stores
                            phase);
         locStore.startup(conn,
                          phase);
+        entityStore.startup(conn,
+                            phase);
       }
     }
   }
@@ -59,6 +65,12 @@ final class FBStores implements Stores
   public EpochStore getEpochStore()
   {
     return epochStore;
+  }
+
+  @Override
+  public EntityStore getEntityStore()
+  {
+    return entityStore;
   }
 
   @Override

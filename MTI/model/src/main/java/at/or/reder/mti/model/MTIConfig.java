@@ -123,10 +123,17 @@ public interface MTIConfig
 
   public String replaceVariables(String value);
 
-  public default String getDatadirectory()
+  public default Path getDatadirectory()
   {
-    return getValue(KEY_DATADIR,
-                    PathVariables.USER_DOC.getPattern() + "/mtidata");
+    return Path.of(getValue(KEY_DATADIR,
+                            PathVariables.USER_DOC.getPattern()),
+                   "mtidata");
+  }
+
+  public default Path getMediaRoot()
+  {
+    return Path.of(getDatadirectory().toString(),
+                   "media");
   }
 
   public UUID getDefaultStoreProvider();

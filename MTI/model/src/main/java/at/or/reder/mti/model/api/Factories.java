@@ -15,6 +15,7 @@
  */
 package at.or.reder.mti.model.api;
 
+import at.or.reder.mti.model.Entity;
 import at.or.reder.mti.model.Epoch;
 import at.or.reder.mti.model.MTIConfig;
 import java.io.FileInputStream;
@@ -127,7 +128,7 @@ public final class Factories
       props.put("host",
                 "localhost");
       props.put("datadir",
-                cfg.getDatadirectory());
+                cfg.getDatadirectory().toString());
       stores = provider.openStores(props);
     }
     return stores;
@@ -136,6 +137,11 @@ public final class Factories
   public static Epoch.BuilderFactory getEpochBuilderFactory()
   {
     return Lookup.getDefault().lookup(Epoch.BuilderFactory.class);
+  }
+
+  public static Entity.BuilderFactory getEntityBuilderFactory()
+  {
+    return Lookup.getDefault().lookup(Entity.BuilderFactory.class);
   }
 
   public static <C> Streamer<C> getStreamer(StreamFormat format,

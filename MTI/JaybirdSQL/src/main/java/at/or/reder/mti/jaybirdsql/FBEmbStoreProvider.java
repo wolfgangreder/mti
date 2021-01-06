@@ -83,7 +83,7 @@ public class FBEmbStoreProvider extends AbstractFBStoreProvider implements Store
     try {
       if (dataDir == null) {
         MTIConfig cfg = Lookup.getDefault().lookup(MTIConfig.class);
-        dataPath = Paths.get(cfg.getDatadirectory());
+        dataPath = cfg.getDatadirectory();
       } else {
         dataPath = Paths.get(dataDir).toRealPath();
       }

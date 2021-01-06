@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Wolfgang Reder.
+ * Copyright 2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.mti.model.api;
+package at.or.reder.mti.model.utils;
 
-import org.openide.util.Lookup;
+import java.util.function.Supplier;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface Stores extends Lookup.Provider
+public final class OneShotSupplier<C> implements Supplier<C>
 {
 
-  public EpochStore getEpochStore();
+  private C value;
 
-  public EntityStore getEntityStore();
+  public OneShotSupplier(C value)
+  {
+    this.value = value;
+  }
+
+  @Override
+  public C get()
+  {
+    if (value != null) {
+      C tmp = value;
+      value = null;
+      return tmp;
+    }
+    return null;
+  }
 
 }

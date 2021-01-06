@@ -15,18 +15,20 @@
  */
 package at.or.reder.mti.model;
 
+import at.or.reder.mti.model.utils.Localizable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
+import java.net.URL;
 import java.nio.file.Path;
+import java.util.UUID;
 import org.openide.util.Lookup;
 
 /**
  * Klasse die Dokumente und Einstellungen.
  *
  * <code><pre>
- * Entity.BuilderFactory factory = Lookup.getDefault().lookup(DefEntityect.BuilderFactory.class);
- * Entity.Builder&lt? extends Entity&gt builder = factory.createBuilder();
+ * Entity.BuilderFactory factory = Factories.getEntityBuilderFactory();
+ * Entity.Builder builder = factory.createBuilder();
  * // attribute setzen
  * Entity instance = builder.build();
  * </pre></code>
@@ -54,13 +56,18 @@ public interface Entity extends Lookup.Provider
      */
     public Entity.Builder copy(Entity e) throws NullPointerException;
 
+    public Entity.Builder id(UUID id);
+
     /**
      * Setzt die Beschreibung
      *
      * @param descr
      * @return {@code this}
      */
-    public Entity.Builder description(String descr);
+    public Entity.Builder description(Localizable descr);
+
+    public Entity.Builder description(String lang,
+                                      String desc);
 
     /**
      * Setzt den original Dateinamen
@@ -97,16 +104,7 @@ public interface Entity extends Lookup.Provider
      * @return {@code this}
      * @throws IllegalArgumentException wenn {@code size<-1}
      */
-    public Entity.Builder size(int size);
-
-    /**
-     * Die URI mit der der Inhalt der Entität geladen werden kann.
-     *
-     * @param uri
-     * @return {@code this}
-     * @throws NullPointerException wenn {@code uri==null}
-     */
-    public Entity.Builder uri(URI uri) throws NullPointerException;
+    public Entity.Builder size(long size);
 
     /**
      * Setzt die Daten der Entity
@@ -114,7 +112,9 @@ public interface Entity extends Lookup.Provider
      * @param tmpFile
      * @return {@code this}
      */
-    public Entity.Builder data(Path tmpFile);
+    public Entity.Builder data(URL tmpFile);
+
+    public Entity.Builder origin(URL origin);
 
     public Entity build();
 
@@ -137,23 +137,16 @@ public interface Entity extends Lookup.Provider
   /**
    * Die Id der Enität.
    *
-   * @return {@link Entity#getURI() }
+   * @return id
    */
-  public URI getId();
-
-  /**
-   * URI des externen Dokuments. Diese Feld wird als Id verwendet
-   *
-   * @return
-   */
-  public URI getURI();
+  public UUID getId();
 
   /**
    * Beschreibung
    *
    * @return niemals {@code null}
    */
-  public String getDescription();
+  public Localizable getDescription();
 
   /**
    * Mime-Typ
@@ -174,7 +167,7 @@ public interface Entity extends Lookup.Provider
    *
    * @return
    */
-  public int getSize();
+  public long getSize();
 
   /**
    * Liest die Daten
@@ -183,5 +176,12 @@ public interface Entity extends Lookup.Provider
    * @throws java.io.IOException
    */
   public InputStream getData() throws IOException;
+
+  /**
+   * Der Ursprung der Entity. Kann z.B. die DownloadURL sein, oder {@code null} wenn es ein eigenes Werk ist.
+   *
+   * @return ursprung oder {@code null}
+   */
+  public URL getOrigin();
 
 }

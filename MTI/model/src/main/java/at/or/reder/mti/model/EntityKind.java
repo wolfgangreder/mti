@@ -51,5 +51,9 @@ public enum EntityKind
   /**
    * Es handelt sich um eine allgemeines Dokument.
    */
-  DOCUMENT;
+  DOCUMENT,
+  /**
+   * Irgend etwas anderes, eigentlich nur ein Fallback.
+   */
+  OTHER;
 }

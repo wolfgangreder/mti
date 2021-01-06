@@ -78,11 +78,13 @@ public final class DefaultEpochBuilderFactory implements Epoch.BuilderFactory
     public Epoch.Builder copy(Epoch toCopy) throws NullPointerException
     {
       this.id = Objects.requireNonNull(toCopy).getId();
+      this.name.getValues().clear();
       this.name.addValues(toCopy.getName());
       this.yearFrom = toCopy.getYearFrom();
       this.yearTo = toCopy.getYearTo();
       this.countries.clear();
       this.countries.addAll(toCopy.getCountries());
+      this.comment.getValues().clear();
       this.comment.addValues(toCopy.getComment());
       return this;
     }
