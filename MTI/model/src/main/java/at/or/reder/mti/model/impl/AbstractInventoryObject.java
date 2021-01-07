@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Wolfgang Reder.
+ * Copyright 2020-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import at.or.reder.mti.model.Entity;
 import at.or.reder.mti.model.InventoryObject;
 import at.or.reder.mti.model.ModelCondition;
 import at.or.reder.mti.model.utils.Money;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,7 +41,7 @@ public abstract class AbstractInventoryObject implements InventoryObject
   protected final LocalDate dateOfPurchase;
   protected final String description;
   protected final UUID id;
-  protected final Instant lastModified;
+  protected final ZonedDateTime lastModified;
   protected final Contact manufacturer;
   protected final Entity masterImage;
   protected final String name;
@@ -54,7 +54,7 @@ public abstract class AbstractInventoryObject implements InventoryObject
                                     ModelCondition condition,
                                     LocalDate dateOfPurchase,
                                     String description,
-                                    Instant lastModified,
+                                    ZonedDateTime lastModified,
                                     Contact manufacturer,
                                     Entity masterImage,
                                     Money price,
@@ -147,7 +147,7 @@ public abstract class AbstractInventoryObject implements InventoryObject
   }
 
   @Override
-  public Instant getLastModified()
+  public ZonedDateTime getLastModified()
   {
     return lastModified;
   }

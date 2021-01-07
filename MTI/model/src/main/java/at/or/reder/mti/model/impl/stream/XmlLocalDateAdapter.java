@@ -13,32 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.mti.model.api;
+package at.or.reder.mti.model.impl.stream;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface Streamer<C>
+public final class XmlLocalDateAdapter extends XmlAdapter<String, LocalDate>
 {
 
-  public StreamFormat getFormat();
+  @Override
+  public LocalDate unmarshal(String v)
+  {
+    if (v != null) {
+      return LocalDate.parse(v,
+                             DateTimeFormatter.ISO_DATE);
+    }
+    return null;
+  }
 
-  public String getMime();
-
-  public Class<C> getStreamableClass();
-
-  public boolean isMarshalSupported();
-
-  public boolean isUnmarshalSupported();
-
-  public C unmarshal(InputStream is) throws IOException;
-
-  public void marshal(C value,
-                      OutputStream out) throws IOException;
+  @Override
+  public String marshal(LocalDate v)
+  {
+    if (v != null) {
+      return v.format(DateTimeFormatter.ISO_DATE);
+    }
+    return null;
+  }
 
 }

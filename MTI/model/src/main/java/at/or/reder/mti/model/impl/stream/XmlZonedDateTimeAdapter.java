@@ -13,32 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.mti.model.api;
+package at.or.reder.mti.model.impl.stream;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface Streamer<C>
+public final class XmlZonedDateTimeAdapter extends XmlAdapter<String, ZonedDateTime>
 {
 
-  public StreamFormat getFormat();
+  @Override
+  public ZonedDateTime unmarshal(String v)
+  {
+    if (v != null) {
+      return ZonedDateTime.parse(v,
+                                 DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+    }
+    return null;
+  }
 
-  public String getMime();
-
-  public Class<C> getStreamableClass();
-
-  public boolean isMarshalSupported();
-
-  public boolean isUnmarshalSupported();
-
-  public C unmarshal(InputStream is) throws IOException;
-
-  public void marshal(C value,
-                      OutputStream out) throws IOException;
+  @Override
+  public String marshal(ZonedDateTime v)
+  {
+    if (v != null) {
+      return v.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+    }
+    return null;
+  }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Wolfgang Reder.
+ * Copyright 2020-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 package at.or.reder.mti.model;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -75,6 +77,16 @@ public interface Defect
      */
     public Defect.Builder description(String descr) throws NullPointerException, IllegalArgumentException;
 
+    public Defect.Builder addEntity(Entity e);
+
+    public Defect.Builder addEntities(Collection<? extends Entity> e);
+
+    public Defect.Builder removeEntity(Entity e);
+
+    public Defect.Builder removeEntities(Collection<? extends Entity> e);
+
+    public Defect.Builder clearEntities();
+
     public Defect build() throws NullPointerException, IllegalStateException;
 
   }
@@ -111,5 +123,7 @@ public interface Defect
    * @return Beschreibung, niemals {@code null}
    */
   public String getDescription();
+
+  public List<Entity> getEntities();
 
 }

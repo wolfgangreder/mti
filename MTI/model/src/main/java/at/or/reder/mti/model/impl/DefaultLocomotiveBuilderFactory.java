@@ -15,66 +15,68 @@
  */
 package at.or.reder.mti.model.impl;
 
+import at.or.reder.dcc.util.Predicates;
 import at.or.reder.mti.model.Contact;
 import at.or.reder.mti.model.Decoder;
+import at.or.reder.mti.model.Defect;
 import at.or.reder.mti.model.Entity;
+import at.or.reder.mti.model.Epoch;
+import at.or.reder.mti.model.Gauge;
 import at.or.reder.mti.model.Locomotive;
 import at.or.reder.mti.model.ModelCondition;
 import at.or.reder.mti.model.ServiceEntry;
+import at.or.reder.mti.model.TractionSystem;
 import at.or.reder.mti.model.utils.Money;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 import org.openide.util.lookup.ServiceProvider;
-import at.or.reder.mti.model.Epoch;
-import at.or.reder.mti.model.Gauge;
 
 @ServiceProvider(service = Locomotive.BuilderFactory.class)
 public final class DefaultLocomotiveBuilderFactory implements Locomotive.BuilderFactory
 {
 
-  public static final class DefaultLocomotive extends AbstractVehicle
-          implements Locomotive
+  public static final class DefaultLocomotive extends AbstractVehicle implements Locomotive
   {
 
     private final String number;
     private final String arrangement;
-    private final String kind;
     private final String clazz;
     private final String company;
     private final String country;
+    private final TractionSystem tractionSystem;
 
     private DefaultLocomotive(UUID id,
                               String name,
                               ModelCondition condition,
                               LocalDate dateOfPurchase,
                               String description,
-                              Instant lastModified,
+                              ZonedDateTime lastModified,
                               Contact manufacturer,
                               Entity masterImage,
                               Money price,
                               String productNumber,
                               Contact retailer,
                               Collection<? extends Entity> entities,
-                              Epoch era,
+                              Epoch epoch,
                               double length,
                               double width,
                               double height,
                               double weight,
                               Collection<? extends ServiceEntry> serviceEntries,
+                              Collection<? extends Defect> defect,
                               Collection<? extends Decoder> decoder,
-                              Gauge scale,
+                              Gauge gauge,
                               Collection<? extends Object> lookupContent,
                               String number,
                               String arrangement,
-                              String kind,
                               String clazz,
                               String company,
-                              String country)
+                              String country,
+                              TractionSystem tractionSystem)
     {
       super(id,
             name,
@@ -88,21 +90,22 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
             productNumber,
             retailer,
             entities,
-            era,
+            epoch,
             length,
             width,
             height,
             weight,
             serviceEntries,
             decoder,
-            scale,
+            gauge,
+            defect,
             lookupContent);
       this.number = number;
       this.arrangement = arrangement;
-      this.kind = kind;
       this.clazz = clazz;
       this.company = company;
       this.country = country;
+      this.tractionSystem = tractionSystem != null ? tractionSystem : TractionSystem.OTHER;
     }
 
     @Override
@@ -115,12 +118,6 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     public String getWheelArrangement()
     {
       return arrangement;
-    }
-
-    @Override
-    public String getKind()
-    {
-      return kind;
     }
 
     @Override
@@ -141,6 +138,12 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
       return country;
     }
 
+    @Override
+    public TractionSystem getTractionSystem()
+    {
+      return tractionSystem;
+    }
+
   }
 
   public static final class DefaultBuilder implements Locomotive.Builder
@@ -151,28 +154,29 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     private LocalDate dateOfPurchase;
     private String description;
     private UUID id;
-    private Instant lastModified;
+    private ZonedDateTime lastModified;
     private Contact manufacturer;
     private Entity masterImage;
     private String name;
     private Money price;
     private String productNumber;
     private Contact retailer;
-    private Epoch era;
+    private Epoch epoch;
     private double length;
     private double width;
     private double height;
     private double weight;
     private final Set<Decoder> decoder = new HashSet<>();
-    private Gauge scale;
+    private Gauge gauge;
     private final Set<ServiceEntry> serviceEntries = new HashSet<>();
+    private final Set<Defect> defects = new HashSet<>();
     private final Set<Object> lookupContent = new HashSet<>();
     private String number;
     private String arrangement;
-    private String kind;
     private String clazz;
     private String company;
     private String country;
+    private TractionSystem tractionSystem;
 
     @Override
     public Locomotive.Builder copy(Locomotive locomotive) throws NullPointerException
@@ -193,22 +197,24 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
       this.price = locomotive.getPrice();
       this.productNumber = locomotive.getProductNumber();
       this.retailer = locomotive.getRetailer();
-      this.era = locomotive.getEra();
+      this.epoch = locomotive.getEpoch();
       this.length = locomotive.getLength();
       this.height = locomotive.getHeight();
       this.weight = locomotive.getWeight();
       this.decoder.clear();
       this.decoder.addAll(locomotive.getDecoder());
-      this.scale = locomotive.getScale();
+      this.gauge = locomotive.getGauge();
       serviceEntries.clear();
       this.serviceEntries.addAll(locomotive.getServiceEntries());
+      defects.clear();;
+      this.defects.addAll(locomotive.getDefect());
       lookupContent.clear();
       this.number = locomotive.getLocomotiveNumber();
       this.arrangement = locomotive.getWheelArrangement();
-      this.kind = locomotive.getKind();
       this.clazz = locomotive.getLocomotiveClass();
       this.company = locomotive.getCompany();
       this.country = locomotive.getCountry();
+      this.tractionSystem = locomotive.getTractionSystem();
       return this;
     }
 
@@ -223,13 +229,6 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     public Locomotive.Builder wheelArrangement(String arrangement)
     {
       this.arrangement = arrangement;
-      return this;
-    }
-
-    @Override
-    public Locomotive.Builder kind(String kind)
-    {
-      this.kind = kind;
       return this;
     }
 
@@ -251,6 +250,13 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     public Locomotive.Builder country(String country)
     {
       this.country = country;
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder tractionSystem(TractionSystem ts)
+    {
+      this.tractionSystem = ts;
       return this;
     }
 
@@ -277,7 +283,7 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
       if (decoder.contains(null)) {
         throw new IllegalStateException("decoder contains null");
       }
-      if (scale == null) {
+      if (gauge == null) {
         throw new IllegalStateException("scale==null");
       }
       if (serviceEntries.contains(null)) {
@@ -286,7 +292,9 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
       if (lookupContent.contains(null)) {
         throw new IllegalStateException("lookupContent contains null");
       }
-
+      if (defects.contains(null)) {
+        throw new IllegalStateException("defects contains null");
+      }
     }
 
     @Override
@@ -369,7 +377,7 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     }
 
     @Override
-    public Locomotive.Builder lastModified(Instant ts) throws NullPointerException
+    public Locomotive.Builder lastModified(ZonedDateTime ts) throws NullPointerException
     {
       if (ts == null) {
         throw new NullPointerException("ts==null");
@@ -431,9 +439,9 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     }
 
     @Override
-    public Locomotive.Builder era(Epoch era)
+    public Locomotive.Builder epoch(Epoch epoch)
     {
-      this.era = era;
+      this.epoch = epoch;
       return this;
     }
 
@@ -506,12 +514,12 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     }
 
     @Override
-    public Locomotive.Builder scale(Gauge scale) throws NullPointerException
+    public Locomotive.Builder gauge(Gauge gauge) throws NullPointerException
     {
-      if (scale == null) {
-        throw new NullPointerException("scale==null");
+      if (gauge == null) {
+        throw new NullPointerException("gauge==null");
       }
-      this.scale = scale;
+      this.gauge = gauge;
       return this;
     }
 
@@ -558,43 +566,45 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     }
 
     @Override
-    public Locomotive.Builder addLookupItem(Object item) throws NullPointerException
+    public Locomotive.Builder addDefect(Defect d)
     {
-      if (item == null) {
-        throw new NullPointerException("item==null");
-      }
-      lookupContent.add(item);
-      return this;
-    }
-
-    @Override
-    public Locomotive.Builder removeLookupItem(Object item)
-    {
-      if (item != null) {
-        lookupContent.remove(item);
+      if (d != null) {
+        defects.add(d);
       }
       return this;
     }
 
     @Override
-    public Locomotive.Builder removeInstancesOfFromLookup(Class<?> clazz) throws NullPointerException
+    public Locomotive.Builder addDefects(Collection<? extends Defect> d)
     {
-      if (clazz == null) {
-        throw new NullPointerException("clazz==null");
-      }
-      Iterator<Object> iter = lookupContent.iterator();
-      while (iter.hasNext()) {
-        if (clazz.isInstance(iter.next())) {
-          iter.remove();
-        }
+      if (d != null) {
+        d.stream().filter(Predicates::isNotNull).forEach(defects::add);
       }
       return this;
     }
 
     @Override
-    public Locomotive.Builder clearLookup()
+    public Locomotive.Builder removeDefect(Defect d)
     {
-      lookupContent.clear();
+      if (d != null) {
+        defects.remove(d);
+      }
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder removeDefects(Collection<? extends Defect> d)
+    {
+      if (d != null) {
+        defects.removeAll(d);
+      }
+      return this;
+    }
+
+    @Override
+    public Locomotive.Builder clearDefects()
+    {
+      defects.clear();
       return this;
     }
 
@@ -614,21 +624,22 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
                                    productNumber,
                                    retailer,
                                    entities,
-                                   era,
+                                   epoch,
                                    length,
                                    width,
                                    height,
                                    weight,
                                    serviceEntries,
+                                   defects,
                                    decoder,
-                                   scale,
+                                   gauge,
                                    lookupContent,
                                    number,
                                    arrangement,
-                                   kind,
                                    clazz,
                                    company,
-                                   country);
+                                   country,
+                                   tractionSystem);
     }
 
   }

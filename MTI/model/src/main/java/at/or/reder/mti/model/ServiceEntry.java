@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Wolfgang Reder.
+ * Copyright 2020-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,18 @@ public interface ServiceEntry
             NullPointerException,
             IllegalArgumentException;
 
+    public ServiceEntry.Builder repairer(Contact contact);
+
+    public ServiceEntry.Builder addEntity(Entity e);
+
+    public ServiceEntry.Builder addEntities(Collection<? extends Entity> e);
+
+    public ServiceEntry.Builder removeEntity(Entity e);
+
+    public ServiceEntry.Builder removeEntities(Collection<? extends Entity> e);
+
+    public ServiceEntry.Builder clearEntities();
+
     public ServiceEntry build();
 
   }
@@ -103,5 +115,9 @@ public interface ServiceEntry
    * @return
    */
   public List<UsedSparePart> getPartsUsed();
+
+  public List<Entity> getEntities();
+
+  public Contact getRepaierer();
 
 }

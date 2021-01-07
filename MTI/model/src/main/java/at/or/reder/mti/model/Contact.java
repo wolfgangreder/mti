@@ -15,8 +15,8 @@
  */
 package at.or.reder.mti.model;
 
-import java.net.URI;
-import java.time.Instant;
+import java.net.URL;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -126,10 +126,10 @@ public interface Contact extends Lookup.Provider
      * @return {@code this}
      * @throws IllegalArgumentException wenn {@code email.getScheme()==null || !email.getScheme().equals("mailto")} und wenn der
      * Aufbau von {@code email.getSchemeSpecificPart()} keiner Emailadresse entspricht.
-     * @see URI#getScheme()
-     * @see URI#getSchemeSpecificPart()
+     * @see URL#getScheme()
+     * @see URL#getSchemeSpecificPart()
      */
-    public Contact.Builder emailShop(URI email) throws IllegalArgumentException;
+    public Contact.Builder emailShop(URL email) throws IllegalArgumentException;
 
     /**
      * Setzt die Emailadresse des Supports.
@@ -138,29 +138,29 @@ public interface Contact extends Lookup.Provider
      * @return {@code this}
      * @throws IllegalArgumentException wenn {@code email.getScheme()==null || !email.getScheme().equals("mailto")} und wenn der
      * Aufbau von {@code email.getSchemeSpecificPart()} keiner Emailadresse entspricht.
-     * @see URI#getScheme()
-     * @see URI#getSchemeSpecificPart()
+     * @see URL#getScheme()
+     * @see URL#getSchemeSpecificPart()
      */
-    public Contact.Builder emailService(URI email) throws IllegalArgumentException;
+    public Contact.Builder emailService(URL email) throws IllegalArgumentException;
 
     /**
-     * Setzt die Homepage. Es muss die URI zumindest die Form http://&lt;host&gt; oder https://&lt;host&gt; haben.
+     * Setzt die Homepage. Es muss die URL zumindest die Form http://&lt;host&gt; oder https://&lt;host&gt; haben.
      *
      * @param www
      * @return {@code this}
      * @throws IllegalArgumentException wenn {@code www} nicht den oben genannten Mindestanformderungen entspricht.
      */
-    public Contact.Builder www(URI www) throws IllegalArgumentException;
+    public Contact.Builder www(URL www) throws IllegalArgumentException;
 
     /**
      * Setzt die Adresse des Web-Shops
      *
      * @param shopAddress
      * @return {@code  this}
-     * @throws IllegalArgumentException wenn {@code shopAddress} nicht den bei {@link Contact.Builder#www(java.net.URI) }
+     * @throws IllegalArgumentException wenn {@code shopAddress} nicht den bei {@link Contact.Builder#www(java.net.URL) }
      * genannten Mindestanforderungen entspricht.
      */
-    public Contact.Builder shopAddress(URI shopAddress) throws IllegalArgumentException;
+    public Contact.Builder shopAddress(URL shopAddress) throws IllegalArgumentException;
 
     /**
      * Telefonnummer Es sind nur Ziffern erlaubt. {@code phone} muss mit {code +}, einer oder zwei Nullen beginnen, und darf dann
@@ -181,16 +181,6 @@ public interface Contact extends Lookup.Provider
      * genannten Mindestanforderungen entspricht.
      */
     public Contact.Builder phone2(String phone) throws IllegalArgumentException;
-
-    /**
-     * Faxnummer
-     *
-     * @param fax
-     * @return {@code this}
-     * @throws IllegalArgumentException wenn {@code fax} nicht den bei {@link Contact.Builder#phone1(java.lang.String) } genannten
-     * Mindestanforderungen entspricht.
-     */
-    public Contact.Builder fax(String fax) throws IllegalArgumentException;
 
     /**
      * Setzt die Rolle des Kontakts
@@ -228,47 +218,13 @@ public interface Contact extends Lookup.Provider
     public Contact.Builder memo(String memo);
 
     /**
-     * Fügt ein Object zum Lookup hinzu
-     *
-     * @param item
-     * @return {@code this}
-     * @throws NullPointerException wenn {@code item==null}
-     */
-    public Contact.Builder addLookupItem(Object item) throws NullPointerException;
-
-    /**
-     * Entfernt {@code item} vom Lookup
-     *
-     * @param item
-     * @return {@code this}
-     */
-    public Contact.Builder removeLookupItem(Object item);
-
-    /**
-     * Entfernt alle Objekte für die gilt {@code clazz.isInstance(item)==true}
-     *
-     * @param clazz
-     * @return {@code this}
-     * @throws NullPointerException wenn {@code clazz==null}
-     * @see Class#isInstance(java.lang.Object)
-     */
-    public Contact.Builder removeInstancesOfFromLookup(Class<?> clazz) throws NullPointerException;
-
-    /**
-     * Entfernt alle Objecte aus dem Lookup
-     *
-     * @return {@code this}
-     */
-    public Contact.Builder clearLookup();
-
-    /**
-     * Setzt den letzten Änderungszeitpunkg
+     * Setzt den letzten Änderungszeitpunkt
      *
      * @param lm
      * @return
      * @throws NullPointerException wenn {@code lm==null}.
      */
-    public Contact.Builder lastModified(Instant lm) throws NullPointerException;
+    public Contact.Builder lastModified(ZonedDateTime lm) throws NullPointerException;
 
     public Contact build() throws IllegalStateException, NullPointerException;
 
@@ -345,32 +301,32 @@ public interface Contact extends Lookup.Provider
   /**
    * Emailadresse des Verkaufs
    *
-   * @return entweder {@code null}, oder {@link URI#getScheme()}{@code .equals("mailto")==true} und
-   * {@link URI#getSchemeSpecificPart()} entspricht im Aufbau einer Emailadresse.
+   * @return entweder {@code null}, oder {@link URL#getScheme()}{@code .equals("mailto")==true} und
+   * {@link URL#getSchemeSpecificPart()} entspricht im Aufbau einer Emailadresse.
    */
-  public URI getEmailShop();
+  public URL getEmailShop();
 
   /**
    * Emailadresse des Supports
    *
-   * @return entweder {@code null}, oder {@link URI#getScheme()}{@code .equals("mailto")==true} und
-   * {@link URI#getSchemeSpecificPart()} entspricht im Aufbau einer Emailadresse.
+   * @return entweder {@code null}, oder {@link URL#getScheme()}{@code .equals("mailto")==true} und
+   * {@link URL#getSchemeSpecificPart()} entspricht im Aufbau einer Emailadresse.
    */
-  public URI getEmailService();
+  public URL getEmailService();
 
   /**
    * Homepage des Kontakts
    *
    * @return entweder {@code null}, oder eine Korrekte Adresse mit dem Scheme http oder https
    */
-  public URI getWWW();
+  public URL getWWW();
 
   /**
    * Adresse des Webshops
    *
    * @return entweder {@code null}, oder eine Korrekte Adresse mit dem Scheme http oder https
    */
-  public URI getShopAddress();
+  public URL getShopAddress();
 
   /**
    * Das Memofeld des Kontaktes.
@@ -396,14 +352,6 @@ public interface Contact extends Lookup.Provider
   public String getPhone2();
 
   /**
-   * Faxnummer des Kontakts
-   *
-   * @return entwender {@code null} oder die der String entspricht dem bei {@link Contact.Builder#phone1(java.lang.String) }
-   * spezifierten Format.
-   */
-  public String getFax();
-
-  /**
    * Rollen des Kontakts
    *
    * @return niemals {@code null} oder leer.
@@ -415,6 +363,6 @@ public interface Contact extends Lookup.Provider
    *
    * @return
    */
-  public Instant getLastModified();
+  public ZonedDateTime getLastModified();
 
 }

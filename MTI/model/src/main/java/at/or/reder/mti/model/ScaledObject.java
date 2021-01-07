@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Wolfgang Reder.
+ * Copyright 2020-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,6 @@ public interface ScaledObject
    *
    * @return niemals {@code null}
    */
-  public Gauge getScale();
+  public Gauge getGauge();
 
 }

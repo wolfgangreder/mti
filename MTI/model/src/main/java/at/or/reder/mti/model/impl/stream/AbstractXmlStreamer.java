@@ -64,6 +64,12 @@ abstract class AbstractXmlStreamer<C, X extends XmlObject<C>> implements Streame
   }
 
   @Override
+  public final String getMime()
+  {
+    return "application/xml";
+  }
+
+  @Override
   public boolean isMarshalSupported()
   {
     return true;

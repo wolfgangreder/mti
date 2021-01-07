@@ -16,8 +16,8 @@
 package at.or.reder.mti.model;
 
 import at.or.reder.mti.model.utils.Money;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -110,8 +110,7 @@ public interface Decoder extends InventoryObject
      * @return {@code this}
      * @throws NullPointerException wenn {@code ts==null}
      */
-    public Decoder.Builder lastModified(Instant ts) throws
-            NullPointerException;
+    public Decoder.Builder lastModified(ZonedDateTime ts) throws NullPointerException;
 
     /**
      * Setzt den Hersteller.

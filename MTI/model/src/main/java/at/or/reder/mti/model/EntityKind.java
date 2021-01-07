@@ -53,6 +53,10 @@ public enum EntityKind
    */
   DOCUMENT,
   /**
+   * Firmwarefile.
+   */
+  FIRMWARE,
+  /**
    * Irgend etwas anderes, eigentlich nur ein Fallback.
    */
   OTHER;

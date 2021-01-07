@@ -25,7 +25,7 @@ import org.openide.util.Lookup;
 public interface Vehicle extends ScaledObject, InventoryObject, ServiceableObject, Lookup.Provider
 {
 
-  public Epoch getEra();
+  public Epoch getEpoch();
 
   public double getLength();
 

@@ -15,6 +15,8 @@
  */
 package at.or.reder.mti.model.api;
 
+import at.or.reder.mti.model.Contact;
+import at.or.reder.mti.model.Decoder;
 import at.or.reder.mti.model.Entity;
 import at.or.reder.mti.model.Epoch;
 import at.or.reder.mti.model.Gauge;
@@ -148,6 +150,16 @@ public final class Factories
   public static Gauge.BuilderFactory getGaugeBuilderFactory()
   {
     return Lookup.getDefault().lookup(Gauge.BuilderFactory.class);
+  }
+
+  public static Contact.BuilderFactory getContactBuilderFactory()
+  {
+    return Lookup.getDefault().lookup(Contact.BuilderFactory.class);
+  }
+
+  public static Decoder.BuilderFactory getDecoderBuilderFactory()
+  {
+    return Lookup.getDefault().lookup(Decoder.BuilderFactory.class);
   }
 
   public static <C> Streamer<C> getStreamer(StreamFormat format,

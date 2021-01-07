@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Wolfgang Reder.
+ * Copyright 2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.mti.model;
+package at.or.reder.mti.model.api;
 
+import at.or.reder.mti.model.Contact;
+import at.or.reder.mti.model.Entity;
+import at.or.reder.mti.model.Locomotive;
+import at.or.reder.mti.model.ServiceEntry;
+import at.or.reder.mti.model.SparePart;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  *
- * @author wolfi
+ * @author Wolfgang Reder
  */
-public interface ServiceableObject
+public interface LocomotiveContainer
 {
 
-  public List<ServiceEntry> getServiceEntries();
+  public List<Locomotive> getLocomotives();
 
-  public List<Defect> getDefect();
+  public Map<UUID, Entity> getEntities();
+
+  public Map<UUID, Contact> getContacts();
+
+  public Map<UUID, ServiceEntry> getServiceEntry();
+
+  public Map<UUID, SparePart> getSpareParts();
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Wolfgang Reder.
+ * Copyright 2020-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package at.or.reder.mti.model;
 
 import at.or.reder.mti.model.utils.Money;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -111,6 +111,6 @@ public interface InventoryObject
    *
    * @return zeitstempel der letzten Änderung, niemals {@code null}
    */
-  public Instant getLastModified();
+  public ZonedDateTime getLastModified();
 
 }

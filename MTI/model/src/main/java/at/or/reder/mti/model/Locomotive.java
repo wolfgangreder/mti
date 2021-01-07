@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Wolfgang Reder.
+ * Copyright 2020-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package at.or.reder.mti.model;
 
 import at.or.reder.mti.model.utils.Money;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -36,8 +36,7 @@ public interface Locomotive extends Vehicle
      * @return {@code this}
      * @throws NullPointerException wenn {@code cond==null}
      */
-    public Locomotive.Builder condition(ModelCondition cond) throws
-            NullPointerException;
+    public Locomotive.Builder condition(ModelCondition cond) throws NullPointerException;
 
     /**
      * Setzt das Kaufdatum.
@@ -80,8 +79,7 @@ public interface Locomotive extends Vehicle
      * @throws NullPointerException wenn {@code e==null}.
      * @throws IllegalArgumentException wenn {@code e null} enthält.
      */
-    public Locomotive.Builder addEntities(Collection<? extends Entity> e) throws
-            NullPointerException, IllegalArgumentException;
+    public Locomotive.Builder addEntities(Collection<? extends Entity> e) throws NullPointerException, IllegalArgumentException;
 
     /**
      * Entfernt alle Entitäten
@@ -106,8 +104,7 @@ public interface Locomotive extends Vehicle
      * @return {@code this}
      * @throws NullPointerException wenn {@code ts==null}
      */
-    public Locomotive.Builder lastModified(Instant ts) throws
-            NullPointerException;
+    public Locomotive.Builder lastModified(ZonedDateTime ts) throws NullPointerException;
 
     /**
      * Setzt den Hersteller.
@@ -162,49 +159,24 @@ public interface Locomotive extends Vehicle
      */
     public Locomotive.Builder retailer(Contact contact);
 
-    /**
-     * Fügt ein Object zum Lookup hinzu
-     *
-     * @param item
-     * @return {@code this}
-     * @throws NullPointerException wenn {@code item==null}
-     */
-    public Locomotive.Builder addLookupItem(Object item) throws NullPointerException;
-
-    /**
-     * Entfernt {@code item} vom Lookup
-     *
-     * @param item
-     * @return {@code this}
-     */
-    public Locomotive.Builder removeLookupItem(Object item);
-
-    /**
-     * Entfernt alle Objekte für die gilt {@code clazz.isInstance(item)==true}
-     *
-     * @param clazz
-     * @return {@code this}
-     * @throws NullPointerException wenn {@code clazz==null}
-     * @see Class#isInstance(java.lang.Object)
-     */
-    public Locomotive.Builder removeInstancesOfFromLookup(Class<?> clazz) throws NullPointerException;
-
-    /**
-     * Entfernt alle Objecte aus dem Lookup
-     *
-     * @return {@code this}
-     */
-    public Locomotive.Builder clearLookup();
-
     public Locomotive.Builder addServiceEntry(ServiceEntry e) throws NullPointerException;
 
     public Locomotive.Builder removeServiceEntry(ServiceEntry e);
 
-    public Locomotive.Builder addServiceEntries(Collection<? extends ServiceEntry> e) throws
-            NullPointerException,
-            IllegalArgumentException;
+    public Locomotive.Builder addServiceEntries(Collection<? extends ServiceEntry> e) throws NullPointerException,
+                                                                                             IllegalArgumentException;
 
     public Locomotive.Builder clearServiceEntries();
+
+    public Locomotive.Builder addDefect(Defect d);
+
+    public Locomotive.Builder addDefects(Collection<? extends Defect> d);
+
+    public Locomotive.Builder removeDefect(Defect d);
+
+    public Locomotive.Builder removeDefects(Collection<? extends Defect> d);
+
+    public Locomotive.Builder clearDefects();
 
     /**
      * Setzt den Masstab
@@ -213,9 +185,9 @@ public interface Locomotive extends Vehicle
      * @return {@code this}
      * @throws NullPointerException wenn {@code scale==null}
      */
-    public Locomotive.Builder scale(Gauge scale) throws NullPointerException;
+    public Locomotive.Builder gauge(Gauge scale) throws NullPointerException;
 
-    public Locomotive.Builder era(Epoch era);
+    public Locomotive.Builder epoch(Epoch era);
 
     public Locomotive.Builder length(double len);
 
@@ -238,13 +210,13 @@ public interface Locomotive extends Vehicle
 
     public Locomotive.Builder wheelArrangement(String arrangement);
 
-    public Locomotive.Builder kind(String kind);
-
     public Locomotive.Builder locomotiveClass(String clazz);
 
     public Locomotive.Builder company(String company);
 
     public Locomotive.Builder country(String country);
+
+    public Locomotive.Builder tractionSystem(TractionSystem ts);
 
     public Locomotive build();
 
@@ -261,12 +233,12 @@ public interface Locomotive extends Vehicle
 
   public String getWheelArrangement();
 
-  public String getKind();
-
   public String getLocomotiveClass();
 
   public String getCompany();
 
   public String getCountry();
+
+  public TractionSystem getTractionSystem();
 
 }

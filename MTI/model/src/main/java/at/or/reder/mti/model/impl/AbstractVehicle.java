@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Wolfgang Reder.
+ * Copyright 2020-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,36 +15,38 @@
  */
 package at.or.reder.mti.model.impl;
 
+import at.or.reder.dcc.util.Predicates;
+import at.or.reder.dcc.util.Utils;
 import at.or.reder.mti.model.Contact;
 import at.or.reder.mti.model.Decoder;
+import at.or.reder.mti.model.Defect;
 import at.or.reder.mti.model.Entity;
+import at.or.reder.mti.model.Epoch;
+import at.or.reder.mti.model.Gauge;
 import at.or.reder.mti.model.ModelCondition;
 import at.or.reder.mti.model.ServiceEntry;
 import at.or.reder.mti.model.Vehicle;
 import at.or.reder.mti.model.utils.Money;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.Lookups;
-import at.or.reder.mti.model.Epoch;
-import at.or.reder.mti.model.Gauge;
 
 public abstract class AbstractVehicle extends AbstractInventoryObject implements Vehicle
 {
 
-  private final Epoch era;
+  private final Epoch epoch;
   private final double length;
   private final double width;
   private final double height;
   private final double weight;
   private final List<Decoder> decoder;
-  private final Gauge scale;
+  private final Gauge gauge;
   private final List<ServiceEntry> serviceEntries;
+  private final List<Defect> defect;
   private final Lookup lookup;
 
   protected AbstractVehicle(UUID id,
@@ -52,21 +54,22 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
                             ModelCondition condition,
                             LocalDate dateOfPurchase,
                             String description,
-                            Instant lastModified,
+                            ZonedDateTime lastModified,
                             Contact manufacturer,
                             Entity masterImage,
                             Money price,
                             String productNumber,
                             Contact retailer,
                             Collection<? extends Entity> entities,
-                            Epoch era,
+                            Epoch epoch,
                             double length,
                             double width,
                             double height,
                             double weight,
                             Collection<? extends ServiceEntry> serviceEntries,
                             Collection<? extends Decoder> decoder,
-                            Gauge scale,
+                            Gauge gauge,
+                            Collection<? extends Defect> defect,
                             Collection<? extends Object> lookupContent)
   {
     super(id,
@@ -81,22 +84,18 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
           productNumber,
           retailer,
           entities);
-    this.era = era;
+    this.epoch = epoch;
     this.length = length;
     this.width = width;
     this.height = height;
     this.weight = weight;
-    if (serviceEntries.isEmpty()) {
-      this.serviceEntries = Collections.emptyList();
-    } else {
-      this.serviceEntries = Collections.unmodifiableList(new ArrayList<>(serviceEntries));
-    }
-    if (decoder.isEmpty()) {
-      this.decoder = Collections.emptyList();
-    } else {
-      this.decoder = Collections.unmodifiableList(new ArrayList<>(decoder));
-    }
-    this.scale = scale;
+    this.serviceEntries = Utils.copyToUnmodifiableList(serviceEntries,
+                                                       Predicates::isNotNull);
+    this.decoder = Utils.copyToUnmodifiableList(decoder,
+                                                Predicates::isNotNull);
+    this.defect = Utils.copyToUnmodifiableList(defect,
+                                               Predicates::isNotNull);
+    this.gauge = gauge;
     if (lookupContent.isEmpty()) {
       lookup = Lookup.EMPTY;
     } else {
@@ -105,9 +104,9 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
   }
 
   @Override
-  public Epoch getEra()
+  public Epoch getEpoch()
   {
-    return era;
+    return epoch;
   }
 
   @Override
@@ -141,15 +140,21 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
   }
 
   @Override
-  public Gauge getScale()
+  public Gauge getGauge()
   {
-    return scale;
+    return gauge;
   }
 
   @Override
   public List<ServiceEntry> getServiceEntries()
   {
     return serviceEntries;
+  }
+
+  @Override
+  public List<Defect> getDefect()
+  {
+    return defect;
   }
 
   @Override

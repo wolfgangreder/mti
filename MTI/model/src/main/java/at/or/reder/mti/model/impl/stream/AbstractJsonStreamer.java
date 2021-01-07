@@ -64,6 +64,12 @@ public abstract class AbstractJsonStreamer<C, X extends XmlObject<C>> implements
   }
 
   @Override
+  public final String getMime()
+  {
+    return "application/json";
+  }
+
+  @Override
   public boolean isMarshalSupported()
   {
     return true;
