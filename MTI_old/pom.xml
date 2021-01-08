@@ -78,7 +78,6 @@
         <module>branding</module>
         <module>application</module>
     <module>MTI-UI</module>
-    <module>MTI-API</module>
   </modules>
 
     <properties>

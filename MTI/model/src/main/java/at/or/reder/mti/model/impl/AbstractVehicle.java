@@ -56,7 +56,7 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
                             String description,
                             ZonedDateTime lastModified,
                             Contact manufacturer,
-                            Entity masterImage,
+                            UUID masterImage,
                             Money price,
                             String productNumber,
                             Contact retailer,

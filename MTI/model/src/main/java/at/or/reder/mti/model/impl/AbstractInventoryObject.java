@@ -43,7 +43,7 @@ public abstract class AbstractInventoryObject implements InventoryObject
   protected final UUID id;
   protected final ZonedDateTime lastModified;
   protected final Contact manufacturer;
-  protected final Entity masterImage;
+  protected final UUID masterImage;
   protected final String name;
   protected final Money price;
   protected final String productNumber;
@@ -56,7 +56,7 @@ public abstract class AbstractInventoryObject implements InventoryObject
                                     String description,
                                     ZonedDateTime lastModified,
                                     Contact manufacturer,
-                                    Entity masterImage,
+                                    UUID masterImage,
                                     Money price,
                                     String productNumber,
                                     Contact retailer,
@@ -143,7 +143,11 @@ public abstract class AbstractInventoryObject implements InventoryObject
   @Override
   public Entity getMasterImage()
   {
-    return masterImage;
+    if (masterImage != null) {
+      return entities.stream().filter((e) -> e.getId().equals(masterImage)).findAny().orElse(
+          null);
+    }
+    return null;
   }
 
   @Override
