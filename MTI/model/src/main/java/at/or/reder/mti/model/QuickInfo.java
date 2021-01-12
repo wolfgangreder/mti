@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wolfgang Reder.
+ * Copyright 2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.swing;
+package at.or.reder.mti.model;
 
-import javax.swing.JPanel;
+import java.util.UUID;
+import javax.swing.Icon;
 
-public interface GlassPaneProvider
+/**
+ *
+ * @author Wolfgang Reder
+ */
+public interface QuickInfo
 {
 
-  public boolean getHideGlassOnBlurClick();
+  public UUID getId();
 
-  public void setHideGlassOnBlurClick(boolean hide);
+  public Icon getIcon();
 
-  public JPanel getContentPanel();
+  public String getLabel();
 
-  public JPanel getGlassPanel();
-
-  public void showGlassPanel(boolean show);
+  public String getDescription();
 
 }

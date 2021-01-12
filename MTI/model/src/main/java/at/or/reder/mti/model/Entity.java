@@ -178,6 +178,13 @@ public interface Entity extends Lookup.Provider
   public InputStream getData() throws IOException;
 
   /**
+   * URL. Kann auch null sein.
+   *
+   * @return url
+   */
+  public URL getDataURL();
+
+  /**
    * Der Ursprung der Entity. Kann z.B. die DownloadURL sein, oder {@code null} wenn es ein eigenes Werk ist.
    *
    * @return ursprung oder {@code null}

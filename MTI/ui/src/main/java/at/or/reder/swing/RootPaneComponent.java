@@ -115,6 +115,12 @@ public class RootPaneComponent extends JComponent implements GlassPaneProvider
   }
 
   @Override
+  public JPanel getContentPanel()
+  {
+    return masterPanel;
+  }
+
+  @Override
   public JPanel getGlassPanel()
   {
     return glassPanel;

@@ -122,7 +122,7 @@ public interface Locomotive extends Vehicle
      * @param e Das Bild des Objekts oder {@code null} falls nicht vorhanden.
      * @return {@code this}
      */
-    public Locomotive.Builder masterImage(Entity e);
+    public Locomotive.Builder masterImage(UUID e);
 
     /**
      * Der Name des Objects
@@ -197,14 +197,11 @@ public interface Locomotive extends Vehicle
 
     public Locomotive.Builder weight(double weight);
 
-    public Locomotive.Builder addDecoder(Decoder d) throws NullPointerException;
+    public Locomotive.Builder address(int address);
 
-    public Locomotive.Builder removeDecoder(Decoder d) throws NullPointerException;
+    public Locomotive.Builder consistsAddress(int address);
 
-    public Locomotive.Builder addDecoder(Collection<? extends Decoder> d) throws NullPointerException,
-                                                                                 IllegalArgumentException;
-
-    public Locomotive.Builder clearDecoder();
+    public Locomotive.Builder decoder(String decoder);
 
     public Locomotive.Builder locomotiveNumber(String number);
 

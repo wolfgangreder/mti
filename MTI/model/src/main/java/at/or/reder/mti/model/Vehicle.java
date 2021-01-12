@@ -15,7 +15,6 @@
  */
 package at.or.reder.mti.model;
 
-import java.util.List;
 import org.openide.util.Lookup;
 
 /**
@@ -35,6 +34,10 @@ public interface Vehicle extends ScaledObject, InventoryObject, ServiceableObjec
 
   public double getWeight();
 
-  public List<Decoder> getDecoder();
+  public int getAddress();
+
+  public int getConsistsAddress();
+
+  public String getDecoder();
 
 }

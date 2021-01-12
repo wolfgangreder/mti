@@ -37,7 +37,7 @@ import java.util.UUID;
  *
  * @author Wolfgang Reder
  */
-final class FBGaugeStore extends AbstractStore implements GaugeStore
+final class FBGaugeStore extends AbstractStore implements GaugeStore, FBStore
 {
 
   private final FBStores stores;
@@ -78,8 +78,9 @@ final class FBGaugeStore extends AbstractStore implements GaugeStore
     }
   }
 
-  void startup(Connection conn,
-               StartupPhase phase) throws SQLException, StoreException
+  @Override
+  public void startup(Connection conn,
+                      StartupPhase phase) throws SQLException, StoreException
   {
     switch (phase) {
       case CREATE:

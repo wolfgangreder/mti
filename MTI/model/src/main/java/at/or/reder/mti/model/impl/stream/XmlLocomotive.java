@@ -15,12 +15,18 @@
  */
 package at.or.reder.mti.model.impl.stream;
 
+import at.or.reder.dcc.util.Predicates;
+import at.or.reder.mti.model.Locomotive;
 import at.or.reder.mti.model.ModelCondition;
 import at.or.reder.mti.model.TractionSystem;
+import at.or.reder.mti.model.api.Factories;
+import at.or.reder.mti.model.utils.Money;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -32,15 +38,13 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *
  * @author Wolfgang Reder
  */
-public class XmlLocomotive
+public class XmlLocomotive implements XmlObject<Locomotive>
 {
 
   @XmlAttribute(name = "number")
   private String number;
   @XmlAttribute(name = "wheel-arrangement")
   private String wheelArr;
-  @XmlAttribute(name = "kind")
-  private String kind;
   @XmlAttribute(name = "class")
   private String clazz;
   @XmlAttribute(name = "company")
@@ -60,9 +64,12 @@ public class XmlLocomotive
   private double height;
   @XmlAttribute(name = "weight")
   private double weight;
-  @XmlElement(name = "decoder")
-  @XmlElementWrapper(name = "decoder-list")
-  private List<XmlDecoder> deocder;
+  @XmlAttribute(name = "address")
+  private int address;
+  @XmlAttribute(name = "consists-address")
+  private int consistsAddress;
+  @XmlAttribute(name = "decoder")
+  private String decoder;
   @XmlAttribute(name = "gauge")
   @XmlIDREF
   private XmlGauge gauge;
@@ -80,25 +87,108 @@ public class XmlLocomotive
   private LocalDate purchase;
   @XmlAttribute(name = "product-number")
   private String productNumber;
-  @XmlElement(name = "manufacturer")
+  @XmlAttribute(name = "manufacturer")
+  @XmlIDREF
   private XmlContact manufacturer;
-  @XmlElement(name = "retailer")
+  @XmlAttribute(name = "retailer")
+  @XmlIDREF
   private XmlContact retailer;
   @XmlAttribute(name = "condition")
   private ModelCondition condition;
   @XmlElement(name = "entity")
   @XmlElementWrapper(name = "entities")
+  @XmlIDREF
   private List<XmlEntity> entities;
   @XmlAttribute(name = "master-image")
   private String masterImage;
   @XmlAttribute(name = "last-modified")
   @XmlJavaTypeAdapter(XmlZonedDateTimeAdapter.class)
   private ZonedDateTime lastModified;
-  @XmlElement(name = "service-entry")
-  @XmlElementWrapper(name = "service-entries")
-  private List<XmlServiceEntriy> serviceEntries;
-  @XmlElement(name = "defect")
-  @XmlElementWrapper(name = "defects")
-  private List<XmlDefect> defects;
+//  @XmlElement(name = "service-entry")
+//  @XmlElementWrapper(name = "service-entries")
+//  private List<XmlServiceEntriy> serviceEntries;
+//  @XmlElement(name = "defect")
+//  @XmlElementWrapper(name = "defects")
+//  private List<XmlDefect> defects;
+
+  public XmlLocomotive()
+  {
+  }
+
+  public XmlLocomotive(Locomotive l)
+  {
+    number = l.getProductNumber();
+    wheelArr = l.getWheelArrangement();
+    clazz = l.getLocomotiveClass();
+
+    company = l.getCompany();
+    country = l.getCountry();
+    tractionSystem = l.getTractionSystem();
+    epoch = new XmlEpoch(l.getEpoch());
+    length = l.getLength();
+    width = l.getWidth();
+    height = l.getHeight();
+    weight = l.getWeight();
+    address = l.getAddress();
+    consistsAddress = l.getConsistsAddress();
+    decoder = l.getDecoder();
+    gauge = new XmlGauge(l.getGauge());
+    id = l.getId().toString();
+    name = l.getName();
+    description = l.getDescription();
+    price = l.getPrice() != null ? l.getPrice().toBigDecimal() : null;
+    purchase = l.getDateOfPurchase();
+    productNumber = l.getProductNumber();
+    manufacturer = l.getManufacturer() != null ? new XmlContact(l.getManufacturer()) : null;
+    retailer = l.getRetailer() != null ? new XmlContact(l.getRetailer()) : null;
+    condition = l.getCondition();
+    entities = l.getEntities().stream().map(XmlEntity::new).collect(Collectors.toList());
+    masterImage = l.getMasterImage() != null ? l.getMasterImage().getId().toString() : null;
+    lastModified = l.getLastModified();
+  }
+
+  @Override
+  public Locomotive toModel()
+  {
+    Locomotive.Builder builder = Factories.getLomotiveBuilderFactory().createBuilder();
+    entities.stream().
+            filter(Predicates::isNotNull).
+            map(XmlEntity::toModel).
+            filter(Predicates::isNotNull).
+            forEach(builder::addEntity);
+    builder.address(address);
+    builder.company(company);
+    builder.condition(condition);
+    builder.consistsAddress(consistsAddress);
+    builder.country(country);
+    builder.dateOfPurchase(purchase);
+    builder.decoder(decoder);
+    builder.description(description);
+    builder.epoch(epoch.toModel());
+    builder.gauge(gauge.toModel());
+    builder.height(height);
+    builder.id(UUID.fromString(id));
+    builder.lastModified(lastModified);
+    builder.length(length);
+    builder.locomotiveClass(clazz);
+    builder.locomotiveNumber(number);
+    if (manufacturer != null) {
+      builder.manufacturer(manufacturer.toModel());
+    }
+    if (masterImage != null) {
+      builder.masterImage(UUID.fromString(id));
+    }
+    builder.name(name);
+    builder.price(Money.valueOf(price));
+    builder.productNumber(productNumber);
+    if (retailer != null) {
+      builder.retailer(retailer.toModel());
+    }
+    builder.tractionSystem(tractionSystem);
+    builder.weight(weight);
+    builder.wheelArrangement(wheelArr);
+    builder.width(width);
+    return builder.build();
+  }
 
 }

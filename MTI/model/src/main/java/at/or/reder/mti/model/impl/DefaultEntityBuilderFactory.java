@@ -223,6 +223,12 @@ public final class DefaultEntityBuilderFactory implements Entity.BuilderFactory
     }
 
     @Override
+    public URL getDataURL()
+    {
+      return url;
+    }
+
+    @Override
     public URL getOrigin()
     {
       return origin;

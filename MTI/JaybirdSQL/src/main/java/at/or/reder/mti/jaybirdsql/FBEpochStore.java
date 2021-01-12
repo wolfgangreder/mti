@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import org.netbeans.api.annotations.common.NonNull;
 
-public final class FBEpochStore extends AbstractStore implements EpochStore
+public final class FBEpochStore extends AbstractStore implements EpochStore, FBStore
 {
 
   private final FBStores store;
@@ -143,8 +143,9 @@ public final class FBEpochStore extends AbstractStore implements EpochStore
                 1);
   }
 
-  void startup(Connection conn,
-               StartupPhase phase) throws SQLException, StoreException
+  @Override
+  public void startup(Connection conn,
+                      StartupPhase phase) throws SQLException, StoreException
   {
     switch (phase) {
       case CREATE:

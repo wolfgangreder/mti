@@ -18,6 +18,7 @@ package at.or.reder.swing;
 import at.or.reder.swing.model.MTIDocument;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.BeanProperty;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -53,6 +54,7 @@ public final class MTILocalTimeTextField extends MTITextField
     getMTIDocument().checkFlags();
   }
 
+  @BeanProperty(bound = false, preferred = true, visualUpdate = true)
   public MTILocalTimeTextField getMinField()
   {
     return minField;
@@ -77,6 +79,7 @@ public final class MTILocalTimeTextField extends MTITextField
     }
   }
 
+  @BeanProperty(bound = false, preferred = true, visualUpdate = true)
   public MTILocalTimeTextField getMaxField()
   {
     return maxField;
@@ -175,6 +178,7 @@ public final class MTILocalTimeTextField extends MTITextField
     return false;
   }
 
+  @BeanProperty(bound = false, preferred = true, visualUpdate = true)
   public DateTimeFormatter getDateTimeFormatter()
   {
     return dtf;
@@ -190,6 +194,7 @@ public final class MTILocalTimeTextField extends MTITextField
     }
   }
 
+  @BeanProperty(bound = false, preferred = true, visualUpdate = true)
   public String getFormatString()
   {
     return formatPattern;
@@ -214,6 +219,7 @@ public final class MTILocalTimeTextField extends MTITextField
     }
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public FormatStyle getFormatStyle()
   {
     return style;

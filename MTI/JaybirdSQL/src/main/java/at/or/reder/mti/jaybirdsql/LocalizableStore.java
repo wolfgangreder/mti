@@ -32,7 +32,7 @@ import java.util.function.BiConsumer;
  *
  * @author Wolfgang Reder
  */
-public final class LocalizableStore extends AbstractStore
+public final class LocalizableStore extends AbstractStore implements FBStore
 {
 
   private final FBStores store;
@@ -42,8 +42,9 @@ public final class LocalizableStore extends AbstractStore
     this.store = store;
   }
 
-  void startup(Connection conn,
-               StartupPhase phase) throws SQLException, StoreException
+  @Override
+  public void startup(Connection conn,
+                      StartupPhase phase) throws SQLException, StoreException
   {
     switch (phase) {
       case CREATE:

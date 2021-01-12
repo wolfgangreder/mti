@@ -131,6 +131,7 @@ public final class ControlTesterTopComponent extends TopComponent
     try {
       Factories.getStores();
     } catch (StoreException ex) {
+      Exceptions.printStackTrace(ex);
     }
   }
 

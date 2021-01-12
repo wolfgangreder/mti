@@ -22,6 +22,7 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.beans.BeanProperty;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Objects;
@@ -134,6 +135,7 @@ public class MTITextArea extends JTextArea implements ErrorFlagable, Commitable
     return (MTIDocument) super.getDocument();
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public boolean isNullAllowed()
   {
     return getMTIDocument().isNullAllowed();
@@ -150,6 +152,7 @@ public class MTITextArea extends JTextArea implements ErrorFlagable, Commitable
     }
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public boolean isTrimText()
   {
     return getMTIDocument().isTrimText();
@@ -166,6 +169,7 @@ public class MTITextArea extends JTextArea implements ErrorFlagable, Commitable
     }
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public int getMinLength()
   {
     return getMTIDocument().getMinLength();
@@ -183,6 +187,7 @@ public class MTITextArea extends JTextArea implements ErrorFlagable, Commitable
     }
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public int getMaxLength()
   {
     return getMTIDocument().getMaxLength();
@@ -225,6 +230,7 @@ public class MTITextArea extends JTextArea implements ErrorFlagable, Commitable
   }
 
   @Override
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public Border getErrorBorder()
   {
     return errorBorder;

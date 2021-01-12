@@ -25,16 +25,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 import java.util.Properties;
-import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import org.apache.commons.dbcp2.ConnectionFactory;
-import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp2.PoolableConnectionFactory;
-import org.apache.commons.dbcp2.PoolingDataSource;
-import org.apache.commons.pool2.ObjectPool;
-import org.apache.commons.pool2.PooledObjectFactory;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSourceFactory;
 import org.firebirdsql.gds.impl.GDSType;
 import org.firebirdsql.management.FBManager;
 import org.openide.util.Lookup;
@@ -68,20 +61,23 @@ public abstract class AbstractFBStoreProvider implements StoreProvider
       String dbq = createDatabase(params,
                                   props);
       url = getURLPrefix() + dbq;
-      ConnectionFactory connFactory = new DriverManagerConnectionFactory(url,
-                                                                         props);
-      PooledObjectFactory factory = new PoolableConnectionFactory(connFactory,
-                                                                  ObjectName.getInstance("at.or.reder.mti",
-                                                                                         "FBConnectionPool",
-                                                                                         dbq));
-      GenericObjectPoolConfig cfg = new GenericObjectPoolConfig();
-      ObjectPool pool = new GenericObjectPool(factory,
-                                              cfg);
-      PoolingDataSource ds = new PoolingDataSource(pool);
+      BasicDataSource ds = BasicDataSourceFactory.createDataSource(props);
+      ds.setDriverClassName("org.firebirdsql.jdbc.FBDriver");
+      ds.addConnectionProperty("charSet",
+                               "UTF8");
+      ds.setUrl(url);
+      ds.setPassword(params.get("password"));
+      ds.setUsername(params.get("user"));
+      ds.setDefaultAutoCommit(false);
+      ds.setPoolPreparedStatements(true);
+      ds.setRollbackOnReturn(true);
+      ds.setJmxName(ObjectName.getInstance("at.or.reder.mti",
+                                           "FBConnectionPool",
+                                           dbq).toString());
       FBStores result = new FBStores(ds);
       result.startup();
       return result;
-    } catch (MalformedObjectNameException | SQLException ex) {
+    } catch (Exception ex) {
       throw new StoreException(ex);
     }
   }

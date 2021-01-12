@@ -115,6 +115,12 @@ public class GlassPaneTopComponent extends TopComponent implements GlassPaneProv
   }
 
   @Override
+  public JPanel getContentPanel()
+  {
+    return masterPanel;
+  }
+
+  @Override
   public JPanel getGlassPanel()
   {
     return glassPanel;

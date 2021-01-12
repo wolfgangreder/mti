@@ -16,6 +16,7 @@
 package at.or.reder.swing;
 
 import java.awt.Graphics;
+import java.beans.BeanProperty;
 import java.util.Objects;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
@@ -55,6 +56,7 @@ public class MTISpinner extends JSpinner implements ErrorFlagable, Commitable
     checkDataValid();
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public boolean isValueRequired()
   {
     return valueRequired;
@@ -119,6 +121,7 @@ public class MTISpinner extends JSpinner implements ErrorFlagable, Commitable
   }
 
   @Override
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public Border getErrorBorder()
   {
     return errorBorder;

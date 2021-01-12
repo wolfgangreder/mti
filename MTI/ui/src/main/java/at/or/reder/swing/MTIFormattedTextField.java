@@ -17,6 +17,7 @@ package at.or.reder.swing;
 
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
+import java.beans.BeanProperty;
 import java.util.Objects;
 import javax.swing.JFormattedTextField;
 import javax.swing.border.Border;
@@ -107,6 +108,7 @@ public class MTIFormattedTextField<V> extends JFormattedTextField implements Com
     }
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public boolean isNullAllowed()
   {
     return isNullAllowed;
@@ -157,6 +159,7 @@ public class MTIFormattedTextField<V> extends JFormattedTextField implements Com
   }
 
   @Override
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public Border getErrorBorder()
   {
     return errorBorder;

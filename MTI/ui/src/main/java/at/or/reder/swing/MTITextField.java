@@ -17,6 +17,7 @@ package at.or.reder.swing;
 
 import at.or.reder.swing.model.MTIDocument;
 import java.awt.Graphics;
+import java.beans.BeanProperty;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Objects;
@@ -75,6 +76,7 @@ public class MTITextField extends JTextField implements ErrorFlagable, Commitabl
     constructed = true;
   }
 
+  @BeanProperty(bound = true, preferred = false, visualUpdate = true)
   public void setCommitedText(String text)
   {
     super.setText(text);
@@ -127,6 +129,7 @@ public class MTITextField extends JTextField implements ErrorFlagable, Commitabl
     return (MTIDocument) super.getDocument();
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public boolean isNullAllowed()
   {
     return getMTIDocument().isNullAllowed();
@@ -143,6 +146,7 @@ public class MTITextField extends JTextField implements ErrorFlagable, Commitabl
     }
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public boolean isTrimText()
   {
     return getMTIDocument().isTrimText();
@@ -159,11 +163,13 @@ public class MTITextField extends JTextField implements ErrorFlagable, Commitabl
     }
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public int getMinLength()
   {
     return getMTIDocument().getMinLength();
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public void setMinLength(int ml)
   {
     int oldMinLength = getMinLength();
@@ -176,6 +182,7 @@ public class MTITextField extends JTextField implements ErrorFlagable, Commitabl
     }
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public int getMaxLength()
   {
     return getMTIDocument().getMaxLength();
@@ -205,18 +212,21 @@ public class MTITextField extends JTextField implements ErrorFlagable, Commitabl
     getMTIDocument().revert();
   }
 
+  @BeanProperty(bound = true, preferred = false, visualUpdate = true)
   @Override
   public boolean isDataValid()
   {
     return getMTIDocument().isValid();
   }
 
+  @BeanProperty(bound = true, preferred = false, visualUpdate = true)
   @Override
   public boolean isDataChanged()
   {
     return getMTIDocument().isChanged();
   }
 
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   @Override
   public Border getErrorBorder()
   {

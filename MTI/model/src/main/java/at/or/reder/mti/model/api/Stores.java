@@ -30,4 +30,6 @@ public interface Stores extends Lookup.Provider
 
   public GaugeStore getGaugeStore();
 
+  public LocoStore getLocoStore();
+
 }

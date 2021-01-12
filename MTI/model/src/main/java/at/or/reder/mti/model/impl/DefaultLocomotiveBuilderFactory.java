@@ -17,7 +17,6 @@ package at.or.reder.mti.model.impl;
 
 import at.or.reder.dcc.util.Predicates;
 import at.or.reder.mti.model.Contact;
-import at.or.reder.mti.model.Decoder;
 import at.or.reder.mti.model.Defect;
 import at.or.reder.mti.model.Entity;
 import at.or.reder.mti.model.Epoch;
@@ -56,7 +55,7 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
                               String description,
                               ZonedDateTime lastModified,
                               Contact manufacturer,
-                              Entity masterImage,
+                              UUID masterImage,
                               Money price,
                               String productNumber,
                               Contact retailer,
@@ -68,7 +67,9 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
                               double weight,
                               Collection<? extends ServiceEntry> serviceEntries,
                               Collection<? extends Defect> defect,
-                              Collection<? extends Decoder> decoder,
+                              String decoder,
+                              int address,
+                              int consistsAddress,
                               Gauge gauge,
                               Collection<? extends Object> lookupContent,
                               String number,
@@ -97,6 +98,8 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
             weight,
             serviceEntries,
             decoder,
+            address,
+            consistsAddress,
             gauge,
             defect,
             lookupContent);
@@ -156,7 +159,7 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     private UUID id;
     private ZonedDateTime lastModified;
     private Contact manufacturer;
-    private Entity masterImage;
+    private UUID masterImage;
     private String name;
     private Money price;
     private String productNumber;
@@ -166,7 +169,9 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     private double width;
     private double height;
     private double weight;
-    private final Set<Decoder> decoder = new HashSet<>();
+    private String decoder;
+    private int address;
+    private int consistsAddress;
     private Gauge gauge;
     private final Set<ServiceEntry> serviceEntries = new HashSet<>();
     private final Set<Defect> defects = new HashSet<>();
@@ -192,7 +197,7 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
       this.id = locomotive.getId();
       this.lastModified = locomotive.getLastModified();
       this.manufacturer = locomotive.getManufacturer();
-      this.masterImage = locomotive.getMasterImage();
+      this.masterImage = locomotive.getMasterImage() != null ? locomotive.getMasterImage().getId() : null;
       this.name = locomotive.getName();
       this.price = locomotive.getPrice();
       this.productNumber = locomotive.getProductNumber();
@@ -201,8 +206,9 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
       this.length = locomotive.getLength();
       this.height = locomotive.getHeight();
       this.weight = locomotive.getWeight();
-      this.decoder.clear();
-      this.decoder.addAll(locomotive.getDecoder());
+      this.decoder = locomotive.getDecoder();
+      this.address = locomotive.getAddress();
+      this.consistsAddress = locomotive.getConsistsAddress();
       this.gauge = locomotive.getGauge();
       serviceEntries.clear();
       this.serviceEntries.addAll(locomotive.getServiceEntries());
@@ -394,12 +400,9 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     }
 
     @Override
-    public Locomotive.Builder masterImage(Entity e)
+    public Locomotive.Builder masterImage(UUID e)
     {
       this.masterImage = e;
-      if (e != null) {
-        addEntity(e);
-      }
       return this;
     }
 
@@ -474,42 +477,23 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
     }
 
     @Override
-    public Locomotive.Builder addDecoder(Decoder d) throws NullPointerException
+    public Locomotive.Builder address(int address)
     {
-      if (d == null) {
-        throw new NullPointerException("d==null");
-      }
-      decoder.add(d);
+      this.address = address;
       return this;
     }
 
     @Override
-    public Locomotive.Builder removeDecoder(Decoder d) throws NullPointerException
+    public Locomotive.Builder consistsAddress(int address)
     {
-      if (d != null) {
-        decoder.remove(d);
-      }
+      this.consistsAddress = address;
       return this;
     }
 
     @Override
-    public Locomotive.Builder addDecoder(Collection<? extends Decoder> d) throws NullPointerException,
-                                                                                 IllegalArgumentException
+    public Locomotive.Builder decoder(String decoder)
     {
-      if (d == null) {
-        throw new NullPointerException("d==null");
-      }
-      if (d.contains(null)) {
-        throw new IllegalArgumentException("d contains null");
-      }
-      decoder.addAll(d);
-      return this;
-    }
-
-    @Override
-    public Locomotive.Builder clearDecoder()
-    {
-      decoder.clear();
+      this.decoder = decoder;
       return this;
     }
 
@@ -632,6 +616,8 @@ public final class DefaultLocomotiveBuilderFactory implements Locomotive.Builder
                                    serviceEntries,
                                    defects,
                                    decoder,
+                                   address,
+                                   consistsAddress,
                                    gauge,
                                    lookupContent,
                                    number,

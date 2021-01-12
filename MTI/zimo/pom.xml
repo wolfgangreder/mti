@@ -57,12 +57,12 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
-            <version>RELEASE111</version>
+            <version>${netbeans.version}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
-            <version>RELEASE111</version>
+            <version>${netbeans.version}</version>
         </dependency>
         <dependency>
             <groupId>at.or.reder</groupId>

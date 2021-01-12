@@ -28,6 +28,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
+import java.beans.BeanProperty;
 import java.net.URL;
 import java.util.Objects;
 import javax.swing.JComponent;
@@ -179,6 +180,7 @@ public class JImage extends JComponent implements Scrollable,
     }
   }
 
+  @BeanProperty(bound = false, preferred = true, visualUpdate = false)
   public boolean isSelectionAllowed()
   {
     return allowSelection;
@@ -254,6 +256,7 @@ public class JImage extends JComponent implements Scrollable,
     return null;
   }
 
+  @BeanProperty(bound = false, preferred = true, visualUpdate = false)
   public boolean isMouseDragEnabled()
   {
     return useMouseDrag;

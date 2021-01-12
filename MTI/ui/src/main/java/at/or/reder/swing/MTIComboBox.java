@@ -16,6 +16,7 @@
 package at.or.reder.swing;
 
 import java.awt.Graphics;
+import java.beans.BeanProperty;
 import java.util.Objects;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
@@ -215,6 +216,7 @@ public class MTIComboBox<T> extends JComboBox<T> implements Commitable, ErrorFla
   }
 
   @Override
+  @BeanProperty(bound = true, preferred = true, visualUpdate = true)
   public final Border getErrorBorder()
   {
     return errorBorder;

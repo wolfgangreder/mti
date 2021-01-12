@@ -20,6 +20,7 @@ import at.or.reder.mti.model.Decoder;
 import at.or.reder.mti.model.Entity;
 import at.or.reder.mti.model.Epoch;
 import at.or.reder.mti.model.Gauge;
+import at.or.reder.mti.model.Locomotive;
 import at.or.reder.mti.model.MTIConfig;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -160,6 +161,11 @@ public final class Factories
   public static Decoder.BuilderFactory getDecoderBuilderFactory()
   {
     return Lookup.getDefault().lookup(Decoder.BuilderFactory.class);
+  }
+
+  public static Locomotive.BuilderFactory getLomotiveBuilderFactory()
+  {
+    return Lookup.getDefault().lookup(Locomotive.BuilderFactory.class);
   }
 
   public static <C> Streamer<C> getStreamer(StreamFormat format,

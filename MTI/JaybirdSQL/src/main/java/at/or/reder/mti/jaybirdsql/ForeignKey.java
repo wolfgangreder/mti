@@ -130,7 +130,7 @@ public class ForeignKey
     DELETE("delete"),
     SET_DEFAULT("set default"),
     SET_NULL("set null"),
-    RESTRICT("restrict");
+    RESTRICT("no action");
     private final String sql;
 
     private CascadeRule(String sql)

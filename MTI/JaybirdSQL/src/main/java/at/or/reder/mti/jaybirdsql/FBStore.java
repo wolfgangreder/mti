@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wolfgang Reder.
+ * Copyright 2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.swing;
+package at.or.reder.mti.jaybirdsql;
 
-import javax.swing.JPanel;
+import at.or.reder.mti.model.api.StoreException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-public interface GlassPaneProvider
+/**
+ *
+ * @author Wolfgang Reder
+ */
+public interface FBStore
 {
 
-  public boolean getHideGlassOnBlurClick();
-
-  public void setHideGlassOnBlurClick(boolean hide);
-
-  public JPanel getContentPanel();
-
-  public JPanel getGlassPanel();
-
-  public void showGlassPanel(boolean show);
+  public void startup(Connection conn,
+                      StartupPhase phase) throws SQLException, StoreException;
 
 }

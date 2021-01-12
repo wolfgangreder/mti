@@ -18,7 +18,6 @@ package at.or.reder.mti.model.impl;
 import at.or.reder.dcc.util.Predicates;
 import at.or.reder.dcc.util.Utils;
 import at.or.reder.mti.model.Contact;
-import at.or.reder.mti.model.Decoder;
 import at.or.reder.mti.model.Defect;
 import at.or.reder.mti.model.Entity;
 import at.or.reder.mti.model.Epoch;
@@ -43,7 +42,9 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
   private final double width;
   private final double height;
   private final double weight;
-  private final List<Decoder> decoder;
+  private final String decoder;
+  private final int address;
+  private final int consistsAddress;
   private final Gauge gauge;
   private final List<ServiceEntry> serviceEntries;
   private final List<Defect> defect;
@@ -67,7 +68,9 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
                             double height,
                             double weight,
                             Collection<? extends ServiceEntry> serviceEntries,
-                            Collection<? extends Decoder> decoder,
+                            String decoder,
+                            int address,
+                            int consistsAddress,
                             Gauge gauge,
                             Collection<? extends Defect> defect,
                             Collection<? extends Object> lookupContent)
@@ -91,8 +94,9 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
     this.weight = weight;
     this.serviceEntries = Utils.copyToUnmodifiableList(serviceEntries,
                                                        Predicates::isNotNull);
-    this.decoder = Utils.copyToUnmodifiableList(decoder,
-                                                Predicates::isNotNull);
+    this.decoder = decoder;
+    this.address = address;
+    this.consistsAddress = consistsAddress;
     this.defect = Utils.copyToUnmodifiableList(defect,
                                                Predicates::isNotNull);
     this.gauge = gauge;
@@ -134,9 +138,21 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
   }
 
   @Override
-  public List<Decoder> getDecoder()
+  public String getDecoder()
   {
     return decoder;
+  }
+
+  @Override
+  public int getAddress()
+  {
+    return address;
+  }
+
+  @Override
+  public int getConsistsAddress()
+  {
+    return consistsAddress;
   }
 
   @Override

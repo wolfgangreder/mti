@@ -54,7 +54,7 @@ import org.openide.util.Lookup;
  *
  * @author Wolfgang Reder
  */
-public final class FBEntityStore extends AbstractStore implements EntityStore
+public final class FBEntityStore extends AbstractStore implements EntityStore, FBStore
 {
 
   private final FBStores stores;
@@ -138,6 +138,7 @@ public final class FBEntityStore extends AbstractStore implements EntityStore
                 1);
   }
 
+  @Override
   public void startup(Connection conn,
                       StartupPhase phase) throws StoreException, SQLException
   {

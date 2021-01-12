@@ -15,21 +15,25 @@
  */
 package at.or.reder.swing;
 
-import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JViewport;
+import javax.swing.RootPaneContainer;
 import javax.swing.border.Border;
 import org.netbeans.api.annotations.common.NonNull;
 import org.openide.util.WeakSet;
@@ -38,22 +42,22 @@ public final class CommitableAndErrorFlagableContainer implements ErrorFlagable,
 {
 
   private final JComponent container;
-  private final List<Commitable> commitables = new ArrayList<>();
-  private final List<ErrorFlagable> errorFlagables = new ArrayList<>();
-  private final WeakSet<JComponent> extraContainer = new WeakSet<>();
+  private final Set<Commitable> commitables = new HashSet<>();
+  private final Set<Validateable> validateables = new HashSet<>();
+  private final WeakSet<Container> extraContainer = new WeakSet<>();
   private final ContainerListener cl = new ContainerListener()
   {
 
     @Override
     public void componentAdded(ContainerEvent e)
     {
-      CommitableAndErrorFlagableContainer.this.componentAdded(e.getChild());
+      CommitableAndErrorFlagableContainer.this.add(e.getChild());
     }
 
     @Override
     public void componentRemoved(ContainerEvent e)
     {
-      CommitableAndErrorFlagableContainer.this.componentRemoved(e.getChild());
+      CommitableAndErrorFlagableContainer.this.remove(e.getChild());
     }
 
   };
@@ -62,45 +66,60 @@ public final class CommitableAndErrorFlagableContainer implements ErrorFlagable,
   private final Supplier<Boolean> testValid;
   private final Supplier<Boolean> testChanged;
   private Border errorBorder = ErrorFlagable.DEFAULT_ERROR_BORDER;
+  private final String context;
 
   public CommitableAndErrorFlagableContainer(@NonNull JComponent c,
                                              Supplier<Boolean> testValid,
                                              Supplier<Boolean> testChanged)
   {
+    this(c,
+         testValid,
+         testChanged,
+         null);
+  }
+
+  public CommitableAndErrorFlagableContainer(@NonNull JComponent c,
+                                             Supplier<Boolean> testValid,
+                                             Supplier<Boolean> testChanged,
+                                             String context)
+  {
     this.container = Objects.requireNonNull(c,
                                             "container is null");
     c.addContainerListener(cl);
+    if (c instanceof RootPaneContainer) {
+      addExtraContainer(((RootPaneContainer) c).getContentPane());
+    } else if (c instanceof GlassPaneProvider) {
+      addExtraContainer(((GlassPaneProvider) c).getContentPanel());
+    }
     this.testValid = testValid;
     this.testChanged = testChanged;
+    if (context != null) {
+      this.context = context;
+    } else {
+      this.context = c.getClass().getName();
+    }
+  }
+
+  public CommitableAndErrorFlagableContainer(@NonNull JComponent c,
+                                             String context)
+  {
+    this(c,
+         null,
+         null,
+         context);
   }
 
   public CommitableAndErrorFlagableContainer(@NonNull JComponent c)
   {
     this(c,
          null,
+         null,
          null);
   }
 
-  public void addExtraContainer(JComponent comp)
+  public String getContext()
   {
-    if (comp != null && comp != container && !extraContainer.contains(comp)) {
-      extraContainer.add(comp);
-      comp.addContainerListener(cl);
-      if (comp instanceof JViewport) {
-        componentAdded(((JViewport) comp).getView());
-      } else if (comp instanceof JSplitPane) {
-        componentAdded(((JSplitPane) comp).getLeftComponent());
-        componentAdded(((JSplitPane) comp).getRightComponent());
-      }
-    }
-  }
-
-  public void removeExtraContainer(JComponent comp)
-  {
-    if (comp != null && comp != container) {
-      extraContainer.remove(comp);
-      comp.removeContainerListener(cl);
-    }
+    return context;
   }
 
   public void checkFlags()
@@ -149,8 +168,8 @@ public final class CommitableAndErrorFlagableContainer implements ErrorFlagable,
     } else {
       dataValid = true;
     }
-    Iterator<ErrorFlagable> iter = errorFlagables.iterator();
-    while (dataValid && iter.hasNext()) {
+    Iterator<Validateable> iter = validateables.iterator();
+    if (dataValid && iter.hasNext()) {
       dataValid &= iter.next().isDataValid();
     }
     if (dataValid && testValid != null) {
@@ -164,7 +183,7 @@ public final class CommitableAndErrorFlagableContainer implements ErrorFlagable,
     }
   }
 
-  public void componentAdded(Component c)
+  public void add(Object c)
   {
     if (c instanceof Commitable) {
       Commitable cc = ((Commitable) c);
@@ -174,32 +193,77 @@ public final class CommitableAndErrorFlagableContainer implements ErrorFlagable,
         commitables.add(cc);
       }
     }
-    if (c instanceof ErrorFlagable) {
-      ErrorFlagable ef = (ErrorFlagable) c;
-      if (!errorFlagables.contains(ef)) {
-        ef.addPropertyChangeListener(PROP_DATAVALID,
+    if (c instanceof Validateable) {
+      Validateable vf = (Validateable) c;
+      if (!validateables.contains(vf)) {
+        vf.addPropertyChangeListener(PROP_DATAVALID,
                                      (PropertyChangeListener) this::checkDataValid);
-        errorFlagables.add(ef);
+        validateables.add(vf);
       }
     }
     if (c instanceof JScrollPane) {
       addExtraContainer(((JScrollPane) c).getViewport());
     } else if (c instanceof JSplitPane) {
       addExtraContainer((JSplitPane) c);
+    } else if (c instanceof JTabbedPane) {
+      addExtraContainer((JTabbedPane) c);
+    } else if (c instanceof GlassPaneProvider) {
+      addExtraContainer(((GlassPaneProvider) c).getContentPanel());
+    } else if (c instanceof RootPaneContainer) {
+      addExtraContainer(((RootPaneContainer) c).getContentPane());
     }
   }
 
-  public void componentRemoved(Component c)
+  public void remove(Object c)
   {
     if (c instanceof Commitable) {
       ((Commitable) c).removePropertyChangeListener(PROP_DATACHANGED,
                                                     (PropertyChangeListener) this::checkDataChanged);
       commitables.remove((Commitable) c);
     }
-    if (c instanceof ErrorFlagable) {
-      ((ErrorFlagable) c).removePropertyChangeListener(PROP_DATAVALID,
-                                                       (PropertyChangeListener) this::checkDataValid);
-      errorFlagables.remove((ErrorFlagable) c);
+    if (c instanceof Validateable) {
+      ((Validateable) c).removePropertyChangeListener(PROP_DATAVALID,
+                                                      (PropertyChangeListener) this::checkDataValid);
+      validateables.remove((ErrorFlagable) c);
+    }
+    if (c instanceof JScrollPane) {
+      removeExtraContainer(((JScrollPane) c).getViewport());
+    } else if (c instanceof JSplitPane) {
+      removeExtraContainer((JSplitPane) c);
+    } else if (c instanceof JTabbedPane) {
+      removeExtraContainer((JTabbedPane) c);
+    } else if (c instanceof GlassPaneProvider) {
+      removeExtraContainer(((GlassPaneProvider) c).getContentPanel());
+    } else if (c instanceof RootPaneContainer) {
+      removeExtraContainer(((RootPaneContainer) c).getContentPane());
+    }
+  }
+
+  public void addExtraContainer(Container comp)
+  {
+    if (comp != null && comp != container && !extraContainer.contains(comp)) {
+      extraContainer.add(comp);
+      comp.addContainerListener(cl);
+      if (comp instanceof JViewport) {
+        add(((JViewport) comp).getView());
+      } else if (comp instanceof JSplitPane) {
+        add(((JSplitPane) comp).getLeftComponent());
+        add(((JSplitPane) comp).getRightComponent());
+      } else if (comp instanceof JTabbedPane) {
+        JTabbedPane tab = (JTabbedPane) comp;
+        for (int i = 0; i < tab.getTabCount(); ++i) {
+          add(tab.getComponentAt(i));
+        }
+      }
+    }
+  }
+
+  private void removeExtraContainer(Container comp)
+  {
+    if (comp != null && comp != container) {
+      extraContainer.remove(comp);
+      comp.removeContainerListener(cl);
+      remove(comp);
     }
   }
 
@@ -315,12 +379,18 @@ public final class CommitableAndErrorFlagableContainer implements ErrorFlagable,
 
   public List<Commitable> getCommitables()
   {
-    return Collections.unmodifiableList(commitables);
+    return Collections.unmodifiableList(new ArrayList<>(commitables));
   }
 
-  public List<ErrorFlagable> getErrorFlagables()
+  public List<Validateable> getValidateables()
   {
-    return Collections.unmodifiableList(errorFlagables);
+    return Collections.unmodifiableList(new ArrayList<>(validateables));
+  }
+
+  @Override
+  public String toString()
+  {
+    return "CommitableAndErrorFlagableContainer{" + "context=" + context + '}';
   }
 
 }
