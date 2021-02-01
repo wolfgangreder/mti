@@ -16,7 +16,7 @@
 package at.or.reder.mti.model.impl;
 
 import at.or.reder.dcc.util.Predicates;
-import at.or.reder.dcc.util.Utils;
+import at.or.reder.dcc.util.DCCUtils;
 import at.or.reder.mti.model.Contact;
 import at.or.reder.mti.model.Defect;
 import at.or.reder.mti.model.Entity;
@@ -92,12 +92,12 @@ public abstract class AbstractVehicle extends AbstractInventoryObject implements
     this.width = width;
     this.height = height;
     this.weight = weight;
-    this.serviceEntries = Utils.copyToUnmodifiableList(serviceEntries,
+    this.serviceEntries = DCCUtils.copyToUnmodifiableList(serviceEntries,
                                                        Predicates::isNotNull);
     this.decoder = decoder;
     this.address = address;
     this.consistsAddress = consistsAddress;
-    this.defect = Utils.copyToUnmodifiableList(defect,
+    this.defect = DCCUtils.copyToUnmodifiableList(defect,
                                                Predicates::isNotNull);
     this.gauge = gauge;
     if (lookupContent.isEmpty()) {

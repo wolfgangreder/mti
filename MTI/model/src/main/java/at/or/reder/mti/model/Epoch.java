@@ -15,7 +15,7 @@
  */
 package at.or.reder.mti.model;
 
-import at.or.reder.mti.model.utils.Localizable;
+import at.or.reder.dcc.util.Localizable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -81,7 +81,7 @@ public interface Epoch
     public Builder name(String lang,
                         String name) throws IllegalArgumentException, NullPointerException;
 
-    public Builder name(@NonNull Localizable names) throws NullPointerException;
+    public Builder name(@NonNull Localizable<? extends String> names) throws NullPointerException;
 
     /**
      * Setzt das erste Jahr der Epoch.
@@ -145,7 +145,7 @@ public interface Epoch
     public Builder comment(String lang,
                            String comment);
 
-    public Builder comment(Localizable comments);
+    public Builder comment(Localizable<? extends String> comments);
 
     public Epoch build();
 
@@ -181,7 +181,7 @@ public interface Epoch
    *
    * @return Name der Epoche
    */
-  public Localizable getName();
+  public Localizable<String> getName();
 
   /**
    * Erstes Jahr der Epoche
@@ -209,6 +209,6 @@ public interface Epoch
    *
    * @return Kommentar zur Epoche. Niemals {@code null}.
    */
-  public Localizable getComment();
+  public Localizable<String> getComment();
 
 }

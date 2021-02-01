@@ -17,7 +17,7 @@ package at.or.reder.mti.model.impl;
 
 import at.or.reder.mti.model.Entity;
 import at.or.reder.mti.model.EntityKind;
-import at.or.reder.mti.model.utils.Localizable;
+import at.or.reder.dcc.util.Localizable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

@@ -15,7 +15,6 @@
  */
 package at.or.reder.swing.model;
 
-import at.or.reder.swing.ModifiedCheckable;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,7 +28,7 @@ public abstract class AbstractErrorAndCommitableEnumTableModel<E extends Enum<E>
 
   private boolean dataValid = true;
   private boolean dataChanged = false;
-  private final PropertyChangeSupport2 pcs = new PropertyChangeSupport2(this);
+  private final MTIPropertyChangeSupport pcs = new MTIPropertyChangeSupport(this);
   protected final List<D> commited = new ArrayList<>();
   private Boolean internalDataChanged;
 
@@ -136,7 +135,8 @@ public abstract class AbstractErrorAndCommitableEnumTableModel<E extends Enum<E>
   }
 
   /**
-   * Vergleicht die Listen data und commited. Die Standardimplementation vergleicht die Elemente paarweise.
+   * Vergleicht die Listen data und commited.
+   * Die Standardimplementation vergleicht die Elemente paarweise.
    *
    * @param commited commited values
    * @param actual actual values
@@ -152,6 +152,21 @@ public abstract class AbstractErrorAndCommitableEnumTableModel<E extends Enum<E>
       D c = cgi.next();
       D d = dgi.next();
       result = c.isModified(d);
+    }
+    return result;
+  }
+
+  protected List<D> getModifiedData()
+  {
+    List<D> result = new ArrayList<>();
+    Iterator<D> cgi = commited.iterator();
+    Iterator<D> dgi = data.iterator();
+    while (cgi.hasNext()) {
+      D c = cgi.next();
+      D d = dgi.next();
+      if (c.isModified(d)) {
+        result.add(d);
+      }
     }
     return result;
   }

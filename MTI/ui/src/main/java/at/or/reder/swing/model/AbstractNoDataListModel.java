@@ -31,7 +31,7 @@ public abstract class AbstractNoDataListModel<I> implements ListModel<I>
   }
 
   @Override
-  public void addListDataListener(ListDataListener l)
+  public final void addListDataListener(ListDataListener l)
   {
     if (l != null) {
       listeners.add(l);
@@ -39,19 +39,19 @@ public abstract class AbstractNoDataListModel<I> implements ListModel<I>
   }
 
   @Override
-  public void removeListDataListener(ListDataListener l)
+  public final void removeListDataListener(ListDataListener l)
   {
     listeners.remove(l);
   }
 
-  protected void fireContentsChanged()
+  protected final void fireContentsChanged()
   {
     fireContentsChanged(0,
                         getSize() - 1);
   }
 
-  protected void fireContentsChanged(int indexFrom,
-                                     int indexTo)
+  protected final void fireContentsChanged(int indexFrom,
+                                           int indexTo)
   {
     ListDataEvent evt = new ListDataEvent(this,
                                           ListDataEvent.CONTENTS_CHANGED,
@@ -62,8 +62,8 @@ public abstract class AbstractNoDataListModel<I> implements ListModel<I>
     }
   }
 
-  protected void fireIntervalAdded(int indexFrom,
-                                   int indexTo)
+  protected final void fireIntervalAdded(int indexFrom,
+                                         int indexTo)
   {
     ListDataEvent evt = new ListDataEvent(this,
                                           ListDataEvent.INTERVAL_ADDED,
@@ -74,8 +74,8 @@ public abstract class AbstractNoDataListModel<I> implements ListModel<I>
     }
   }
 
-  protected void fireIntervalRemoved(int indexFrom,
-                                     int indexTo)
+  protected final void fireIntervalRemoved(int indexFrom,
+                                           int indexTo)
   {
     ListDataEvent evt = new ListDataEvent(this,
                                           ListDataEvent.INTERVAL_REMOVED,

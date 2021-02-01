@@ -15,7 +15,9 @@
  */
 package at.or.reder.swing;
 
+import at.or.reder.swing.model.Commitable;
 import at.or.reder.swing.model.EnumCheckboxModel;
+import at.or.reder.swing.model.ErrorFlagable;
 import java.awt.AWTEvent;
 import java.awt.Dimension;
 import java.awt.EventQueue;

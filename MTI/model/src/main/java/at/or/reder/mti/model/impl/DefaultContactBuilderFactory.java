@@ -16,7 +16,7 @@
 package at.or.reder.mti.model.impl;
 
 import at.or.reder.dcc.util.Predicates;
-import at.or.reder.dcc.util.Utils;
+import at.or.reder.dcc.util.DCCUtils;
 import at.or.reder.mti.model.Contact;
 import at.or.reder.mti.model.ContactType;
 import java.net.URL;
@@ -312,7 +312,7 @@ public final class DefaultContactBuilderFactory implements Contact.BuilderFactor
       this.shopAddress = shopAddress;
       this.phone1 = phone1;
       this.phone2 = phone2;
-      this.types = Utils.copyToUnmodifiableEnumSet(types,
+      this.types = DCCUtils.copyToUnmodifiableEnumSet(types,
                                                    ContactType.class,
                                                    Predicates::isNotNull);
       this.memo = memo;

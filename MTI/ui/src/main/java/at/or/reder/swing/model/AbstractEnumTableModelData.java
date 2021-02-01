@@ -65,16 +65,16 @@ public abstract class AbstractEnumTableModelData<E extends Enum<E>, D> extends A
   }
 
   /**
-   * Dient zum Ändern des Tabelleninhalts. Die Standardimplementation wirft eine {@code UnsupportedOperationException}. Soll ein
-   * TableModel mutierbar sein, muss entweder diese Methode oder {@link at.mountainsd.msdswing.models.AbstractEnumTableModel#setValueAt(java.lang.Object, int, java.lang.Enum)
-   * } überschrienben werden.
+   * Dient zum Ändern des Tabelleninhalts.
+   * Die Standardimplementation wirft eine {@code UnsupportedOperationException}.
+   * Soll ein TableModel mutierbar sein, muss entweder diese Methode oder {@link at.mountain_sd.gui.swing.models.AbstractEnumTableModel#setValueAt(java.lang.Object, int, java.lang.Enum) } überschrienben werden.
    *
    * @param newValue newvalue
    * @param data data
    * @param rowIndex rowIndex
    * @param col column
    * @return {@code true} falls ein Event ausgelöst werden soll.
-   * @see at.mountainsd.msdswing.models.AbstractEnumTableModel#setValueAt(java.lang.Object, int, java.lang.Enum)
+   * @see at.mountain_sd.gui.swing.models.AbstractEnumTableModel#setValueAt(java.lang.Object, int, java.lang.Enum)
    */
   protected boolean setValueAt(Object newValue,
                                D data,

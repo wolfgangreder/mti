@@ -15,6 +15,7 @@
  */
 package at.or.reder.swing;
 
+import at.or.reder.swing.model.GlassPaneProvider;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Graphics;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wolfgang Reder.
+ * Copyright 2017-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@ public final class AspectRatio extends Number
                                                                3);
   public static final AspectRatio ASPECT_9_16 = new AspectRatio(9,
                                                                 16);
+  public static final AspectRatio ASPECT_3_1 = new AspectRatio(3,
+                                                               1);
   public static final AspectRatio ASPECT_1_1 = new AspectRatio(1,
                                                                1);
   public static final AspectRatio ASPECT_KEEP = new AspectRatio(-1,

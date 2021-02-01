@@ -22,10 +22,10 @@ import at.or.reder.mti.model.api.Factories;
 import at.or.reder.mti.model.api.LocoStore;
 import at.or.reder.mti.model.api.StoreException;
 import at.or.reder.mti.ui.QuickInfoSavable;
-import at.or.reder.swing.Commitable;
-import at.or.reder.swing.CommitableAndErrorFlagableContainer;
 import at.or.reder.swing.GlassPaneTopComponent;
-import at.or.reder.swing.Validateable;
+import at.or.reder.swing.model.Commitable;
+import at.or.reder.swing.model.CommitableAndErrorFlagableContainer;
+import at.or.reder.swing.model.Validateable;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.util.UUID;
@@ -81,6 +81,8 @@ public final class LocoTopComponent extends GlassPaneTopComponent
     cef.addPropertyChangeListener(Validateable.PROP_DATAVALID,
                                   this::onDataModifiedChanged);
     initComponents();
+    tbMaster.add("NMRA",
+                 new NMRACVEditor());
     setName(Bundle.CTL_LocoTopComponent());
     setToolTipText(Bundle.HINT_LocoTopComponent());
   }
@@ -128,8 +130,15 @@ public final class LocoTopComponent extends GlassPaneTopComponent
   private void saveLoco() throws IOException
   {
     Locomotive.Builder builder = Factories.getLomotiveBuilderFactory().createBuilder();
+    builder.id(id);
     baseInfoPanel1.assignValues(builder);
-    cef.commit();
+    try {
+      LocoStore store = Factories.getStores().getLocoStore();
+      store.store(builder.build());
+      setLoco(store.get(id));
+    } catch (StoreException ex) {
+      throw new IOException(ex);
+    }
   }
 
   /** This method is called from within the constructor to

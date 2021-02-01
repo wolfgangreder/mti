@@ -38,7 +38,7 @@ public class XmlEntity implements XmlObject<Entity>
   @XmlID
   private UUID id;
   @XmlElement(name = "description")
-  private XmlLocalizable description;
+  private XmlStringLocalizable description;
   @XmlAttribute(name = "file-name")
   private String fileName;
   @XmlAttribute(name = "kind")
@@ -59,7 +59,7 @@ public class XmlEntity implements XmlObject<Entity>
   public XmlEntity(Entity e)
   {
     id = e.getId();
-    description = new XmlLocalizable(e.getDescription());
+    description = new XmlStringLocalizable(e.getDescription());
     fileName = e.getFileName();
     kind = e.getKind();
     mimeType = e.getMimeType();

@@ -66,7 +66,7 @@ public final class CornerButtonController
 
   };
   private final JTable table;
-  private final String prefix;
+  private String prefix;
   private final JButton cornerButton;
   private final Set<Integer> disabledColumns = new HashSet<>();
   private TableColumnModel colModel;
@@ -229,6 +229,16 @@ public final class CornerButtonController
     this._filter = filter;
   }
 
+  public void setPrefix(String prefix)
+  {
+    this.prefix = prefix;
+  }
+
+  public String getPrefix()
+  {
+    return prefix;
+  }
+
   private JButton createCornerButton()
   {
     JButton btn = new JButton(ImageUtilities.loadImageIcon("at/mountainsd/msdswing/models/colselector10.png",
@@ -376,9 +386,11 @@ public final class CornerButtonController
     if (model instanceof AbstractTableModel) {
       am = (AbstractTableModel) model;
     }
-    for (int i = 0; i < model.getColumnCount(); ++i) {
-      if (am == null || am.isColumnDisplayable(i)) {
-        pop.add(createMenuItem(i));
+    if (model != null) {
+      for (int i = 0; i < model.getColumnCount(); ++i) {
+        if (am == null || am.isColumnDisplayable(i)) {
+          pop.add(createMenuItem(i));
+        }
       }
     }
     JScrollPane pane = getScrollPane();
@@ -452,6 +464,7 @@ public final class CornerButtonController
     return true;
   }
 
+  @SuppressWarnings("UseSpecificCatch")
   private void createColumns(Properties props)
   {
     colModel.removeColumnModelListener(colModelListener);
@@ -486,7 +499,7 @@ public final class CornerButtonController
                   colModel.addColumn(col);
                 }
               }
-            } catch (Error | Exception th) {
+            } catch (Throwable th) {
               Exceptions.printStackTrace(th);
             }
           }

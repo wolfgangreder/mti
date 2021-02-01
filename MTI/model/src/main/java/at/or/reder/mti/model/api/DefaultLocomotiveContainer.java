@@ -16,7 +16,7 @@
 package at.or.reder.mti.model.api;
 
 import at.or.reder.dcc.util.Predicates;
-import at.or.reder.dcc.util.Utils;
+import at.or.reder.dcc.util.DCCUtils;
 import at.or.reder.mti.model.Contact;
 import at.or.reder.mti.model.Defect;
 import at.or.reder.mti.model.Entity;
@@ -48,7 +48,7 @@ public final class DefaultLocomotiveContainer implements LocomotiveContainer
 
   public DefaultLocomotiveContainer(Collection<? extends Locomotive> locomotives)
   {
-    this.locomotives = Utils.copyToUnmodifiableList(locomotives,
+    this.locomotives = DCCUtils.copyToUnmodifiableList(locomotives,
                                                     Predicates::isNotNull);
   }
 

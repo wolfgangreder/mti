@@ -33,10 +33,6 @@ import javax.swing.text.PlainDocument;
 import org.openide.util.ChangeSupport;
 import org.openide.util.Exceptions;
 
-/**
- *
- * @author Wolfgang Reder
- */
 public class MTIDocument extends PlainDocument
 {
 
@@ -46,7 +42,7 @@ public class MTIDocument extends PlainDocument
   private boolean changed;
   private boolean valid;
   private boolean trimText;
-  private final PropertyChangeSupport2 propChangeSupport = new PropertyChangeSupport2(this);
+  private final MTIPropertyChangeSupport propChangeSupport = new MTIPropertyChangeSupport(this);
   private final ChangeSupport changeSupport = new ChangeSupport(this);
   private int minLength = 0;
   private int maxLength = Integer.MAX_VALUE;
@@ -109,21 +105,14 @@ public class MTIDocument extends PlainDocument
   };
   private BiFunction<MTIDocument, String, Boolean> validChecker;
   private BiFunction<MTIDocument, String, Boolean> changedChecker;
-  private final ChangeDocumentListener cdl = new ChangeDocumentListener()
-  {
-    @Override
-    protected void changed(DocumentEvent e)
-    {
-      changeSupport.fireChange();
-    }
-
-  };
+  private final ChangeDocumentListener cdl = this::documentChanged;
 
   @SuppressWarnings("OverridableMethodCallInConstructor")
   public MTIDocument()
   {
-    innerCheckFlags();
     addDocumentListener(cdl);
+    original = getText();
+    innerCheckFlags();
   }
 
   @SuppressWarnings("OverridableMethodCallInConstructor")
@@ -133,6 +122,12 @@ public class MTIDocument extends PlainDocument
     addDocumentListener(cdl);
     original = getText();
     innerCheckFlags();
+  }
+
+  private void documentChanged(DocumentEvent evt)
+  {
+    checkFlagsAndFire();
+    changeSupport.fireChange();
   }
 
   public String getOriginal()

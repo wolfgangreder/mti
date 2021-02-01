@@ -255,7 +255,8 @@ public abstract class AbstractTableModel implements TableModel
   }
 
   /**
-   * Wird aufgerufen, bevor die registierten Event-Listener aufgerufen werden. Die Standardimplementierung hat keine funktion.
+   * Wird aufgerufen, bevor die registierten Event-Listener aufgerufen werden.
+   * Die Standardimplementierung hat keine funktion.
    *
    * @param evt event
    */
@@ -265,7 +266,8 @@ public abstract class AbstractTableModel implements TableModel
   }
 
   /**
-   * Wird aufgerufen, nachdem die registierten Event-Listener aufgerufen wurden. Die Standardimplementierung hat keine funktion.
+   * Wird aufgerufen, nachdem die registierten Event-Listener aufgerufen wurden.
+   * Die Standardimplementierung hat keine funktion.
    *
    * @param evt event
    */

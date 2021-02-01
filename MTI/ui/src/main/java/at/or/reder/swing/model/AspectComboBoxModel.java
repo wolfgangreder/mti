@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wolfgang Reder.
+ * Copyright 2017-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ public final class AspectComboBoxModel extends AbstractComboBoxModel<AspectRatio
     data.add(AspectRatio.ASPECT_3_4);
     data.add(AspectRatio.ASPECT_16_9);
     data.add(AspectRatio.ASPECT_9_16);
+    data.add(AspectRatio.ASPECT_3_1);
     data.add(AspectRatio.ASPECT_1_1);
     selected = AspectRatio.ASPECT_FREE;
   }

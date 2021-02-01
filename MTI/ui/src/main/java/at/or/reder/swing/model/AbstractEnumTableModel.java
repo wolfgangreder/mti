@@ -56,6 +56,20 @@ public abstract class AbstractEnumTableModel<E extends Enum<E>> extends Abstract
   }
 
   @Override
+  public E getColumnEnum(int columnIndex)
+  {
+    if (columnIndex < 0 || columnIndex >= columns.size()) {
+      return null;
+    }
+    for (E e : columns) {
+      if (e.ordinal() == columnIndex) {
+        return e;
+      }
+    }
+    return null;
+  }
+
+  @Override
   public int getColumnCount()
   {
     return columns.size();

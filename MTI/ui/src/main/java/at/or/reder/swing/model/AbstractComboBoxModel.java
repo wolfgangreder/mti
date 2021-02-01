@@ -17,27 +17,21 @@ package at.or.reder.swing.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-import javax.swing.ComboBoxModel;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 
-/**
- *
- * @author Wolfgang Reder
- */
-public abstract class AbstractComboBoxModel<E> implements ComboBoxModel<E>
+public abstract class AbstractComboBoxModel<I> extends AbstractNoDataComboBoxModel<I>
 {
 
-  protected final List<E> data = new ArrayList<>();
-  private final Set<ListDataListener> listener = new CopyOnWriteArraySet<>();
-  protected E selected;
+  protected final List<I> data = new ArrayList<>();
 
-  @Override
-  public final E getSelectedItem()
+  protected AbstractComboBoxModel()
   {
-    return selected;
+  }
+
+  protected AbstractComboBoxModel(List<I> data,
+                                  I selected)
+  {
+    this.data.addAll(data);
+    this.selected = selected;
   }
 
   @Override
@@ -47,81 +41,9 @@ public abstract class AbstractComboBoxModel<E> implements ComboBoxModel<E>
   }
 
   @Override
-  public final E getElementAt(int index)
+  public final I getElementAt(int index)
   {
     return data.get(index);
-  }
-
-  @Override
-  public final void addListDataListener(ListDataListener l)
-  {
-    if (l != null) {
-      listener.add(l);
-    }
-  }
-
-  @Override
-  public final void removeListDataListener(ListDataListener l)
-  {
-    listener.remove(l);
-  }
-
-  protected final void fireContentsChanged()
-  {
-    if (listener.isEmpty()) {
-      return;
-    }
-    ListDataEvent evt = new ListDataEvent(this,
-                                          ListDataEvent.CONTENTS_CHANGED,
-                                          0,
-                                          data.size());
-    for (ListDataListener l : listener) {
-      l.contentsChanged(evt);
-    }
-  }
-
-  protected final void fireSelectionChanged()
-  {
-    if (listener.isEmpty()) {
-      return;
-    }
-    ListDataEvent evt = new ListDataEvent(this,
-                                          ListDataEvent.CONTENTS_CHANGED,
-                                          -1,
-                                          -1);
-    for (ListDataListener l : listener) {
-      l.contentsChanged(evt);
-    }
-  }
-
-  protected final void fireIntervalAdded(int indexFrom,
-                                         int indexTo)
-  {
-    if (listener.isEmpty()) {
-      return;
-    }
-    ListDataEvent evt = new ListDataEvent(this,
-                                          ListDataEvent.INTERVAL_ADDED,
-                                          indexFrom,
-                                          indexTo);
-    for (ListDataListener l : listener) {
-      l.intervalAdded(evt);
-    }
-  }
-
-  protected final void fireIntervalRemoved(int indexFrom,
-                                           int indexTo)
-  {
-    if (listener.isEmpty()) {
-      return;
-    }
-    ListDataEvent evt = new ListDataEvent(this,
-                                          ListDataEvent.INTERVAL_REMOVED,
-                                          indexFrom,
-                                          indexTo);
-    for (ListDataListener l : listener) {
-      l.intervalRemoved(evt);
-    }
   }
 
 }

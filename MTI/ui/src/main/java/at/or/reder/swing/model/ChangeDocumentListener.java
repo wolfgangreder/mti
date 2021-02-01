@@ -18,25 +18,26 @@ package at.or.reder.swing.model;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-public abstract class ChangeDocumentListener implements DocumentListener
+@FunctionalInterface
+public interface ChangeDocumentListener extends DocumentListener
 {
 
-  protected abstract void changed(DocumentEvent e);
+  public void changed(DocumentEvent e);
 
   @Override
-  public void insertUpdate(DocumentEvent e)
+  public default void insertUpdate(DocumentEvent e)
   {
     changed(e);
   }
 
   @Override
-  public void removeUpdate(DocumentEvent e)
+  public default void removeUpdate(DocumentEvent e)
   {
     changed(e);
   }
 
   @Override
-  public void changedUpdate(DocumentEvent e)
+  public default void changedUpdate(DocumentEvent e)
   {
     changed(e);
   }

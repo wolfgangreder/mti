@@ -15,7 +15,6 @@
  */
 package at.or.reder.swing.model;
 
-import at.or.reder.swing.ModifiedCheckable;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,13 +22,12 @@ import java.util.List;
 import javax.swing.event.TableModelEvent;
 
 public abstract class AbstractErrorAndCommitableTableModel<D extends ModifiedCheckable<D>> extends AbstractTableModelData<D>
-        implements
-        ErrorAndCommitableTableModel
+        implements ErrorAndCommitableTableModel
 {
 
   private boolean dataValid = true;
   private boolean dataChanged = false;
-  private final PropertyChangeSupport2 pcs = new PropertyChangeSupport2(this);
+  private final MTIPropertyChangeSupport pcs = new MTIPropertyChangeSupport(this);
   protected final List<D> commited = new ArrayList<>();
   private Boolean internalDataChanged;
 
@@ -131,7 +129,8 @@ public abstract class AbstractErrorAndCommitableTableModel<D extends ModifiedChe
   }
 
   /**
-   * Vergleicht die Listen data und commited. Die Standardimplementation vergleicht die Elemente paarweise.
+   * Vergleicht die Listen data und commited.
+   * Die Standardimplementation vergleicht die Elemente paarweise.
    *
    * @param commited commited values
    * @param actual actual values

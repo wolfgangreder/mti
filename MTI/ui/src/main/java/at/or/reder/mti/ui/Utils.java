@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wolfgang Reder.
+ * Copyright 2017-2021 Wolfgang Reder.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package at.or.reder.mti.ui;
 
 import java.awt.Color;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -546,6 +547,16 @@ public final class Utils
                      alpha);
   }
 
+  public static boolean isHTTP(String www)
+  {
+    try {
+      return testIsHTTP(new URI(www)) == null;
+    } catch (URISyntaxException ex) {
+
+    }
+    return false;
+  }
+
   public static String testIsHTTP(URI www)
   {
     if (www != null) {
@@ -557,6 +568,15 @@ public final class Utils
       }
     }
     return null;
+  }
+
+  public static boolean isEmail(String str)
+  {
+    try {
+      return testIsEmail(new URI(str)) == null;
+    } catch (URISyntaxException ex) {
+    }
+    return false;
   }
 
   public static String testIsEmail(URI u)

@@ -15,6 +15,7 @@
  */
 package at.or.reder.swing;
 
+import at.or.reder.swing.model.Commitable;
 import java.util.EventObject;
 import javax.swing.ButtonModel;
 import javax.swing.JCheckBox;

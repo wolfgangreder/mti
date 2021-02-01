@@ -15,8 +15,6 @@
  */
 package at.or.reder.swing.model;
 
-import at.or.reder.swing.Commitable;
-import at.or.reder.swing.Validateable;
 import javax.swing.table.TableModel;
 
 public interface ErrorAndCommitableTableModel extends TableModel, Validateable, Commitable

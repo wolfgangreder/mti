@@ -28,7 +28,7 @@ public class AbstractListModel<I> extends AbstractNoDataListModel<I>
   {
   }
 
-  public AbstractListModel(Collection<I> data)
+  public AbstractListModel(Collection<? extends I> data)
   {
     if (data != null) {
       this.data.addAll(data);
@@ -36,13 +36,13 @@ public class AbstractListModel<I> extends AbstractNoDataListModel<I>
   }
 
   @Override
-  public int getSize()
+  public final int getSize()
   {
     return data.size();
   }
 
   @Override
-  public I getElementAt(int index)
+  public final I getElementAt(int index)
   {
     return data.get(index);
   }

@@ -15,6 +15,7 @@
  */
 package at.or.reder.swing;
 
+import at.or.reder.swing.model.NodeContainer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;

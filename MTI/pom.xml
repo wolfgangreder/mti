@@ -70,8 +70,8 @@
     <module>application</module>
     <module>model</module>
     <module>ui</module>
-    <module>zimo</module>
     <module>JaybirdSQL</module>
+    <module>../../zcan20</module>
   </modules>
 
   <properties>

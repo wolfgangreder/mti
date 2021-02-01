@@ -15,7 +15,7 @@
  */
 package at.or.reder.mti.ui.zsx;
 
-import at.or.reder.dcc.util.Utils;
+import at.or.reder.dcc.util.DCCUtils;
 import at.or.reder.mti.model.Epoch;
 import at.or.reder.mti.model.TractionSystem;
 import at.or.reder.mti.model.api.Factories;
@@ -140,7 +140,7 @@ public final class ZSXFile
   {
     File digestFile = new File(target,
                                target.getName() + ".sha512");
-    String strDigest = Utils.byteArray2HexString(digest);
+    String strDigest = DCCUtils.byteArray2HexString(digest);
     try (FileWriter writer = new FileWriter(digestFile,
                                             StandardCharsets.UTF_8)) {
       writer.write(strDigest);
@@ -201,7 +201,7 @@ public final class ZSXFile
     char[] buffer = new char[128];
     int read = reader.read(buffer);
     if (read == buffer.length) {
-      ByteBuffer bb = Utils.hexString2ByteBuffer(new String(buffer),
+      ByteBuffer bb = DCCUtils.hexString2ByteBuffer(new String(buffer),
                                                  null,
                                                  (char) 0);
       return bb.array();

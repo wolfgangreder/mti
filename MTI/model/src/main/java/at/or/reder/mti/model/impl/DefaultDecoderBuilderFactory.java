@@ -16,7 +16,7 @@
 package at.or.reder.mti.model.impl;
 
 import at.or.reder.dcc.util.Predicates;
-import at.or.reder.dcc.util.Utils;
+import at.or.reder.dcc.util.DCCUtils;
 import at.or.reder.mti.model.Contact;
 import at.or.reder.mti.model.Decoder;
 import at.or.reder.mti.model.Entity;
@@ -259,7 +259,7 @@ public final class DefaultDecoderBuilderFactory implements Decoder.BuilderFactor
       this.condition = condition;
       this.dateOfPurchase = dateOfPurchase;
       this.description = description;
-      this.entities = Utils.copyToUnmodifiableList(entities,
+      this.entities = DCCUtils.copyToUnmodifiableList(entities,
                                                    Predicates::isNotNull);
       this.id = id;
       this.lastModified = lastModified;

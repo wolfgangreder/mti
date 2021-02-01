@@ -39,7 +39,7 @@ public class XmlEpoch implements XmlObject<Epoch>
   @XmlAttribute(name = "id")
   private String id;
   @XmlElement(name = "name")
-  private XmlLocalizable name;
+  private XmlStringLocalizable name;
   @XmlAttribute(name = "year-from")
   private int yearFrom;
   @XmlAttribute(name = "year-to")
@@ -47,7 +47,7 @@ public class XmlEpoch implements XmlObject<Epoch>
   @XmlElement(name = "countries") // Jackson mag @XmlList nicht, darum wird das hier simuliert
   private String countries;
   @XmlElement(name = "comment")
-  private XmlLocalizable comment;
+  private XmlStringLocalizable comment;
 
   public XmlEpoch()
   {
@@ -57,7 +57,7 @@ public class XmlEpoch implements XmlObject<Epoch>
   {
     id = Objects.requireNonNull(epoch,
                                 "epoch is null").getId().toString();
-    name = new XmlLocalizable(epoch.getName());
+    name = new XmlStringLocalizable(epoch.getName());
     yearFrom = epoch.getYearFrom();
     yearTo = epoch.getYearTo();
     Set<String> c = epoch.getCountries();
@@ -66,7 +66,7 @@ public class XmlEpoch implements XmlObject<Epoch>
               filter((country) -> country != null && !country.isBlank()).
               collect(Collectors.joining(" "));
     }
-    comment = new XmlLocalizable(epoch.getComment());
+    comment = new XmlStringLocalizable(epoch.getComment());
   }
 
   @Override

@@ -90,6 +90,11 @@
       <artifactId>org-openide-util</artifactId>
       <version>${netbeans.version}</version>
     </dependency>
+    <dependency>
+      <groupId>at.or.reder</groupId>
+      <artifactId>zcan20</artifactId>
+      <version>2021.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

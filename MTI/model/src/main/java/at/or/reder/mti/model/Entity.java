@@ -15,7 +15,7 @@
  */
 package at.or.reder.mti.model;
 
-import at.or.reder.mti.model.utils.Localizable;
+import at.or.reder.dcc.util.Localizable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -64,7 +64,7 @@ public interface Entity extends Lookup.Provider
      * @param descr
      * @return {@code this}
      */
-    public Entity.Builder description(Localizable descr);
+    public Entity.Builder description(Localizable<? extends String> descr);
 
     public Entity.Builder description(String lang,
                                       String desc);
@@ -146,7 +146,7 @@ public interface Entity extends Lookup.Provider
    *
    * @return niemals {@code null}
    */
-  public Localizable getDescription();
+  public Localizable<String> getDescription();
 
   /**
    * Mime-Typ

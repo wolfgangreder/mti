@@ -20,6 +20,11 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import org.netbeans.api.annotations.common.NonNull;
 
+/**
+ *
+ * @author reder
+ * @param <E> e
+ */
 public interface EnumTableModel<E extends Enum<E>> extends TableModel
 {
 
@@ -38,6 +43,8 @@ public interface EnumTableModel<E extends Enum<E>> extends TableModel
     }
     return null;
   }
+
+  public E getColumnEnum(int columnIndex);
 
   public String getColumnName(@NonNull E col);
 

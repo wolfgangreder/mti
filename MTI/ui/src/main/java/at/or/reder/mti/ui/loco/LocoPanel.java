@@ -16,9 +16,9 @@
 package at.or.reder.mti.ui.loco;
 
 import at.or.reder.mti.model.Locomotive;
-import at.or.reder.swing.Commitable;
-import at.or.reder.swing.CommitableAndErrorFlagableContainer;
-import at.or.reder.swing.ErrorFlagable;
+import at.or.reder.swing.model.Commitable;
+import at.or.reder.swing.model.CommitableAndErrorFlagableContainer;
+import at.or.reder.swing.model.ErrorFlagable;
 import java.util.function.Supplier;
 import javax.swing.JPanel;
 import javax.swing.border.Border;

@@ -15,7 +15,9 @@
  */
 package at.or.reder.swing;
 
+import at.or.reder.swing.model.Commitable;
 import at.or.reder.swing.model.ErrorAndCommitableTableModel;
+import at.or.reder.swing.model.ErrorFlagable;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.border.Border;

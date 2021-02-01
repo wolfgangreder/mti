@@ -15,8 +15,8 @@
  */
 package at.or.reder.mti.jaybirdsql;
 
+import at.or.reder.dcc.util.Localizable;
 import at.or.reder.mti.model.api.StoreException;
-import at.or.reder.mti.model.utils.Localizable;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -113,16 +113,16 @@ public final class LocalizableStore extends AbstractStore implements FBStore
 
   public void storeLocalizables(Connection conn,
                                 String key,
-                                Map<UUID, Localizable> locToStore) throws SQLException, StoreException
+                                Map<UUID, Localizable<? extends String>> locToStore) throws SQLException, StoreException
   {
     try (PreparedStatement stmt = conn.prepareStatement("update or insert into localisations\n"
                                                         + "(key,id,lang,val)values(?,?,?,?) matching (id,key,lang)")) {
       stmt.setString(1,
                      key);
-      for (Map.Entry<UUID, Localizable> e : locToStore.entrySet()) {
+      for (Map.Entry<UUID, Localizable<? extends String>> e : locToStore.entrySet()) {
         stmt.setString(2,
                        e.getKey().toString());
-        for (Map.Entry<String, String> v : e.getValue().getValues().entrySet()) {
+        for (Map.Entry<String, ? extends String> v : e.getValue().getValues().entrySet()) {
           if (v.getKey() != null && !v.getKey().isBlank()) {
             stmt.setString(3,
                            v.getKey());

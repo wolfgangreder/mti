@@ -15,13 +15,14 @@
  */
 package at.or.reder.mti.model.impl;
 
-import at.or.reder.dcc.util.Utils;
+import at.or.reder.dcc.util.Localizable;
+import at.or.reder.dcc.util.StringLocalizable;
+import at.or.reder.dcc.util.DCCUtils;
 import at.or.reder.mti.model.Epoch;
 import at.or.reder.mti.model.api.EpochContainer;
 import at.or.reder.mti.model.api.Factories;
 import at.or.reder.mti.model.api.StreamFormat;
 import at.or.reder.mti.model.api.Streamer;
-import at.or.reder.mti.model.utils.Localizable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -52,10 +53,9 @@ public final class DefaultEpochBuilderFactory implements Epoch.BuilderFactory
   @Override
   public List<Epoch> getDefaultValues() throws IOException
   {
-    InputStream is = getClass().getResourceAsStream("/at/or/reder/mti/model/epoch.default.json");
+    InputStream is = getClass().getResourceAsStream("/at/or/reder/mti/model/epoch.default.xml");
     if (is != null) {
-
-      Streamer<EpochContainer> streamer = Factories.getStreamer(StreamFormat.JSON,
+      Streamer<EpochContainer> streamer = Factories.getStreamer(StreamFormat.XML,
                                                                 EpochContainer.class);
       if (streamer != null) {
         return streamer.unmarshal(is);
@@ -68,11 +68,11 @@ public final class DefaultEpochBuilderFactory implements Epoch.BuilderFactory
   {
 
     private UUID id;
-    private final Localizable name = new Localizable(true);
+    private final Localizable<String> name = new StringLocalizable(true);
     private int yearFrom;
     private Integer yearTo;
     private final Set<String> countries = new HashSet<>();
-    private final Localizable comment = new Localizable(true);
+    private final Localizable<String> comment = new StringLocalizable(true);
 
     @Override
     public Epoch.Builder copy(Epoch toCopy) throws NullPointerException
@@ -107,10 +107,10 @@ public final class DefaultEpochBuilderFactory implements Epoch.BuilderFactory
     }
 
     @Override
-    public Epoch.Builder name(Localizable names) throws NullPointerException
+    public Epoch.Builder name(Localizable<? extends String> names) throws NullPointerException
     {
       this.name.getValues().clear();
-      for (Map.Entry<String, String> e : names.getValues().entrySet()) {
+      for (Map.Entry<String, ? extends String> e : names.getValues().entrySet()) {
         name(e.getKey(),
              e.getValue());
       }
@@ -118,10 +118,10 @@ public final class DefaultEpochBuilderFactory implements Epoch.BuilderFactory
     }
 
     @Override
-    public Epoch.Builder comment(Localizable comments)
+    public Epoch.Builder comment(Localizable<? extends String> comments)
     {
       this.comment.getValues().clear();
-      for (Map.Entry<String, String> e : comments.getValues().entrySet()) {
+      for (Map.Entry<String, ? extends String> e : comments.getValues().entrySet()) {
         comment(e.getKey(),
                 e.getValue());
       }
@@ -216,24 +216,24 @@ public final class DefaultEpochBuilderFactory implements Epoch.BuilderFactory
   {
 
     private final UUID id;
-    private final Localizable name;
+    private final Localizable<String> name;
     private final int yearFrom;
     private final Integer yearTo;
     private final Set<String> countries;
-    private final Localizable comment;
+    private final Localizable<String> comment;
 
     public DefaultEpoch(UUID id,
-                        Localizable name,
+                        Localizable<String> name,
                         int yearFrom,
                         Integer yearTo,
                         Set<String> countries,
-                        Localizable comment)
+                        Localizable<String> comment)
     {
       this.id = id;
       this.name = name.toImutable();
       this.yearFrom = yearFrom;
       this.yearTo = yearTo;
-      this.countries = Utils.copyToUnmodifiableSet(countries,
+      this.countries = DCCUtils.copyToUnmodifiableSet(countries,
                                                    null);
       this.comment = comment.toImutable();
     }
@@ -245,7 +245,7 @@ public final class DefaultEpochBuilderFactory implements Epoch.BuilderFactory
     }
 
     @Override
-    public Localizable getName()
+    public Localizable<String> getName()
     {
       return name;
     }
@@ -269,7 +269,7 @@ public final class DefaultEpochBuilderFactory implements Epoch.BuilderFactory
     }
 
     @Override
-    public Localizable getComment()
+    public Localizable<String> getComment()
     {
       return comment;
     }

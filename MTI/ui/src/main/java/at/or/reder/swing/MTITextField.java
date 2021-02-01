@@ -15,6 +15,8 @@
  */
 package at.or.reder.swing;
 
+import at.or.reder.swing.model.Commitable;
+import at.or.reder.swing.model.ErrorFlagable;
 import at.or.reder.swing.model.MTIDocument;
 import java.awt.Graphics;
 import java.beans.BeanProperty;
